@@ -1,0 +1,211 @@
+{
+  "users": [
+    {
+      "id": "1",
+      "username": "username1",
+      "email": "email1",
+      "password": "password1",
+      "phoneNumber": "+375442352658",
+      "registrationDate": "2024-02-20 23:17:59.000000",
+      "role": "user",
+      "emailVerified": true,
+      "phoneNumberVerified": true,
+      "enableNotifications": true,
+      "enableShowStatus": true,
+      "enableShowEmail": true,
+      "enablePromotionalNotifications": true
+    },
+    {
+        "id": "2",
+        "username": "username2",
+        "email": "email2",
+        "password": "password2",
+        "phoneNumber": "+375447897651",
+        "registrationDate": "2024-01-12 23:24:17.196633",
+        "role": "admin",
+        "emailVerified": true,
+        "phoneNumberVerified": true,
+        "enableNotifications": true,
+        "enableShowStatus": true,
+        "enableShowEmail": true,
+        "enablePromotionalNotifications": true
+      }
+  ],
+  "lots": [
+    {
+      "id": "1",
+      "title": "Apples from farm",
+      "description": "Apples from my farm near Bukhara, delicious and sweet.",
+      "quantity": 10000,
+      "pricePerTon": 1.2,
+      "currency":"BYN",
+      "creationDate": "2024-01-12 23:24:17.196633",
+      "expiration": "2592000000",
+      "productCategory": {
+        "id": 1,
+        "title": "Fruits",
+        "productType": {
+          "id": 1,
+          "title": "Apples"
+        }
+      },
+      "lotType": "sell",
+      "user": {
+        "id":2,
+        "username": "username2",
+        "email": "email2",
+        "phoneNumber": "+375447897651"
+      },
+      "location": {
+        "id":1,
+        "country":"Belarus",
+        "region":"Minsk region",
+        "latitude":"53.902284",
+        "longitude":"27.561831"
+      },
+      "tags": [
+        {
+          "id": 1,
+          "title": "fresh"
+        },
+        {
+          "id":2,
+          "title":"wax"
+        }
+      ],
+      "images":[
+          {
+            "id":1,
+            "name":"0776a0db-200e-40ca-a353-980b92785346.jpg"
+          },
+          {
+            "id":2,
+            "name":"77d4dc59-3013-41aa-8a7b-cb27cb6fa425.jpg"
+          },
+          {
+            "id":3,
+            "name":"e7933b36-1d04-4d5a-ae3d-c4a47964dd06.jpg"
+          }
+      ]
+    },
+    {
+        "id": "2",
+        "title": "Grapes from farm",
+        "description": "Gpapes from my farm near Minsk.",
+        "quantity": 10123,
+        "pricePerTon": 1.8,
+        "currency":"USD",
+        "creationDate": "2024-01-12 23:24:17.196633",
+        "expiration": "2592000000",
+        "productCategory": {
+          "id": 1,
+          "title": "Fruits",
+          "productType": {
+            "id": 1,
+            "title": "Grapes"
+          }
+        },
+        "lotType": "buy",
+        "user": {
+          "id":1,
+          "username": "username1",
+          "email": "email1",
+          "phoneNumber": "+375442352658"
+        },
+        "location": {
+          "id":1,
+          "country":"Belarus",
+          "region":"Minsk region",
+          "latitude":"53.902284",
+          "longitude":"27.561831"
+        },
+        "tags": [
+          {
+            "id": 1,
+            "title": "fresh"
+          }
+        ],
+        "images":[
+          {
+            "id":4,
+            "name":"e7933b36-1d04-4d5a-ae3d-c4a47964dd06.jpg"
+          }
+      ]
+      }
+  ],
+  "productCategories": [
+    {
+      "id": 1,
+      "title": "Fruits"
+    },
+    {
+      "id": 2,
+      "title": "Vegetables"
+    },
+    {
+      "id": 3,
+      "title": "Crops"
+    },
+    {
+      "id": 4,
+      "title": "Dry fruits"
+    }
+  ],
+  "productTypes":[
+    {
+        "id":1,
+        "title":"Apples",
+        "productCategoryId":1
+    },
+    {
+        "id":2,
+        "title":"Cpricots",
+        "productCategoryId":1
+    },
+    {
+        "id":3,
+        "title":"Cherries",
+        "productCategoryId":1
+    },
+    {
+        "id":4,
+        "title":"Cucumbers",
+        "productCategoryId":2
+    },
+    {
+        "id":5,
+        "title":"Onion",
+        "productCategoryId":2
+    },
+    {
+        "id":6,
+        "title":"Corn",
+        "productCategoryId":3
+    },
+    {
+        "id":7,
+        "title":"Rice",
+        "productCategoryId":3
+    },
+    {
+        "id":8,
+        "title":"Wheat",
+        "productCategoryId":3
+    },
+    {
+        "id":9,
+        "title":"Almond",
+        "productCategoryId":4
+    },
+    {
+        "id":10,
+        "title":"Walnuts",
+        "productCategoryId":4
+    },
+    {
+        "id":11,
+        "title":"Dried Apricots",
+        "productCategoryId":4
+    }
+  ]
+}
