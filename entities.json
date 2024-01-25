@@ -6,7 +6,7 @@
       "email": "email1",
       "password": "hashed",
       "phoneNumber": "+375442352658",
-      "registrationDate": "2024-02-20 23:17:59.000000",
+      "registrationDate": "2024-01-21T13:59:36.139962600Z",
       "emailVerified": true
     },
     {
@@ -15,7 +15,7 @@
       "email": "email2",
       "password": "hashed",
       "phoneNumber": "+375447897651",
-      "registrationDate": "2024-01-12 23:24:17.196633",
+      "registrationDate": "2024-01-22T13:59:36.139962600Z",
       "emailVerified": true
     }
   ],
@@ -26,7 +26,7 @@
       "email": "email1",
       "password": "hashed",
       "phoneNumber": "+375442352658",
-      "registrationDate": "2024-02-20 23:17:59.000000",
+      "registrationDate": "2024-01-12T13:59:36.139962600Z",
       "emailVerified": true
     }
   ],
@@ -38,8 +38,8 @@
       "quantity": 10000,
       "pricePerTon": 1.2,
       "currency": "BYN",
-      "creationDate": "2024-01-12 23:24:17.196633",
-      "expirationDate": "2024-01-15 23:24:17.196633",
+      "creationDate": "2024-01-25T13:59:36.139962600Z",
+      "expirationDate": "2024-01-29T13:59:36.139962600Z",
       "productCategory": {
         "id": 5,
         "title": "Apples",
@@ -91,8 +91,8 @@
       "quantity": 10123,
       "pricePerTon": 1.8,
       "currency": "USD",
-      "creationDate": "2024-01-12 23:24:17.196633",
-      "expirationDate": "2024-01-15 23:24:17.196633",
+      "creationDate": "2024-01-25T13:59:36.139962600Z",
+      "expirationDate": "2024-02-12T13:59:36.139962600Z",
       "productCategory":{
         "id": 5,
         "title": "Apples",
