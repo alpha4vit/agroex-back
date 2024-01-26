@@ -1,0 +1,20 @@
+[
+  {
+    "id": 4,
+    "username": "roman2321",
+    "email": "roman2",
+    "password": null,
+    "phoneNumber": "+980231321",
+    "registrationDate": "2024-01-26T15:49:19.934787500Z",
+    "emailVerified": false
+  },
+  {
+    "id": 5,
+    "username": "roman2",
+    "email": "roman2",
+    "password": "roman2",
+    "phoneNumber": "+980231321",
+    "registrationDate": "2024-01-26T15:52:08.882286600Z",
+    "emailVerified": false
+  }
+]
