@@ -1,0 +1,19 @@
+package com.vention.agroex.service;
+
+import com.vention.agroex.entity.Lot;
+import org.springframework.stereotype.Service;
+
+import java.util.List;
+
+@Service
+public interface LotService {
+    Lot save(Lot lot);
+
+    Lot findById(Long id);
+
+    void deleteById(Long id);
+
+    List<Lot> findAll();
+
+    Lot update(Long id, Lot lot);
+}
