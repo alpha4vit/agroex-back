@@ -1,8 +1,6 @@
 package com.vention.agroex.exception.handler;
 
-import com.vention.agroex.exception.LotListInitializationException;
-import com.vention.agroex.exception.LotListSavingException;
-import com.vention.agroex.exception.NoSuchLotException;
+import com.vention.agroex.exception.*;
 import com.vention.agroex.model.ExceptionResponse;
 import org.springframework.http.HttpStatus;
 import org.springframework.http.ResponseEntity;
@@ -20,6 +18,9 @@ public class CustomExceptionHandler extends ResponseEntityExceptionHandler {
             case NoSuchLotException e -> createResponse(e, HttpStatus.NOT_FOUND);
             case LotListInitializationException e -> createResponse(e, HttpStatus.INTERNAL_SERVER_ERROR);
             case LotListSavingException e -> createResponse(e, HttpStatus.INTERNAL_SERVER_ERROR);
+            case NotFoundException e -> createResponse(e, HttpStatus.NOT_FOUND);
+            case JsonIOException e -> createResponse(e, HttpStatus.INTERNAL_SERVER_ERROR);
+            case UserListInitializationException e -> createResponse(e, HttpStatus.INTERNAL_SERVER_ERROR);
             default -> createResponse(exception, HttpStatus.INTERNAL_SERVER_ERROR);
         };
     }
