@@ -1,7 +1,6 @@
 package com.vention.agroex.dto;
 
 import com.fasterxml.jackson.annotation.JsonProperty;
-import jakarta.persistence.Id;
 import lombok.*;
 
 import java.time.Instant;
@@ -13,7 +12,6 @@ import java.time.Instant;
 @Builder
 public class UserDTO {
 
-    @Id
     private Long id;
 
     private String username;

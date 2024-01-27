@@ -5,6 +5,7 @@ import com.vention.agroex.entity.User;
 import com.vention.agroex.service.UserService;
 import com.vention.agroex.util.mapper.UserMapper;
 import com.vention.agroex.util.validator.UserValidator;
+import io.swagger.v3.oas.annotations.tags.Tag;
 import jakarta.validation.Valid;
 import lombok.RequiredArgsConstructor;
 import org.springframework.http.HttpStatus;
@@ -17,6 +18,7 @@ import java.util.List;
 @RestController
 @RequiredArgsConstructor
 @RequestMapping("/users")
+@Tag(name = "User controller")
 public class UserController {
 
     private final UserService userService;
