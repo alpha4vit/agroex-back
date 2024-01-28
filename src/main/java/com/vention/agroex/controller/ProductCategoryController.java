@@ -2,9 +2,11 @@ package com.vention.agroex.controller;
 
 import com.vention.agroex.entity.ProductCategory;
 import com.vention.agroex.service.ProductCategoryService;
+import com.vention.agroex.util.validator.ProductCategoryValidator;
 import io.swagger.v3.oas.annotations.tags.Tag;
 import lombok.RequiredArgsConstructor;
 import org.springframework.http.ResponseEntity;
+import org.springframework.validation.BindingResult;
 import org.springframework.web.bind.annotation.*;
 
 import java.util.List;
@@ -16,15 +18,21 @@ import java.util.List;
 public class ProductCategoryController {
 
     private final ProductCategoryService productCategoryService;
+    private final ProductCategoryValidator productCategoryValidator;
 
     @PostMapping()
-    public ResponseEntity<ProductCategory> save(@RequestBody ProductCategory productCategory) {
+    public ResponseEntity<ProductCategory> save(@RequestBody ProductCategory productCategory,
+                                                BindingResult bindingResult) {
+        productCategoryValidator.validate(productCategory, bindingResult);
         var savedProductCategory = productCategoryService.save(productCategory);
         return ResponseEntity.ok(savedProductCategory);
     }
 
     @PutMapping("/{id}")
-    public ResponseEntity<ProductCategory> update(@PathVariable Long id, @RequestBody ProductCategory productCategory) {
+    public ResponseEntity<ProductCategory> update(@PathVariable Long id,
+                                                  @RequestBody ProductCategory productCategory,
+                                                  BindingResult bindingResult) {
+        productCategoryValidator.validate(productCategory, bindingResult);
         var updatedProductCategory = productCategoryService.update(id, productCategory);
         return ResponseEntity.ok(updatedProductCategory);
     }

@@ -43,4 +43,5 @@ public class LotServiceImpl implements LotService {
     public Lot update(Lot lot) {
         return lotRepository.save(lot);
     }
+
 }

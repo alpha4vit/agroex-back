@@ -62,15 +62,21 @@ public class Lot {
     private String lotType;
 
     @ManyToOne
+    @JoinColumn(name = "user_id")
     private User user;
 
     @ManyToOne(cascade = CascadeType.ALL)
     private Location location;
 
-    @ElementCollection
+    @ManyToMany(cascade = CascadeType.ALL)
+    @JoinTable(
+            name = "lot_tag",
+            joinColumns = @JoinColumn(name = "lot_id"),
+            inverseJoinColumns = @JoinColumn(name = "tag_id"),
+            uniqueConstraints = @UniqueConstraint(columnNames = {"lot_id", "tag_id"}))
     private List<Tag> tags;
 
-    @OneToMany(cascade = CascadeType.ALL)
+    @OneToMany
     private List<Image> images;
 
 }

@@ -4,9 +4,12 @@ import com.vention.agroex.dto.LotDTO;
 import com.vention.agroex.entity.Lot;
 import com.vention.agroex.service.LotService;
 import com.vention.agroex.util.mapper.LotMapper;
+import com.vention.agroex.util.validator.LotDTOValidator;
 import io.swagger.v3.oas.annotations.tags.Tag;
+import jakarta.validation.Valid;
 import lombok.RequiredArgsConstructor;
 import org.springframework.http.ResponseEntity;
+import org.springframework.validation.BindingResult;
 import org.springframework.web.bind.annotation.*;
 
 import java.util.List;
@@ -19,16 +22,22 @@ public class LotController {
 
     private final LotService lotService;
     private final LotMapper lotMapper;
+    private final LotDTOValidator lotDTOValidator;
 
     @PostMapping
-    public ResponseEntity<LotDTO> save(@RequestBody LotDTO lotDTO) {
+    public ResponseEntity<LotDTO> save(@RequestBody @Valid LotDTO lotDTO,
+                                       BindingResult bindingResult) {
+        lotDTOValidator.validate(lotDTO, bindingResult);
         Lot entity = lotMapper.toEntity(lotDTO);
         entity = lotService.save(entity);
         return ResponseEntity.ok(lotMapper.toDTO(entity));
     }
 
-    @PutMapping("/{id}")
-    public ResponseEntity<LotDTO> update(@PathVariable Long id, @RequestBody LotDTO lotDTO) {
+    @PutMapping({"/{id}"})
+    public ResponseEntity<LotDTO> update(@PathVariable Long id,
+                                         @RequestBody @Valid LotDTO lotDTO,
+                                         BindingResult bindingResult) {
+        lotDTOValidator.validate(lotDTO, bindingResult);
         Lot entity = lotService.getById(id);
         entity = lotMapper.update(entity, lotDTO);
         entity = lotService.update(entity);
@@ -41,7 +50,7 @@ public class LotController {
         return ResponseEntity.ok(lotMapper.toDTO(fetchedLot));
     }
 
-    @GetMapping
+    @GetMapping()
     public ResponseEntity<List<LotDTO>> findAll() {
         List<Lot> fetchedLotsList = lotService.getAll();
         return ResponseEntity.ok(lotMapper.toDTOs(fetchedLotsList));

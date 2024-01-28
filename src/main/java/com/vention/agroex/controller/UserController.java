@@ -4,7 +4,8 @@ import com.vention.agroex.dto.UserDTO;
 import com.vention.agroex.entity.User;
 import com.vention.agroex.service.UserService;
 import com.vention.agroex.util.mapper.UserMapper;
-import com.vention.agroex.util.validator.UserValidator;
+import com.vention.agroex.util.validator.UserDTOCreateValidator;
+import com.vention.agroex.util.validator.UserDTOUpdateValidator;
 import io.swagger.v3.oas.annotations.tags.Tag;
 import jakarta.validation.Valid;
 import lombok.RequiredArgsConstructor;
@@ -23,7 +24,8 @@ public class UserController {
 
     private final UserService userService;
     private final UserMapper userMapper;
-    private final UserValidator userValidator;
+    private final UserDTOCreateValidator userDTOCreateValidator;
+    private final UserDTOUpdateValidator userDTOUpdateValidator;
 
     @GetMapping
     public ResponseEntity<List<UserDTO>> getAll() {
@@ -39,7 +41,7 @@ public class UserController {
     @PostMapping
     public ResponseEntity<UserDTO> createUser(@RequestBody @Valid UserDTO userDTO,
                                               BindingResult bindingResult) {
-        userValidator.validate(userDTO, bindingResult);
+        userDTOCreateValidator.validate(userDTO, bindingResult);
         User entity = userMapper.toEntity(userDTO);
         entity = userService.save(entity);
         return ResponseEntity.ok(userMapper.toDTO(entity));
@@ -56,7 +58,8 @@ public class UserController {
     public ResponseEntity<UserDTO> updateUser(@PathVariable("id") Long id,
                                               @RequestBody @Valid UserDTO userDTO,
                                               BindingResult bindingResult) {
-        userValidator.validate(userDTO, bindingResult);
+        userDTO.setId(id);
+        userDTOUpdateValidator.validate(userDTO, bindingResult);
         User entity = userService.getById(id);
         entity = userMapper.update(entity, userDTO);
         entity = userService.update(entity);
