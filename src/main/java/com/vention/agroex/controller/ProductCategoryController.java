@@ -2,6 +2,7 @@ package com.vention.agroex.controller;
 
 import com.vention.agroex.entity.ProductCategory;
 import com.vention.agroex.service.ProductCategoryService;
+import io.swagger.v3.oas.annotations.tags.Tag;
 import lombok.RequiredArgsConstructor;
 import org.springframework.http.ResponseEntity;
 import org.springframework.web.bind.annotation.*;
@@ -11,6 +12,7 @@ import java.util.List;
 @RestController
 @RequestMapping("/categories")
 @RequiredArgsConstructor
+@Tag(name = "Product Category Controller")
 public class ProductCategoryController {
 
     private final ProductCategoryService productCategoryService;

@@ -24,7 +24,7 @@ public class UserDTO {
     private String phoneNumber;
 
     @JsonProperty(access = JsonProperty.Access.READ_ONLY)
-    private Instant registrationDate;
+    private Instant creationDate;
 
     @JsonProperty(access = JsonProperty.Access.READ_ONLY)
     private Boolean emailVerified;

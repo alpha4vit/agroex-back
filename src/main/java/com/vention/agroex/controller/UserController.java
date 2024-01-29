@@ -26,19 +26,19 @@ public class UserController {
     private final UserValidator userValidator;
 
     @GetMapping
-    public ResponseEntity<List<UserDTO>> getAll(){
+    public ResponseEntity<List<UserDTO>> getAll() {
         return ResponseEntity.ok(userMapper.toDtos(userService.getAll()));
     }
 
     @GetMapping("/{id}")
-    public ResponseEntity<UserDTO> getById(@PathVariable("id") Long id){
-        var user = userService.getById(id);
+    public ResponseEntity<UserDTO> getById(@PathVariable("id") Long id) {
+        User user = userService.getById(id);
         return ResponseEntity.ok(userMapper.toDTO(user));
     }
 
     @PostMapping
     public ResponseEntity<UserDTO> createUser(@RequestBody @Valid UserDTO userDTO,
-                                              BindingResult bindingResult){
+                                              BindingResult bindingResult) {
         userValidator.validate(userDTO, bindingResult);
         User entity = userMapper.toEntity(userDTO);
         entity = userService.save(entity);
@@ -47,18 +47,22 @@ public class UserController {
 
     @DeleteMapping("/{id}")
     @ResponseStatus(HttpStatus.OK)
-    public void deleteUserById(@PathVariable("id") Long id){
+    public ResponseEntity<Long> deleteUserById(@PathVariable("id") Long id) {
         userService.deleteById(id);
+        return ResponseEntity.ok(id);
     }
 
     @PutMapping("/{id}")
     public ResponseEntity<UserDTO> updateUser(@PathVariable("id") Long id,
                                               @RequestBody @Valid UserDTO userDTO,
-                                              BindingResult bindingResult){
+                                              BindingResult bindingResult) {
         userValidator.validate(userDTO, bindingResult);
-        User entity = userMapper.toEntity(userDTO);
-        entity = userService.update(entity, id);
+        User entity = userService.getById(id);
+        entity = userMapper.update(entity, userDTO);
+        entity = userService.update(entity);
         return ResponseEntity.ok(userMapper.toDTO(entity));
     }
+
+
 
 }

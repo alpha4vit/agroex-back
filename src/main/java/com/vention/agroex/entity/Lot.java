@@ -36,7 +36,7 @@ public class Lot {
     @Column(name = "packaging")
     private String packaging;
 
-    @Column(name = "enabledByAdmin")
+    @Column(name = "enabled_by_admin")
     private Boolean enabledByAdmin;
 
     @Column(name = "quantity")
@@ -67,7 +67,7 @@ public class Lot {
     @ManyToOne(cascade = CascadeType.ALL)
     private Location location;
 
-    @ManyToMany(cascade = CascadeType.ALL)
+    @ElementCollection
     private List<Tag> tags;
 
     @OneToMany(cascade = CascadeType.ALL)

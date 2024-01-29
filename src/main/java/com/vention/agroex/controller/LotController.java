@@ -1,7 +1,9 @@
 package com.vention.agroex.controller;
 
 import com.vention.agroex.dto.LotDTO;
+import com.vention.agroex.entity.Lot;
 import com.vention.agroex.service.LotService;
+import com.vention.agroex.util.mapper.LotMapper;
 import io.swagger.v3.oas.annotations.tags.Tag;
 import lombok.RequiredArgsConstructor;
 import org.springframework.http.ResponseEntity;
@@ -16,29 +18,33 @@ import java.util.List;
 public class LotController {
 
     private final LotService lotService;
+    private final LotMapper lotMapper;
 
-    @PostMapping()
+    @PostMapping
     public ResponseEntity<LotDTO> save(@RequestBody LotDTO lotDTO) {
-        var savedLot = lotService.save(lotDTO);
-        return ResponseEntity.ok(savedLot);
+        Lot entity = lotMapper.toEntity(lotDTO);
+        entity = lotService.save(entity);
+        return ResponseEntity.ok(lotMapper.toDTO(entity));
     }
 
     @PutMapping("/{id}")
-    public ResponseEntity<LotDTO> update(@PathVariable Long id, @RequestBody LotDTO lot) {
-        var updatedLot = lotService.update(id, lot);
-        return ResponseEntity.ok(updatedLot);
+    public ResponseEntity<LotDTO> update(@PathVariable Long id, @RequestBody LotDTO lotDTO) {
+        Lot entity = lotService.getById(id);
+        entity = lotMapper.update(entity, lotDTO);
+        entity = lotService.update(entity);
+        return ResponseEntity.ok(lotMapper.toDTO(entity));
     }
 
     @GetMapping("/{id}")
     public ResponseEntity<LotDTO> findById(@PathVariable Long id) {
-        var fetchedLot = lotService.getById(id);
-        return ResponseEntity.ok(fetchedLot);
+        Lot fetchedLot = lotService.getById(id);
+        return ResponseEntity.ok(lotMapper.toDTO(fetchedLot));
     }
 
-    @GetMapping()
+    @GetMapping
     public ResponseEntity<List<LotDTO>> findAll() {
-        var fetchedLotsList = lotService.getAll();
-        return ResponseEntity.ok(fetchedLotsList);
+        List<Lot> fetchedLotsList = lotService.getAll();
+        return ResponseEntity.ok(lotMapper.toDTOs(fetchedLotsList));
     }
 
     @DeleteMapping("/{id}")

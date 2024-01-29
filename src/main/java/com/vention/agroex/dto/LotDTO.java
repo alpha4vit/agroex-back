@@ -44,7 +44,7 @@ public class LotDTO {
 
     private Long userId;
 
-    private Location location;
+    private LocationDTO location;
 
     private List<Tag> tags;
 

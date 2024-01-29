@@ -7,6 +7,7 @@ import org.springframework.http.ResponseEntity;
 import org.springframework.web.bind.annotation.ControllerAdvice;
 import org.springframework.web.bind.annotation.ExceptionHandler;
 import org.springframework.web.servlet.mvc.method.annotation.ResponseEntityExceptionHandler;
+import jakarta.persistence.EntityNotFoundException;
 
 
 @ControllerAdvice
@@ -16,6 +17,7 @@ public class CustomExceptionHandler extends ResponseEntityExceptionHandler {
     public ResponseEntity<ExceptionResponse> handle(Exception exception) {
         return switch (exception) {
             case JsonIOException e -> createResponse(e, HttpStatus.INTERNAL_SERVER_ERROR);
+            case EntityNotFoundException e -> createResponse(e, HttpStatus.NOT_FOUND);
             default -> createResponse(exception, HttpStatus.INTERNAL_SERVER_ERROR);
         };
     }

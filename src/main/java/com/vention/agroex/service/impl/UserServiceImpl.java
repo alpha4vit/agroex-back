@@ -8,7 +8,6 @@ import lombok.RequiredArgsConstructor;
 import org.springframework.stereotype.Service;
 import org.springframework.transaction.annotation.Transactional;
 
-import java.time.Instant;
 import java.util.List;
 
 @Service
@@ -18,7 +17,6 @@ public class UserServiceImpl implements UserService {
 
     private final UserRepository userRepository;
 
-    @Override
     public List<User> getAll() {
         return userRepository.findAll();
     }
@@ -29,24 +27,23 @@ public class UserServiceImpl implements UserService {
                 .orElseThrow(() -> new EntityNotFoundException("User with this id not found!"));
     }
 
-    @Transactional
     @Override
+    @Transactional
     public User save(User user) {
-        user.setRegistrationDate(Instant.now());
         user.setEmailVerified(false);
         return userRepository.save(user);
     }
 
+    @Transactional
     @Override
     public void deleteById(Long id) {
         User user = getById(id);
         userRepository.delete(user);
     }
 
-    @Transactional
     @Override
-    public User update(User user, Long id) {
-        user.setId(id);
+    @Transactional
+    public User update(User user) {
         return userRepository.save(user);
     }
 

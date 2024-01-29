@@ -15,4 +15,3 @@ public class Image {
     @Column(name = "name")
     private String name;
 }
-
