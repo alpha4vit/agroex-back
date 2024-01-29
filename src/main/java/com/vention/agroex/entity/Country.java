@@ -9,11 +9,11 @@ import lombok.Builder;
 import lombok.Data;
 import lombok.NoArgsConstructor;
 
-@Entity
 @Data
-@AllArgsConstructor
-@NoArgsConstructor
+@Entity
 @Builder
+@NoArgsConstructor
+@AllArgsConstructor
 public class Country {
 
     @Id

@@ -12,7 +12,6 @@ import java.util.List;
 
 @Service
 @RequiredArgsConstructor
-@Transactional(readOnly = true)
 public class UserServiceImpl implements UserService {
 
     private final UserRepository userRepository;
@@ -28,14 +27,12 @@ public class UserServiceImpl implements UserService {
                 .orElseThrow(() -> new EntityNotFoundException("User with this id not found!"));
     }
 
-    @Transactional
     @Override
     public User save(User user) {
         user.setEmailVerified(false);
         return userRepository.save(user);
     }
 
-    @Transactional
     @Override
     public void deleteById(Long id) {
         User user = getById(id);
@@ -43,7 +40,6 @@ public class UserServiceImpl implements UserService {
     }
 
     @Override
-    @Transactional
     public User update(User user) {
         return userRepository.save(user);
     }

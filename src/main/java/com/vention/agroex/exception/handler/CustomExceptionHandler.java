@@ -18,6 +18,7 @@ public class CustomExceptionHandler extends ResponseEntityExceptionHandler {
 
     @ExceptionHandler
     public ResponseEntity<ExceptionResponse> handle(Exception exception) {
+        logger.error(exception.getMessage());
         return switch (exception) {
             case JsonIOException e -> createResponse(e, HttpStatus.INTERNAL_SERVER_ERROR, new HashMap<>());
             case EntityNotFoundException e -> createResponse(e, HttpStatus.NOT_FOUND, new HashMap<>());
