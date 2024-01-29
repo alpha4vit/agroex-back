@@ -14,6 +14,14 @@ public class Lot {
 
     private String description;
 
+    private String variety;
+
+    private String size;
+
+    private String packaging;
+
+    private Boolean enabledByAdmin;
+
     private int quantity;
 
     private float pricePerTon;
