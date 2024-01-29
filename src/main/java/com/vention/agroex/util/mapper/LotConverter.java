@@ -36,7 +36,6 @@ public class LotConverter {
                 .currency(lotDTO.getCurrency())
                 .expirationDate(lotDTO.getExpirationDate())
                 .lotType(lotDTO.getLotType())
-                .images(lotDTO.getImages())
                 .tags(lotDTO.getTags())
                 .build();
 
@@ -78,7 +77,6 @@ public class LotConverter {
         lot.setCurrency(lotDTO.getCurrency());
         lot.setCreationDate(lotDTO.getCreationDate());
         lot.setExpirationDate(lotDTO.getExpirationDate());
-        lot.setImages(lotDTO.getImages());
         lot.setTags(lotDTO.getTags());
 
         Optional.of(lotDTO.getProductCategoryId())
@@ -116,7 +114,6 @@ public class LotConverter {
                 .creationDate(lot.getCreationDate())
                 .expirationDate(lot.getExpirationDate())
                 .lotType(lot.getLotType())
-                .images(lot.getImages())
                 .tags(lot.getTags())
                 .build();
 

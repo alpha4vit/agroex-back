@@ -1,6 +1,7 @@
 package com.vention.agroex.controller;
 
 import com.vention.agroex.dto.LotDTO;
+import com.vention.agroex.dto.ImageDTO;
 import com.vention.agroex.entity.Lot;
 import com.vention.agroex.service.LotService;
 import com.vention.agroex.util.mapper.LotMapper;
@@ -8,9 +9,11 @@ import com.vention.agroex.util.validator.LotDTOValidator;
 import io.swagger.v3.oas.annotations.tags.Tag;
 import jakarta.validation.Valid;
 import lombok.RequiredArgsConstructor;
+import org.springframework.http.HttpStatus;
 import org.springframework.http.ResponseEntity;
 import org.springframework.validation.BindingResult;
 import org.springframework.web.bind.annotation.*;
+import org.springframework.web.multipart.MultipartFile;
 
 import java.util.List;
 
@@ -60,5 +63,21 @@ public class LotController {
     public ResponseEntity<Void> deleteById(@PathVariable Long id) {
         lotService.deleteById(id);
         return ResponseEntity.noContent().build();
+    }
+
+
+    @PostMapping("/{id}/images")
+    public ResponseEntity<String> uploadImageForLot(@PathVariable("id") Long lotId,
+                                  @RequestParam("file") MultipartFile file){
+        ImageDTO image = new ImageDTO(file);
+        String saved = lotService.uploadImage(lotId, image);
+        return ResponseEntity.ok(saved);
+    }
+
+    @DeleteMapping("/{id}/images")
+    @ResponseStatus(HttpStatus.OK)
+    public void deleteImageForLot(@PathVariable("id") Long lotId,
+                                  @RequestParam("fileName") String fileName){
+        lotService.deleteImage(fileName);
     }
 }

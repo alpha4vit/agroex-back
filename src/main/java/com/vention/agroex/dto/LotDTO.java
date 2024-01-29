@@ -63,5 +63,5 @@ public class LotDTO {
 
     private List<Tag> tags;
 
-    private List<Image> images;
+    private List<ImageResponseDTO> images;
 }

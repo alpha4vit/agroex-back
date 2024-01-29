@@ -18,4 +18,7 @@ public interface LotService {
 
     Lot update(Lot lot);
 
+    String uploadImage(Long id, ImageDTO image);
+
+    void deleteImage(String fileName);
 }
