@@ -1,9 +1,9 @@
 package com.vention.agroex.service.impl;
 
 import com.vention.agroex.entity.User;
-import com.vention.agroex.exception.NotFoundException;
+import com.vention.agroex.repository.UserRepository;
 import com.vention.agroex.service.UserService;
-import com.vention.agroex.repository.json.JsonUserRepository;
+import jakarta.persistence.EntityNotFoundException;
 import lombok.RequiredArgsConstructor;
 import org.springframework.stereotype.Service;
 import org.springframework.transaction.annotation.Transactional;
@@ -16,7 +16,7 @@ import java.util.List;
 @Transactional(readOnly = true)
 public class UserServiceImpl implements UserService {
 
-    private final JsonUserRepository userRepository;
+    private final UserRepository userRepository;
 
     @Override
     public List<User> getAll() {
@@ -26,7 +26,7 @@ public class UserServiceImpl implements UserService {
     @Override
     public User getById(Long id) {
         return userRepository.findById(id)
-                .orElseThrow(() -> new NotFoundException("User with this id not found!"));
+                .orElseThrow(() -> new EntityNotFoundException("User with this id not found!"));
     }
 
     @Transactional

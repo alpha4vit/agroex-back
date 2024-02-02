@@ -2,7 +2,8 @@ plugins {
     id 'java'
     id 'org.springframework.boot' version '3.2.2'
     id 'io.spring.dependency-management' version '1.1.4'
-    id("io.freefair.lombok") version "8.4"
+    id "io.freefair.lombok" version "8.4"
+    id "org.flywaydb.flyway" version "10.7.0"
 }
 
 group = 'com.vention'
@@ -10,6 +11,13 @@ version = '0.0.1-SNAPSHOT'
 
 java {
     sourceCompatibility = '21'
+}
+
+flyway {
+    url = 'jdbc:postgresql://localhost:5432/agroex_db'
+    user = 'postgres'
+    password = 'root'
+    schemas = ['public']
 }
 
 repositories {
@@ -28,9 +36,12 @@ dependencies {
     testRuntimeOnly 'org.junit.jupiter:junit-jupiter-engine'
     implementation 'ch.qos.logback:logback-classic'
     implementation 'org.mapstruct:mapstruct:1.5.5.Final'
+    implementation 'org.postgresql:postgresql'
     annotationProcessor 'org.mapstruct:mapstruct-processor:1.5.5.Final'
     implementation 'org.springdoc:springdoc-openapi-starter-webmvc-ui:2.3.0'
     implementation 'org.postgresql:postgresql:42.7.1'
+    implementation 'org.springdoc:springdoc-openapi-starter-webmvc-ui:2.3.0'
+    implementation 'org.flywaydb:flyway-maven-plugin:10.7.0'
 }
 
 tasks.named('test') {
