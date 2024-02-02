@@ -1,19 +1,19 @@
 package com.vention.agroex.service;
 
-import com.vention.agroex.entity.Lot;
+import com.vention.agroex.dto.LotDTO;
 import org.springframework.stereotype.Service;
 
 import java.util.List;
 
 @Service
 public interface LotService {
-    Lot save(Lot lot);
+    LotDTO save(LotDTO lotDTO);
 
-    Lot findById(Long id);
+    LotDTO getById(Long id);
 
     void deleteById(Long id);
 
-    List<Lot> findAll();
+    List<LotDTO> getAll();
 
-    Lot update(Long id, Lot lot);
+    LotDTO update(Long id, LotDTO lot);
 }

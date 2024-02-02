@@ -15,12 +15,7 @@ public class CustomExceptionHandler extends ResponseEntityExceptionHandler {
     @ExceptionHandler
     public ResponseEntity<ExceptionResponse> handle(Exception exception) {
         return switch (exception) {
-            case NoSuchLotException e -> createResponse(e, HttpStatus.NOT_FOUND);
-            case LotListInitializationException e -> createResponse(e, HttpStatus.INTERNAL_SERVER_ERROR);
-            case LotListSavingException e -> createResponse(e, HttpStatus.INTERNAL_SERVER_ERROR);
-            case NotFoundException e -> createResponse(e, HttpStatus.NOT_FOUND);
             case JsonIOException e -> createResponse(e, HttpStatus.INTERNAL_SERVER_ERROR);
-            case UserListInitializationException e -> createResponse(e, HttpStatus.INTERNAL_SERVER_ERROR);
             default -> createResponse(exception, HttpStatus.INTERNAL_SERVER_ERROR);
         };
     }

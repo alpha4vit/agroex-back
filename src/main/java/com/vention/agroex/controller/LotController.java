@@ -1,6 +1,6 @@
 package com.vention.agroex.controller;
 
-import com.vention.agroex.entity.Lot;
+import com.vention.agroex.dto.LotDTO;
 import com.vention.agroex.service.LotService;
 import io.swagger.v3.oas.annotations.tags.Tag;
 import lombok.RequiredArgsConstructor;
@@ -18,26 +18,26 @@ public class LotController {
     private final LotService lotService;
 
     @PostMapping()
-    public ResponseEntity<Lot> save(@RequestBody Lot lot) {
-        var savedLot = lotService.save(lot);
+    public ResponseEntity<LotDTO> save(@RequestBody LotDTO lotDTO) {
+        var savedLot = lotService.save(lotDTO);
         return ResponseEntity.ok(savedLot);
     }
 
     @PutMapping("/{id}")
-    public ResponseEntity<Lot> update(@PathVariable Long id, @RequestBody Lot lot) {
+    public ResponseEntity<LotDTO> update(@PathVariable Long id, @RequestBody LotDTO lot) {
         var updatedLot = lotService.update(id, lot);
         return ResponseEntity.ok(updatedLot);
     }
 
     @GetMapping("/{id}")
-    public ResponseEntity<Lot> findById(@PathVariable Long id) {
-        var fetchedLot = lotService.findById(id);
+    public ResponseEntity<LotDTO> findById(@PathVariable Long id) {
+        var fetchedLot = lotService.getById(id);
         return ResponseEntity.ok(fetchedLot);
     }
 
     @GetMapping()
-    public ResponseEntity<List<Lot>> findAll() {
-        var fetchedLotsList = lotService.findAll();
+    public ResponseEntity<List<LotDTO>> findAll() {
+        var fetchedLotsList = lotService.getAll();
         return ResponseEntity.ok(fetchedLotsList);
     }
 
