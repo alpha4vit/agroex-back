@@ -1,7 +1,10 @@
 package com.vention.agroex.util.mapper;
 
+import com.vention.agroex.dto.LocationDTO;
 import com.vention.agroex.dto.LotDTO;
+import com.vention.agroex.entity.Location;
 import com.vention.agroex.entity.Lot;
+import com.vention.agroex.service.CountryService;
 import com.vention.agroex.service.ProductCategoryService;
 import com.vention.agroex.service.UserService;
 import lombok.Data;
@@ -17,6 +20,7 @@ public class LotConverter {
 
     private final ProductCategoryService productCategoryService;
     private final UserService userService;
+    private final CountryService countryService;
 
     public Lot toEntity(LotDTO lotDTO) {
         Lot lot = Lot.builder()
@@ -31,7 +35,6 @@ public class LotConverter {
                 .pricePerTon(lotDTO.getPricePerTon())
                 .currency(lotDTO.getCurrency())
                 .expirationDate(lotDTO.getExpirationDate())
-                .location(lotDTO.getLocation())
                 .lotType(lotDTO.getLotType())
                 .images(lotDTO.getImages())
                 .tags(lotDTO.getTags())
@@ -49,6 +52,17 @@ public class LotConverter {
                     lot.setUser(user);
                 });
 
+        Optional.of(lotDTO.getLocation().getCountryId())
+                .ifPresent(id -> {
+                    var country = countryService.getById(id);
+                    lot.setLocation(Location.builder()
+                                    .country(country)
+                                    .longitude(lotDTO.getLocation().getLongitude())
+                                    .latitude(lotDTO.getLocation().getLatitude())
+                                    .region(lotDTO.getLocation().getRegion())
+                            .build());
+                });
+
         return lot;
     }
 
@@ -62,8 +76,8 @@ public class LotConverter {
         lot.setQuantity(lotDTO.getQuantity());
         lot.setPricePerTon(lotDTO.getPricePerTon());
         lot.setCurrency(lotDTO.getCurrency());
+        lot.setCreationDate(lotDTO.getCreationDate());
         lot.setExpirationDate(lotDTO.getExpirationDate());
-        lot.setLocation(lotDTO.getLocation());
         lot.setImages(lotDTO.getImages());
         lot.setTags(lotDTO.getTags());
 
@@ -74,6 +88,17 @@ public class LotConverter {
         Optional.of(lotDTO.getUserId())
                 .ifPresent(id -> lot.setUser(userService
                         .getById(id)));
+
+        Optional.of(lotDTO.getLocation().getCountryId())
+                .ifPresent(id -> {
+                    var country = countryService.getById(id);
+                    lot.setLocation(Location.builder()
+                            .country(country)
+                            .longitude(lotDTO.getLocation().getLongitude())
+                            .latitude(lotDTO.getLocation().getLatitude())
+                            .region(lotDTO.getLocation().getRegion())
+                            .build());
+                });
     }
 
     public LotDTO toDTO(Lot lot) {
@@ -90,7 +115,6 @@ public class LotConverter {
                 .currency(lot.getCurrency())
                 .creationDate(lot.getCreationDate())
                 .expirationDate(lot.getExpirationDate())
-                .location(lot.getLocation())
                 .lotType(lot.getLotType())
                 .images(lot.getImages())
                 .tags(lot.getTags())
@@ -101,6 +125,16 @@ public class LotConverter {
 
         Optional.ofNullable(lot.getUser())
                 .ifPresent(user -> lotDTO.setUserId(user.getId()));
+
+        Optional.of(lot.getLocation().getCountry())
+                .ifPresent(country -> {
+                    lotDTO.setLocation(LocationDTO.builder()
+                            .countryId(country.getId())
+                            .longitude(lot.getLocation().getLongitude())
+                            .latitude(lot.getLocation().getLatitude())
+                            .region(lot.getLocation().getRegion())
+                            .build());
+                });
 
         return lotDTO;
     }

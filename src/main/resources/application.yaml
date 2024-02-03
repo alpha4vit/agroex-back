@@ -1,14 +1,16 @@
 spring:
+  config:
+    import: optional:file:.env[.properties]
   datasource:
-    username: postgres
-    password: root
+    username: ${POSTGRES_USERNAME}
+    password: ${POSTGRES_PASSWORD}
     driverClassName: org.postgresql.Driver
-    url: jdbc:postgresql://localhost:5432/agroex_db
+    url: jdbc:postgresql://${POSTGRES_HOST}:${POSTGRES_PORT}/${POSTGRES_DATABASE}
   jpa:
     show-sql: true
     hibernate:
       ddl-auto: update
       dialect: org.hibernate.dialect.PostgreSQLDialect
   flyway:
-    enabled: true
+    enabled: false
     locations: classpath:db/migration

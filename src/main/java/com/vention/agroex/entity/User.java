@@ -2,8 +2,10 @@ package com.vention.agroex.entity;
 
 import jakarta.persistence.*;
 import lombok.*;
+import org.hibernate.annotations.CreationTimestamp;
 
 import java.time.Instant;
+import java.util.List;
 
 @Entity
 @Table(name = "users")
@@ -31,10 +33,14 @@ public class User {
     @Column(name = "phone_number")
     private String phoneNumber;
 
-    @Column(name = "registrationDate")
-    private Instant registrationDate;
+    @Column(name = "creation_date")
+    @CreationTimestamp
+    private Instant creationDate;
 
     @Column(name = "email_verified")
     private Boolean emailVerified;
+
+    @OneToMany(mappedBy = "user", cascade = CascadeType.REMOVE)
+    private List<Lot> lots;
 
 }
