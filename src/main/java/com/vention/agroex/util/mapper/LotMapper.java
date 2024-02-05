@@ -18,6 +18,7 @@ public abstract class LotMapper {
 
     @Autowired
     protected UserService userService;
+
     @Autowired
     protected ProductCategoryService productCategoryService;
 

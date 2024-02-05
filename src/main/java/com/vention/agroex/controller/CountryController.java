@@ -4,11 +4,13 @@ import com.vention.agroex.dto.CountryDTO;
 import com.vention.agroex.entity.Country;
 import com.vention.agroex.service.CountryService;
 import com.vention.agroex.util.mapper.CountryMapper;
+import com.vention.agroex.util.validator.CountryDTOValidator;
 import io.swagger.v3.oas.annotations.tags.Tag;
 import jakarta.validation.Valid;
 import lombok.RequiredArgsConstructor;
 import org.springframework.http.HttpStatus;
 import org.springframework.http.ResponseEntity;
+import org.springframework.validation.BindingResult;
 import org.springframework.web.bind.annotation.*;
 
 import java.util.List;
@@ -21,6 +23,7 @@ public class CountryController {
     
     private final CountryService countryService;
     private final CountryMapper countryMapper;
+    private final CountryDTOValidator countryDTOValidator;
 
     @GetMapping
     public ResponseEntity<List<CountryDTO>> getAll(){
@@ -34,7 +37,9 @@ public class CountryController {
     }
 
     @PostMapping
-    public ResponseEntity<CountryDTO> createUser(@RequestBody @Valid CountryDTO countryDTO){
+    public ResponseEntity<CountryDTO> createUser(@RequestBody @Valid CountryDTO countryDTO,
+                                                 BindingResult bindingResult){
+        countryDTOValidator.validate(countryDTO, bindingResult);
         Country entity = countryMapper.toEntity(countryDTO);
         entity = countryService.save(entity);
         return ResponseEntity.ok(countryMapper.toDTO(entity));
@@ -48,7 +53,9 @@ public class CountryController {
 
     @PutMapping("/{id}")
     public ResponseEntity<CountryDTO> updateUser(@PathVariable("id") Long id,
-                                              @RequestBody @Valid CountryDTO countryDTO){
+                                              @RequestBody @Valid CountryDTO countryDTO,
+                                                 BindingResult bindingResult){
+        countryDTOValidator.validate(countryDTO, bindingResult);
         Country entity = countryMapper.toEntity(countryDTO);
         entity = countryService.update(entity, id);
         return ResponseEntity.ok(countryMapper.toDTO(entity));

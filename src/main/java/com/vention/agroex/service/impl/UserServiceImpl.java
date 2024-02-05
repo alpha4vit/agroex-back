@@ -17,6 +17,7 @@ public class UserServiceImpl implements UserService {
 
     private final UserRepository userRepository;
 
+    @Override
     public List<User> getAll() {
         return userRepository.findAll();
     }
@@ -27,8 +28,8 @@ public class UserServiceImpl implements UserService {
                 .orElseThrow(() -> new EntityNotFoundException("User with this id not found!"));
     }
 
-    @Override
     @Transactional
+    @Override
     public User save(User user) {
         user.setEmailVerified(false);
         return userRepository.save(user);

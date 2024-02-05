@@ -416,6 +416,8 @@ components:
         username:
           type: string
           example: 123_user_321
+          maxLength: 64
+          minLength: 3
         email:
           type: string
           example: user_test@gmail.com
@@ -423,6 +425,8 @@ components:
           type: string
           writeOnly: true
           example: user-test123321
+          maxLength: 2147483647
+          minLength: 10
         phoneNumber:
           type: string
           example: "+375448901238"
@@ -438,74 +442,6 @@ components:
     Image:
       type: string
       example: 0776a0db-200e-40ca-a353-980b92785346.jpg
-    Location:
-      type: object
-      properties:
-        id:
-          type: integer
-          format: int64
-        country:
-          type: string
-          example: Belarus
-        region:
-          type: string
-          example: Minsk region
-        latitude:
-          type: string
-          example: "53.902284"
-        longitude:
-          type: string
-          example: "27.561831"
-    Lot:
-      type: object
-      properties:
-        id:
-          type: integer
-          format: int64
-          example: 1
-        title:
-          type: string
-          example: Braeburn Apples
-        description:
-          type: string
-          example: "Fresh Central Otago Braeburn Apples delivered direct to your door.\
-            \ The best flavoured apple, great for eating. Long lasting."
-        quantity:
-          type: integer
-          format: int32
-          example: 10000
-        pricePerTon:
-          type: number
-          format: float
-          example: 1299
-        currency:
-          type: string
-          example: USD
-        creationDate:
-          type: string
-          format: date-time
-          example: 2024-01-26T15:52:08.8822866Z
-        expirationDate:
-          type: string
-          format: date-time
-          example: 2024-01-26T15:52:08.8822866Z
-        productCategory:
-          $ref: '#/components/schemas/ProductCategory'
-        lotType:
-          type: string
-          example: sell
-        user:
-          $ref: '#/components/schemas/User'
-        location:
-          $ref: '#/components/schemas/Location'
-        tags:
-          type: array
-          items:
-            $ref: '#/components/schemas/Tag'
-        images:
-          type: array
-          items:
-            $ref: '#/components/schemas/Image'
     ProductCategory:
       type: object
       properties:
@@ -516,6 +452,7 @@ components:
         title:
           type: string
           example: Fruits
+
         parentId:
           type: integer
           format: int64
@@ -530,6 +467,8 @@ components:
         title:
           type: string
           example: fresh
+          maxLength: 64
+          minLength: 1
     User:
       type: object
       properties:
@@ -559,6 +498,8 @@ components:
         region:
           type: string
           example: "Minsk region"
+          maxLength: 64
+          minLength: 0
         latitude:
           type: string
           example: "53.902284"
@@ -575,16 +516,26 @@ components:
         title:
           type: string
           example: "Orange Lot"
+          maxLength: 64
+          minLength: 5
         description:
           type: string
           example: "Fresh oranges from the orchard"
+          maxLength: 1000
+          minLength: 0
         variety:
           type: string
+          maxLength: 64
+          minLength: 0
           example: "varient"
         size:
           type: string
+          maxLength: 64
+          minLength: 0
           example: "70+"
         packaging:
+          maxLength: 64
+          minLength: 0
           type: string
           example: "Container"
         enabledByAdmin:
@@ -594,11 +545,14 @@ components:
           type: integer
           format: int32
           example: 10000
+          minimum: 1
         pricePerTon:
           type: number
           format: float
           example: 1.5
         currency:
+          maxLength: 10
+          minLength: 0
           type: string
           example: "USD"
         creationDate:
@@ -614,6 +568,7 @@ components:
           format: int64
           example: 1
         lotType:
+          pattern: \b(?:buy|sell)\b
           type: string
           example: "sell"
         userId:
@@ -641,3 +596,5 @@ components:
         title:
           type: string
           example: "Belarus"
+          maxLength: 64
+          minLength: 1
