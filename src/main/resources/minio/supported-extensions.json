@@ -1,0 +1,14 @@
+{
+  "jpeg": "image/jpeg",
+  "jpg": "image/jpeg",
+  "tiff": "image/tiff",
+  "tif": "image/tiff",
+  "ico": "image/vnd.microsoft.icon",
+  "icon": "image/vnd.microsoft.icon",
+  "bmp": "image/bmp",
+  "gif": "image/gif",
+  "heic": "image/heic",
+  "heif": "image/heif",
+  "png": "image/png",
+  "webp": "image/webp"
+}

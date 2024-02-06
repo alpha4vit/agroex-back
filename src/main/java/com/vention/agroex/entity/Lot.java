@@ -76,7 +76,7 @@ public class Lot {
             uniqueConstraints = @UniqueConstraint(columnNames = {"lot_id", "tag_id"}))
     private List<Tag> tags;
 
-    @OneToMany
+    @OneToMany(mappedBy = "lot")
     private List<Image> images;
 
 }
