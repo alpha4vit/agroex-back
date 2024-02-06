@@ -34,6 +34,7 @@ public abstract class LotMapper {
     @Mapping(target = "userId", source = "lot.user.id")
     @Mapping(target = "productCategoryId", source = "lot.productCategory.id")
     @Mapping(target = "location.countryId", source = "lot.location.country.id")
+    @Mapping(target = "location.countryName", source = "lot.location.country.name")
     public abstract LotDTO toDTO(Lot lot);
 
     public abstract List<Lot> toEntities(List<LotDTO> dtos);

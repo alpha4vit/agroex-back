@@ -14,7 +14,9 @@ import lombok.NoArgsConstructor;
 public class LocationDTO {
     private Long countryId;
 
-    @NotBlank(message = "Region can`t be blank")
+    private String countryName;
+
+    @NotBlank(message = "Region cant be blank")
     @Size(max = 64, message = "Region must be less than 64 characters")
     private String region;
 

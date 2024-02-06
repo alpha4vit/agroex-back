@@ -1,5 +1,9 @@
 version: '3'
 
+volumes:
+  minio-data:
+    driver: local
+
 services:
   db:
     image: "postgres:15.1-alpine"
@@ -12,11 +16,27 @@ services:
       - "5432:5432"
     networks:
       - app-network
+  minio:
+    container_name: minio
+    image: "minio/minio:latest"
+    environment:
+      - MINIO_ROOT_USER=${MINIO_ACCESS_KEY}
+      - MINIO_ROOT_PASSWORD=${MINIO_SECRET_KEY}
+      - MINIO_DEFAULT_BUCKETS=${MINIO_BUCKET}
+    command: server ~/minio --console-address :9090
+    ports:
+        - "9090:9090"
+        - "9000:9000"
+    volumes:
+        - minio-data:/minio
+    networks:
+      - app-network
   app:
     build:
       context: .
     depends_on:
       - db
+      - minio
     container_name: agroex-api
     env_file:
       - .env

@@ -8,13 +8,13 @@ import java.time.Instant;
 import java.util.List;
 
 @Entity
-@Table(name = "users")
 @Getter
 @Setter
-@NoArgsConstructor
-@AllArgsConstructor
 @Builder
 @ToString
+@NoArgsConstructor
+@AllArgsConstructor
+@Table(name = "users")
 public class User {
 
     @Id
@@ -33,8 +33,8 @@ public class User {
     @Column(name = "phone_number")
     private String phoneNumber;
 
-    @Column(name = "creation_date")
     @CreationTimestamp
+    @Column(name = "creation_date")
     private Instant creationDate;
 
     @Column(name = "email_verified")

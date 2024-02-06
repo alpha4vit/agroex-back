@@ -1,11 +1,19 @@
 package com.vention.agroex.entity;
 
+import com.fasterxml.jackson.annotation.JsonIgnore;
 import jakarta.persistence.*;
+import lombok.AllArgsConstructor;
+import lombok.Builder;
 import lombok.Data;
+import lombok.NoArgsConstructor;
+
 
 @Data
 @Entity
-@Table(name = "image")
+@Builder
+@NoArgsConstructor
+@AllArgsConstructor
+@Table(name = "lot_images")
 public class Image {
 
     @Id
@@ -14,4 +22,9 @@ public class Image {
 
     @Column(name = "name")
     private String name;
+
+    @ManyToOne
+    @JsonIgnore
+    @JoinColumn(name = "lot_id")
+    private Lot lot;
 }
