@@ -37,21 +37,27 @@ public class ProductCategoryController {
         return ResponseEntity.ok(updatedProductCategory);
     }
 
-    @GetMapping()
+    @GetMapping("/all")
     public ResponseEntity<List<ProductCategoryEntity>> findAll() {
-        var fetchedProductCategoryList = productCategoryService.getAll();
-        return ResponseEntity.ok(fetchedProductCategoryList);
+        var fetchedProductCategories = productCategoryService.getAll();
+        return ResponseEntity.ok(fetchedProductCategories);
     }
 
     @GetMapping("/{id}")
     public ResponseEntity<List<ProductCategoryEntity>> findAllSubcategories(@PathVariable Long id) {
-        var fetchedProductSubcategoryCategoryList = productCategoryService.getSubcategoriesById(id);
-        return ResponseEntity.ok(fetchedProductSubcategoryCategoryList);
+        var fetchedProductCategories = productCategoryService.getSubcategoriesById(id);
+        return ResponseEntity.ok(fetchedProductCategories);
+    }
+
+    @GetMapping()
+    public ResponseEntity<List<ProductCategoryEntity>> findAllMainCategories() {
+        var fetchedProductCategories = productCategoryService.getSubcategoriesById(0L);
+        return ResponseEntity.ok(fetchedProductCategories);
     }
 
     @DeleteMapping("/{id}")
-    public ResponseEntity<Void> deleteById(@PathVariable Long id) {
+    public ResponseEntity<Long> deleteById(@PathVariable Long id) {
         productCategoryService.deleteById(id);
-        return ResponseEntity.noContent().build();
+        return ResponseEntity.ok(id);
     }
 }

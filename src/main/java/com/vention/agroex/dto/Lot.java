@@ -2,6 +2,7 @@ package com.vention.agroex.dto;
 
 import com.fasterxml.jackson.annotation.JsonProperty;
 import com.vention.agroex.entity.TagEntity;
+import com.vention.agroex.model.ProductCategoryModel;
 import jakarta.validation.constraints.*;
 import lombok.*;
 
@@ -53,7 +54,7 @@ public class Lot {
 
     private Instant expirationDate;
 
-    private Long productCategoryId;
+    private ProductCategoryModel productCategory;
 
     @Pattern(regexp = "\\b(?:buy|sell)\\b", message = "Lot type can be only buy/sell")
     private String lotType;
