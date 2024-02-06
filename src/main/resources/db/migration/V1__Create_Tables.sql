@@ -96,12 +96,7 @@ create table if not exists lot_images
     name      varchar(255),
     lot_id    bigint
         constraint fk_lot_images_lot
-            references lot,
-    images_id bigint not null
-        constraint uk_lot_images_images
-            unique
-        constraint fk_lot_images
-            references lot_images
+            references lot
 );
 
 alter table lot_images
