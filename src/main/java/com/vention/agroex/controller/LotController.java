@@ -15,6 +15,7 @@ import org.springframework.web.bind.annotation.*;
 import org.springframework.web.multipart.MultipartFile;
 
 import java.util.List;
+import java.util.Map;
 
 @Slf4j
 @RestController
@@ -53,6 +54,10 @@ public class LotController {
     }
 
     @GetMapping()
+    public List<Lot> search(@RequestParam Map<String, String> filters) {
+        return lotMapper.toDTOs(lotService.getWithCriteria(filters));
+    }
+
     public ResponseEntity<List<Lot>> findAll() {
         var fetchedLotsList = lotService.getAll();
         return ResponseEntity.ok(lotMapper.toDTOs(fetchedLotsList));

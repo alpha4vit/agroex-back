@@ -1,15 +1,18 @@
 package com.vention.agroex.service.impl;
 
 import com.vention.agroex.entity.ProductCategoryEntity;
+import com.vention.agroex.filter.ProductCategorySpecificationsBuilder;
 import com.vention.agroex.repository.ProductCategoryRepository;
 import com.vention.agroex.service.ProductCategoryService;
 import jakarta.persistence.EntityNotFoundException;
 import jakarta.transaction.Transactional;
 import lombok.RequiredArgsConstructor;
 import lombok.extern.slf4j.Slf4j;
+import org.springframework.data.jpa.domain.Specification;
 import org.springframework.stereotype.Service;
 
 import java.util.List;
+import java.util.regex.Pattern;
 
 @Slf4j
 @Service
@@ -56,5 +59,19 @@ public class ProductCategoryServiceImpl implements ProductCategoryService {
                 .orElseThrow(() -> new EntityNotFoundException(String.format("There is no category with id %d", id)));
         productCategory.setParentId(fetchedCategory.getParentId());
         return productCategoryRepository.save(productCategory);
+    }
+
+    @Override
+    public List<ProductCategoryEntity> getWithFilters(String filters) {
+        var builder = new ProductCategorySpecificationsBuilder();
+
+        Pattern pattern = Pattern.compile("(\\w+?)([:<>])(\\w+?),");
+        var matcher = pattern.matcher(filters + ",");
+        while (matcher.find()) {
+            builder.with(matcher.group(1), matcher.group(2), matcher.group(3));
+        }
+
+        Specification<ProductCategoryEntity> spec = builder.build();
+        return productCategoryRepository.findAll(spec);
     }
 }

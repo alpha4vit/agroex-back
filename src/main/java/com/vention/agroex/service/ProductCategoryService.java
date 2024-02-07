@@ -18,4 +18,6 @@ public interface ProductCategoryService {
     List<ProductCategoryEntity> getAll();
 
     ProductCategoryEntity update(Long id, ProductCategoryEntity productCategoryEntity);
+
+    List<ProductCategoryEntity> getWithFilters(String filters);
 }
