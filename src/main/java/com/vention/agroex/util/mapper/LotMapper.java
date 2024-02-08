@@ -41,6 +41,7 @@ public interface LotMapper {
                 .variety(received.getVariety() != null ? received.getVariety() : before.getVariety())
                 .images(before.getImages())
                 .tags(received.getTags())
+                .enabledByAdmin(received.getEnabledByAdmin())
                 .build();
 
         LocationEntity locationEntity = LocationEntity.builder()

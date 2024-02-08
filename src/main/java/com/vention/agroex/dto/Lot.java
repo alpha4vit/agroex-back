@@ -34,7 +34,6 @@ public class Lot {
     @Size(max = 64, message = "Lot packaging must be less than 64 characters")
     private String packaging;
 
-    @JsonProperty(access = JsonProperty.Access.READ_ONLY)
     private Boolean enabledByAdmin;
 
     @NotNull
