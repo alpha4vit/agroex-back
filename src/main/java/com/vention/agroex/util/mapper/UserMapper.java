@@ -1,7 +1,7 @@
 package com.vention.agroex.util.mapper;
 
-import com.vention.agroex.dto.UserDTO;
-import com.vention.agroex.entity.User;
+import com.vention.agroex.dto.User;
+import com.vention.agroex.entity.UserEntity;
 import org.mapstruct.Mapper;
 import org.mapstruct.Mapping;
 import org.mapstruct.MappingTarget;
@@ -11,18 +11,18 @@ import java.util.List;
 @Mapper(componentModel = "spring")
 public interface UserMapper {
 
-    User toEntity(UserDTO userDTO);
+    UserEntity toEntity(User user);
 
-    UserDTO toDTO(User user);
+    User toDTO(UserEntity userEntity);
 
-    List<User> toEntities(List<UserDTO> dtos);
+    List<UserEntity> toEntities(List<User> dtos);
 
-    List<UserDTO> toDtos(List<User> users);
+    List<User> toDtos(List<UserEntity> userEntities);
 
     @Mapping(target = "id", ignore = true)
     @Mapping(target = "creationDate", ignore = true)
     @Mapping(target = "password", ignore = true)
     @Mapping(target = "emailVerified", ignore = true)
-    User update(@MappingTarget User target, UserDTO source);
+    UserEntity update(@MappingTarget UserEntity target, UserEntity source);
 
 }

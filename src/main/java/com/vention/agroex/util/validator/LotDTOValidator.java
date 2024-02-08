@@ -1,6 +1,6 @@
 package com.vention.agroex.util.validator;
 
-import com.vention.agroex.dto.LotDTO;
+import com.vention.agroex.dto.Lot;
 import com.vention.agroex.exception.InvalidArgumentException;
 import org.springframework.stereotype.Component;
 import org.springframework.validation.Errors;
@@ -15,7 +15,7 @@ public class LotDTOValidator implements Validator {
 
     @Override
     public boolean supports(Class<?> clazz) {
-        return LotDTO.class.equals(clazz);
+        return Lot.class.equals(clazz);
     }
 
     @Override

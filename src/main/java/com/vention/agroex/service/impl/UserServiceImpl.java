@@ -1,12 +1,12 @@
 package com.vention.agroex.service.impl;
 
-import com.vention.agroex.entity.User;
+import com.vention.agroex.entity.UserEntity;
 import com.vention.agroex.repository.UserRepository;
 import com.vention.agroex.service.UserService;
+import com.vention.agroex.util.mapper.UserMapper;
 import jakarta.persistence.EntityNotFoundException;
 import lombok.RequiredArgsConstructor;
 import org.springframework.stereotype.Service;
-import org.springframework.transaction.annotation.Transactional;
 
 import java.util.List;
 
@@ -15,33 +15,35 @@ import java.util.List;
 public class UserServiceImpl implements UserService {
 
     private final UserRepository userRepository;
+    private final UserMapper userMapper;
 
     @Override
-    public List<User> getAll() {
+    public List<UserEntity> getAll() {
         return userRepository.findAll();
     }
 
     @Override
-    public User getById(Long id) {
+    public UserEntity getById(Long id) {
         return userRepository.findById(id)
                 .orElseThrow(() -> new EntityNotFoundException("User with this id not found!"));
     }
 
     @Override
-    public User save(User user) {
-        user.setEmailVerified(false);
-        return userRepository.save(user);
+    public UserEntity save(UserEntity userEntity) {
+        userEntity.setEmailVerified(false);
+        return userRepository.save(userEntity);
     }
 
     @Override
     public void deleteById(Long id) {
-        User user = getById(id);
-        userRepository.delete(user);
+        var userEntity = getById(id);
+        userRepository.delete(userEntity);
     }
 
     @Override
-    public User update(User user) {
-        return userRepository.save(user);
+    public UserEntity update(Long id, UserEntity source) {
+        var userEntity = userMapper.update(getById(id), source);
+        return userRepository.save(userEntity);
     }
 
 }

@@ -8,10 +8,13 @@ import lombok.Data;
 import lombok.NoArgsConstructor;
 
 @Data
+@Builder
 @NoArgsConstructor
 @AllArgsConstructor
-@Builder
-public class LocationDTO {
+public class Location {
+
+    private Long id;
+
     private Long countryId;
 
     private String countryName;

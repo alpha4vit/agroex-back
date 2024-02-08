@@ -1,6 +1,6 @@
 package com.vention.agroex.util.validator;
 
-import com.vention.agroex.dto.CountryDTO;
+import com.vention.agroex.dto.Country;
 import com.vention.agroex.exception.InvalidArgumentException;
 import com.vention.agroex.repository.CountryRepository;
 import lombok.RequiredArgsConstructor;
@@ -19,14 +19,14 @@ public class CountryDTOValidator implements Validator {
 
     @Override
     public boolean supports(Class<?> clazz) {
-        return CountryDTO.class.equals(clazz);
+        return Country.class.equals(clazz);
     }
 
     @Override
     public void validate(Object target, Errors errors) {
-        CountryDTO countryDTO = (CountryDTO) target;
+        Country country = (Country) target;
         Map<String, String> errorsMap = new HashMap<>();
-        if (countryRepository.findByName(countryDTO.getName()).isPresent())
+        if (countryRepository.findByName(country.getName()).isPresent())
             errorsMap.put("title", "Country with this title already exists!");
         errors.getFieldErrors()
                 .forEach(error -> errorsMap.put(error.getField(), error.getDefaultMessage()));

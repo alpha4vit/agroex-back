@@ -1,17 +1,17 @@
 package com.vention.agroex.service;
 
-import com.vention.agroex.dto.ImageDTO;
-import com.vention.agroex.entity.Image;
-import com.vention.agroex.entity.Lot;
+import com.vention.agroex.dto.Image;
+import com.vention.agroex.entity.ImageEntity;
+import com.vention.agroex.entity.LotEntity;
 
 public interface ImageService {
 
-    Image getById(Long id);
+    ImageEntity getById(Long id);
 
-    Image getByName(String name);
+    ImageEntity getByName(String name);
 
-    String upload(final ImageDTO image, Lot lot);
+    String upload(Image image, LotEntity lotEntity);
 
-    void remove(Image image);
+    void remove(ImageEntity imageEntity);
 
 }

@@ -1,7 +1,7 @@
 package com.vention.agroex.util.validator;
 
-import com.vention.agroex.dto.UserDTO;
-import com.vention.agroex.entity.User;
+import com.vention.agroex.dto.User;
+import com.vention.agroex.entity.UserEntity;
 import com.vention.agroex.exception.InvalidArgumentException;
 import com.vention.agroex.repository.UserRepository;
 import jakarta.persistence.EntityNotFoundException;
@@ -21,33 +21,39 @@ public class UserDTOUpdateValidator implements Validator {
 
     @Override
     public boolean supports(Class<?> clazz) {
-        return UserDTO.class.equals(clazz);
+        return User.class.equals(clazz);
     }
 
     @Override
     public void validate(Object target, Errors errors) {
-        UserDTO userDTO = (UserDTO) target;
-        User beforeUser = userRepository.findById(userDTO.getId())
+        User user = (User) target;
+        UserEntity beforeUserEntity = userRepository.findById(user.getId())
                 .orElseThrow(() -> new EntityNotFoundException("User with this id not found!"));
         Map<String, String> errorsMap = new HashMap<>();
-        if (!beforeUser.getUsername().equals(userDTO.getUsername()) && userRepository.findByUsername(userDTO.getUsername()).isPresent())
-            errorsMap.put("username", "User with this username already exists!");
-        if (!beforeUser.getEmail().equals(userDTO.getEmail()) && userRepository.findByEmail(userDTO.getEmail()).isPresent())
-            errorsMap.put("email", "User with this email already exists!");
-        if (!beforeUser.getPhoneNumber().equals(userDTO.getPhoneNumber()) && userRepository.findByPhoneNumber(userDTO.getPhoneNumber()).isPresent())
-            errorsMap.put("phone_number", "User with this phone number already exists!");
+
+        userRepository.findByUsernameOrEmailOrPhoneNumber(user.getUsername(), user.getEmail(), user.getPhoneNumber())
+                .forEach(userEntity -> {
+                    if (!beforeUserEntity.getUsername().equals(user.getUsername()) && userEntity.getUsername().equals(user.getUsername()))
+                        errorsMap.put("username", "User with this username already exists!");
+                    if (!beforeUserEntity.getEmail().equals(user.getEmail()) && userEntity.getEmail().equals(user.getEmail()))
+                        errorsMap.put("email", "User with this email already exists!");
+                    if (!beforeUserEntity.getPhoneNumber().equals(user.getPhoneNumber()) && userEntity.getPhoneNumber().equals(user.getPhoneNumber()))
+                        errorsMap.put("phone_number", "User with this phone number already exists!");
+                });
+
         errors.getFieldErrors()
                 .forEach(fieldError ->
                 {
                     if (fieldError.getField().equals("password")) {
-                        if (userDTO.getPassword() != null && !userDTO.getPassword().isBlank())
+                        if (user.getPassword() != null && !user.getPassword().isBlank())
                             errorsMap.put(fieldError.getField(), fieldError.getDefaultMessage());
                     }
                     else
                         errorsMap.put(fieldError.getField(), fieldError.getDefaultMessage());
 
                 });
-        if (errorsMap.size() > 0){
+
+        if (!errorsMap.isEmpty()){
             throw new InvalidArgumentException(errorsMap, "Invalid arguments!");
         }
     }

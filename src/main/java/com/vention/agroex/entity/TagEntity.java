@@ -1,13 +1,18 @@
 package com.vention.agroex.entity;
 
-import com.fasterxml.jackson.annotation.JsonProperty;
 import jakarta.persistence.*;
+import lombok.AllArgsConstructor;
+import lombok.Builder;
 import lombok.Data;
-
+import lombok.NoArgsConstructor;
 
 @Data
-@Entity(name = "product_category")
-public class ProductCategory {
+@Entity
+@Builder
+@NoArgsConstructor
+@AllArgsConstructor
+@Table(name = "tags")
+public class TagEntity {
 
     @Id
     @GeneratedValue(strategy = GenerationType.IDENTITY)
@@ -15,7 +20,4 @@ public class ProductCategory {
 
     @Column(name = "title")
     private String title;
-
-    @Column(name = "parent_id")
-    private Long parentId;
 }

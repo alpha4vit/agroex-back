@@ -1,24 +1,22 @@
 package com.vention.agroex.service;
 
-import com.vention.agroex.entity.Lot;
-import org.springframework.stereotype.Service;
-import com.vention.agroex.dto.ImageDTO;
+import com.vention.agroex.dto.Image;
+import com.vention.agroex.entity.LotEntity;
 
 import java.util.List;
 
-@Service
 public interface LotService {
-    Lot save(Lot lot);
+    LotEntity save(LotEntity lotEntity);
 
-    Lot getById(Long id);
+    LotEntity getById(Long id);
 
     void deleteById(Long id);
 
-    List<Lot> getAll();
+    List<LotEntity> getAll();
 
-    Lot update(Lot lot);
+    LotEntity update(Long id, LotEntity entity);
 
-    String uploadImage(Long id, ImageDTO image);
+    String uploadImage(Long id, Image image);
 
     void deleteImage(String fileName);
 }
