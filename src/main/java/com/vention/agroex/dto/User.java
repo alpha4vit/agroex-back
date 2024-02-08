@@ -35,7 +35,6 @@ public class User {
     @JsonProperty(access = JsonProperty.Access.READ_ONLY)
     private Instant creationDate;
 
-    @JsonProperty(access = JsonProperty.Access.READ_ONLY)
     private Boolean emailVerified;
 
 }

@@ -22,7 +22,6 @@ public interface UserMapper {
     @Mapping(target = "id", ignore = true)
     @Mapping(target = "creationDate", ignore = true)
     @Mapping(target = "password", ignore = true)
-    @Mapping(target = "emailVerified", ignore = true)
     UserEntity update(@MappingTarget UserEntity target, UserEntity source);
 
 }
