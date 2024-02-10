@@ -40,6 +40,9 @@ public class UserEntity {
     @Column(name = "email_verified")
     private Boolean emailVerified;
 
+    @Column(name = "avatar")
+    private String avatar;
+
     @OneToMany(mappedBy = "user", cascade = CascadeType.REMOVE)
     private List<LotEntity> lots;
 

@@ -30,7 +30,7 @@ public class ProductCategoryServiceImpl implements ProductCategoryService {
     public ProductCategoryEntity getById(Long id) {
         return productCategoryRepository.findById(id)
                 .orElseThrow(() ->
-                        new EntityNotFoundException(String.format("There is no lots with id %d", id)));
+                        new EntityNotFoundException(String.format("There is no product category with id %d", id)));
     }
 
     @Override

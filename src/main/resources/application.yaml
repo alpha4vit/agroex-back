@@ -1,6 +1,13 @@
 spring:
+  activate:
+    on-profile: local
   config:
     import: optional:file:.env[.properties]
+  servlet:
+    multipart:
+      max-file-size: 30MB
+      max-request-size: 30MB
+      enabled: true
   datasource:
     username: ${POSTGRES_USERNAME}
     password: ${POSTGRES_PASSWORD}
@@ -19,3 +26,4 @@ minio:
   url: ${MINIO_URL}
   accessKey: ${MINIO_ACCESS_KEY}
   secretKey: ${MINIO_SECRET_KEY}
+#  supported-extensions-path:

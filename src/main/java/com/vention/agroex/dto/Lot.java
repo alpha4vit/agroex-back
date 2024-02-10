@@ -64,5 +64,6 @@ public class Lot {
 
     private List<TagEntity> tags;
 
+    @JsonProperty(access = JsonProperty.Access.READ_ONLY)
     private List<ImageResponse> images;
 }

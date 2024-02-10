@@ -69,7 +69,7 @@ public class LotEntity {
     @ManyToOne(cascade = CascadeType.ALL)
     private LocationEntity location;
 
-    @ManyToMany(cascade = CascadeType.ALL)
+    @ManyToMany
     @JoinTable(
             name = "lot_tag",
             joinColumns = @JoinColumn(name = "lot_id"),
@@ -77,7 +77,7 @@ public class LotEntity {
             uniqueConstraints = @UniqueConstraint(columnNames = {"lot_id", "tag_id"}))
     private List<TagEntity> tags;
 
-    @OneToMany(mappedBy = "lot")
+    @OneToMany(mappedBy = "lot", cascade = CascadeType.REMOVE)
     private List<ImageEntity> images;
 
 }

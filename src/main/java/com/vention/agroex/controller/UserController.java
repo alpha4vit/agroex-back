@@ -1,5 +1,6 @@
 package com.vention.agroex.controller;
 
+import com.vention.agroex.dto.Image;
 import com.vention.agroex.dto.User;
 import com.vention.agroex.service.UserService;
 import com.vention.agroex.util.mapper.UserMapper;
@@ -12,6 +13,7 @@ import org.springframework.http.HttpStatus;
 import org.springframework.http.ResponseEntity;
 import org.springframework.validation.BindingResult;
 import org.springframework.web.bind.annotation.*;
+import org.springframework.web.multipart.MultipartFile;
 
 import java.util.List;
 
@@ -62,6 +64,12 @@ public class UserController {
         return ResponseEntity.ok(userMapper.toDTO(saved));
     }
 
-
+    @PostMapping("/{id}/avatar")
+    public ResponseEntity<User> uploadAvatar(@PathVariable("id") Long id,
+                                                @RequestParam("file") MultipartFile file){
+        var avatar = new Image(file);
+        var user = userService.uploadAvatar(id, avatar);
+        return ResponseEntity.ok(userMapper.toDTO(user));
+    }
 
 }

@@ -1,13 +1,17 @@
 package com.vention.agroex.exception.handler;
 
-import com.vention.agroex.exception.*;
+import com.vention.agroex.exception.ImageException;
+import com.vention.agroex.exception.ImageLotException;
+import com.vention.agroex.exception.InvalidArgumentException;
+import com.vention.agroex.exception.JsonIOException;
 import com.vention.agroex.model.ExceptionResponse;
+import jakarta.persistence.EntityNotFoundException;
+import lombok.RequiredArgsConstructor;
 import org.springframework.http.HttpStatus;
 import org.springframework.http.ResponseEntity;
 import org.springframework.web.bind.annotation.ControllerAdvice;
 import org.springframework.web.bind.annotation.ExceptionHandler;
 import org.springframework.web.servlet.mvc.method.annotation.ResponseEntityExceptionHandler;
-import jakarta.persistence.EntityNotFoundException;
 
 import java.util.HashMap;
 import java.util.Map;
@@ -23,6 +27,8 @@ public class CustomExceptionHandler extends ResponseEntityExceptionHandler {
             case JsonIOException e -> createResponse(e, HttpStatus.INTERNAL_SERVER_ERROR, new HashMap<>());
             case EntityNotFoundException e -> createResponse(e, HttpStatus.NOT_FOUND, new HashMap<>());
             case InvalidArgumentException e -> createResponse(e, HttpStatus.BAD_REQUEST, e.getErrors());
+            case ImageLotException e -> createResponse(e, HttpStatus.BAD_REQUEST, new HashMap<>());
+            case ImageException e -> createResponse(e, HttpStatus.BAD_REQUEST, new HashMap<>());
             default -> createResponse(exception, HttpStatus.INTERNAL_SERVER_ERROR, new HashMap<>());
         };
     }

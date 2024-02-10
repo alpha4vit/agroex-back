@@ -1,8 +1,9 @@
 package com.vention.agroex.service;
 
-import com.vention.agroex.dto.Image;
 import com.vention.agroex.entity.ImageEntity;
 import com.vention.agroex.entity.LotEntity;
+
+import java.util.List;
 
 public interface ImageService {
 
@@ -10,8 +11,10 @@ public interface ImageService {
 
     ImageEntity getByName(String name);
 
-    String upload(Image image, LotEntity lotEntity);
+    ImageEntity save(ImageEntity imageEntity);
 
-    void remove(ImageEntity imageEntity);
+    void delete(ImageEntity imageEntity);
+
+    List<ImageEntity> getAllByLot(LotEntity lotEntity);
 
 }

@@ -1,15 +1,22 @@
 package com.vention.agroex.service.impl;
 
 import com.vention.agroex.dto.Image;
-import com.vention.agroex.entity.*;
+import com.vention.agroex.entity.ImageEntity;
+import com.vention.agroex.entity.LotEntity;
+import com.vention.agroex.exception.ImageException;
+import com.vention.agroex.exception.ImageLotException;
 import com.vention.agroex.repository.LotRepository;
 import com.vention.agroex.service.*;
 import com.vention.agroex.util.mapper.LotMapper;
 import jakarta.persistence.EntityNotFoundException;
+import jakarta.transaction.Transactional;
 import lombok.RequiredArgsConstructor;
 import lombok.extern.slf4j.Slf4j;
 import org.springframework.stereotype.Service;
+import org.springframework.web.multipart.MultipartFile;
 
+import java.util.ArrayList;
+import java.util.Arrays;
 import java.util.List;
 
 @Slf4j
@@ -18,6 +25,7 @@ import java.util.List;
 public class LotServiceImpl implements LotService {
 
     private final LotRepository lotRepository;
+    private final ImageServiceStorage imageServiceStorage;
     private final ImageService imageService;
     private final ProductCategoryService productCategoryService;
     private final CountryService countryService;
@@ -25,7 +33,8 @@ public class LotServiceImpl implements LotService {
     private final LotMapper lotMapper;
 
     @Override
-    public LotEntity save(LotEntity lotEntity) {
+    @Transactional(rollbackOn = ImageLotException.class)
+    public LotEntity save(LotEntity lotEntity,  MultipartFile[] files) {
         var userEntity = userService.getById(lotEntity.getUser().getId());
         var countryEntity = countryService.getById(lotEntity.getLocation().getCountry().getId());
         var productCategoryEntity = productCategoryService.getById(lotEntity.getProductCategory().getId());
@@ -35,7 +44,11 @@ public class LotServiceImpl implements LotService {
         lotEntity.getLocation().setCountry(countryEntity);
         lotEntity.setProductCategory(productCategoryEntity);
 
-        return lotRepository.save(lotEntity);
+        var saved = lotRepository.save(lotEntity);
+        if (files != null)
+            saved.setImages(uploadImages(saved.getId(), files));
+
+        return saved;
     }
 
     @Override
@@ -50,12 +63,19 @@ public class LotServiceImpl implements LotService {
     }
 
     @Override
+    public void delete(LotEntity lot) {
+        lotRepository.delete(lot);
+    }
+
+    @Override
     public List<LotEntity> getAll() {
         return lotRepository.findAll();
     }
 
     @Override
-    public LotEntity update(Long id, LotEntity entity) {
+    public LotEntity update(Long id, LotEntity entity,  MultipartFile[] files) {
+        clearImagesForLot(id);
+
         var result = lotMapper.update(getById(id), entity);
 
         var userEntity = userService.getById(result.getUser().getId());
@@ -66,19 +86,45 @@ public class LotServiceImpl implements LotService {
         result.getLocation().setCountry(countryEntity);
         result.setProductCategory(productCategoryEntity);
 
-        return lotRepository.save(result);
+        var saved = lotRepository.save(result);
+
+        if (files != null)
+            saved.setImages(uploadImages(saved.getId(), files));
+
+        return saved;
     }
 
     @Override
-    public String uploadImage(Long id, Image image) {
+    public List<ImageEntity> uploadImages(Long id, MultipartFile[] files) {
         var lotEntity = getById(id);
-        return imageService.upload(image, lotEntity);
+        List<ImageEntity> images = new ArrayList<>();
+        try {
+            Arrays.stream(files).forEach(file -> {
+                String imageName = imageServiceStorage.uploadToStorage(new Image(file));
+                images.add(imageService.save(ImageEntity.builder()
+                        .lot(lotEntity)
+                        .name(imageName)
+                        .build()));
+            });
+            return images;
+        } catch (ImageException e) {
+            images.forEach(imageServiceStorage::remove);
+            throw new ImageLotException(id, e.getMessage());
+        }
     }
 
     @Override
     public void deleteImage(String fileName) {
         var imageEntity = imageService.getByName(fileName);
-        imageService.remove(imageEntity);
+        imageService.delete(imageEntity);
+    }
+
+    public void clearImagesForLot(Long lotId){
+        var lotEntity = getById(lotId);
+        lotEntity.getImages().forEach(image -> {
+            imageService.delete(image);
+            imageServiceStorage.remove(image);
+        });
     }
 
 }
