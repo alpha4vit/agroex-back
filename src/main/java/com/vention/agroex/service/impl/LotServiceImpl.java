@@ -31,15 +31,15 @@ public class LotServiceImpl implements LotService {
     private final LotMapper lotMapper;
     private final UserService userService;
     private final ImageService imageService;
+    private final ImageServiceStorage imageServiceStorage;
     private final FilterService filterService;
     private final LotRepository lotRepository;
-    private final CountryService countryService;
-    private final ImageServiceStorage imageServiceStorage;
     private final ProductCategoryService productCategoryService;
+    private final CountryService countryService;
 
     @Override
     @Transactional(rollbackOn = ImageLotException.class)
-    public LotEntity save(LotEntity lotEntity, MultipartFile[] files) {
+    public LotEntity save(LotEntity lotEntity,  MultipartFile[] files) {
         var userEntity = userService.getById(lotEntity.getUser().getId());
         var countryEntity = countryService.getById(lotEntity.getLocation().getCountry().getId());
 
@@ -155,7 +155,7 @@ public class LotServiceImpl implements LotService {
         imageService.delete(imageEntity);
     }
 
-    public void clearImagesForLot(Long lotId) {
+    public void clearImagesForLot(Long lotId){
         var lotEntity = getById(lotId);
         lotEntity.getImages().forEach(image -> {
             imageService.delete(image);
