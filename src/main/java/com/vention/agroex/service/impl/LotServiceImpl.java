@@ -116,6 +116,21 @@ public class LotServiceImpl implements LotService {
     }
 
     @Override
+    public LotEntity update(Long id, LotEntity entity) {
+        var result = lotMapper.update(getById(id), entity);
+
+        var userEntity = userService.getById(result.getUser().getId());
+        var countryEntity = countryService.getById(result.getLocation().getCountry().getId());
+        var productCategoryEntity = productCategoryService.getById(result.getProductCategory().getId());
+
+        result.setUser(userEntity);
+        result.getLocation().setCountry(countryEntity);
+        result.setProductCategory(productCategoryEntity);
+
+        return lotRepository.save(result);
+    }
+
+    @Override
     public List<ImageEntity> uploadImages(Long id, MultipartFile[] files) {
         var lotEntity = getById(id);
         List<ImageEntity> images = new ArrayList<>();
