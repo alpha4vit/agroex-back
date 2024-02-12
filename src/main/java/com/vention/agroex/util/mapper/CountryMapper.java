@@ -1,7 +1,7 @@
 package com.vention.agroex.util.mapper;
 
-import com.vention.agroex.dto.CountryDTO;
-import com.vention.agroex.entity.Country;
+import com.vention.agroex.dto.Country;
+import com.vention.agroex.entity.CountryEntity;
 import org.mapstruct.Mapper;
 
 import java.util.List;
@@ -9,11 +9,11 @@ import java.util.List;
 @Mapper(componentModel = "spring")
 public interface CountryMapper {
 
-    Country toEntity(CountryDTO countryDTO);
+    CountryEntity toEntity(Country country);
 
-    CountryDTO toDTO(Country country);
+    Country toDTO(CountryEntity countryEntity);
 
-    List<Country> toEntities(List<CountryDTO> dtos);
+    List<CountryEntity> toEntities(List<Country> dtos);
 
-    List<CountryDTO> toDtos(List<Country> users);
+    List<Country> toDtos(List<CountryEntity> users);
 }

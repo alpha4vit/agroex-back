@@ -1,6 +1,6 @@
 package com.vention.agroex.service.impl;
 
-import com.vention.agroex.entity.ProductCategory;
+import com.vention.agroex.entity.ProductCategoryEntity;
 import com.vention.agroex.repository.ProductCategoryRepository;
 import com.vention.agroex.service.ProductCategoryService;
 import jakarta.persistence.EntityNotFoundException;
@@ -19,22 +19,22 @@ public class ProductCategoryServiceImpl implements ProductCategoryService {
     private final ProductCategoryRepository productCategoryRepository;
 
     @Override
-    public ProductCategory save(ProductCategory productCategory) {
-        if (productCategory.getParentId() == null) {
-            productCategory.setParentId(0L);
+    public ProductCategoryEntity save(ProductCategoryEntity productCategoryEntity) {
+        if (productCategoryEntity.getParentId() == null) {
+            productCategoryEntity.setParentId(0L);
         }
-        return productCategoryRepository.save(productCategory);
+        return productCategoryRepository.save(productCategoryEntity);
     }
 
     @Override
-    public ProductCategory getById(Long id) {
+    public ProductCategoryEntity getById(Long id) {
         return productCategoryRepository.findById(id)
                 .orElseThrow(() ->
                         new EntityNotFoundException(String.format("There is no lots with id %d", id)));
     }
 
     @Override
-    public List<ProductCategory> getSubcategoriesById(Long parentId) {
+    public List<ProductCategoryEntity> getSubcategoriesById(Long parentId) {
         return productCategoryRepository.findProductCategoryListByParentId(parentId);
     }
 
@@ -46,14 +46,14 @@ public class ProductCategoryServiceImpl implements ProductCategoryService {
     }
 
     @Override
-    public List<ProductCategory> getAll() {
+    public List<ProductCategoryEntity> getAll() {
         return productCategoryRepository.findAll();
     }
 
     @Override
-    public ProductCategory update(Long id, ProductCategory productCategory) {
+    public ProductCategoryEntity update(Long id, ProductCategoryEntity productCategoryEntity) {
         if (productCategoryRepository.existsById(id)) {
-            return productCategoryRepository.save(productCategory);
+            return productCategoryRepository.save(productCategoryEntity);
         } else {
             throw new EntityNotFoundException(String.format("There is no category with id %d", id));
         }

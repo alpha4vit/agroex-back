@@ -1,19 +1,19 @@
 package com.vention.agroex.service;
 
-import com.vention.agroex.entity.User;
+import com.vention.agroex.entity.UserEntity;
 
 import java.util.List;
 
 public interface UserService {
 
-    List<User> getAll();
+    List<UserEntity> getAll();
 
-    User getById(Long id);
+    UserEntity getById(Long id);
 
-    User save(User user);
+    UserEntity save(UserEntity userEntity);
 
     void deleteById(Long id);
 
-    User update(User user);
+    UserEntity update(Long id, UserEntity source);
 
 }

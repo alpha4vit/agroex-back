@@ -1,6 +1,6 @@
 package com.vention.agroex.util.validator;
 
-import com.vention.agroex.entity.ProductCategory;
+import com.vention.agroex.entity.ProductCategoryEntity;
 import com.vention.agroex.exception.InvalidArgumentException;
 import com.vention.agroex.repository.ProductCategoryRepository;
 import lombok.RequiredArgsConstructor;
@@ -19,14 +19,14 @@ public class ProductCategoryValidator implements Validator {
 
     @Override
     public boolean supports(Class<?> clazz) {
-        return ProductCategory.class.equals(clazz);
+        return ProductCategoryEntity.class.equals(clazz);
     }
 
     @Override
     public void validate(Object target, Errors errors) {
-        ProductCategory productCategory = (ProductCategory) target;
+        ProductCategoryEntity productCategoryEntity = (ProductCategoryEntity) target;
         Map<String, String> errorsMap = new HashMap<>();
-        if (productCategoryRepository.findByTitle(productCategory.getTitle()).isPresent())
+        if (productCategoryRepository.findByTitle(productCategoryEntity.getTitle()).isPresent())
             errorsMap.put("title", "Product category with this title already exists");
         errors.getFieldErrors()
                 .forEach(error -> errorsMap.put(error.getField(), error.getDefaultMessage()));

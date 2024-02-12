@@ -3,11 +3,10 @@ package com.vention.agroex.service.impl;
 
 import com.fasterxml.jackson.core.type.TypeReference;
 import com.fasterxml.jackson.databind.ObjectMapper;
-import com.fasterxml.jackson.databind.SerializationFeature;
-import com.vention.agroex.entity.Image;
-import com.vention.agroex.entity.Lot;
+import com.vention.agroex.dto.Image;
+import com.vention.agroex.entity.ImageEntity;
+import com.vention.agroex.entity.LotEntity;
 import com.vention.agroex.exception.ImageException;
-import com.vention.agroex.dto.ImageDTO;
 import com.vention.agroex.props.MinioProperties;
 import com.vention.agroex.repository.ImageRepository;
 import com.vention.agroex.service.ImageService;
@@ -24,7 +23,9 @@ import org.springframework.web.multipart.MultipartFile;
 
 import java.io.File;
 import java.io.InputStream;
-import java.util.*;
+import java.util.HashMap;
+import java.util.Map;
+import java.util.UUID;
 
 @Slf4j
 @Service
@@ -34,16 +35,13 @@ public class ImageServiceImpl implements ImageService {
     private final MinioClient minioClient;
     private final MinioProperties minioProperties;
     private final ImageRepository imageRepository;
+    private final ObjectMapper mapper;
     private Map<String, String> supportedExtensions = new HashMap<>();
-    private ObjectMapper mapper = new ObjectMapper();
-    private File supportedExtensionsFile = new File("src/main/resources/minio/supported-extensions.json");
+    private final File supportedExtensionsFile = new File("src/main/resources/minio/supported-extensions.json");
 
     @PostConstruct
     private void init() {
         try {
-            mapper.findAndRegisterModules();
-            mapper.enable(SerializationFeature.INDENT_OUTPUT);
-
             log.info("Reading supported file extensions from JSON file");
             supportedExtensions = mapper.readValue(supportedExtensionsFile, new TypeReference<>() {});
             log.info("Supported file extensions uploaded from JSON file");
@@ -53,32 +51,32 @@ public class ImageServiceImpl implements ImageService {
     }
 
     @Override
-    public Image getById(Long id) {
+    public ImageEntity getById(Long id) {
         return imageRepository.findById(id)
                 .orElseThrow(() -> new EntityNotFoundException("Image with this id not found!"));
     }
 
     @Override
-    public Image getByName(String name) {
+    public ImageEntity getByName(String name) {
         return imageRepository.findByName(name)
                 .orElseThrow(() -> new EntityNotFoundException("Image with this name not found!"));
     }
 
     @Override
     @Transactional
-    public String upload(ImageDTO image, Lot lot) {
+    public String upload(Image image, LotEntity lotEntity) {
         createBucket();
-        MultipartFile file = image.getFile();
+        var file = image.getFile();
         if (file.getOriginalFilename() == null || file.getOriginalFilename().isBlank())
             throw new ImageException("Invalid file name");
-        String fileName = generateStringFileName(file);
+        var fileName = generateStringFileName(file);
         try {
             InputStream inputStream = file.getInputStream();
             saveImage(inputStream, fileName, file);
-            imageRepository.save(Image
+            imageRepository.save(ImageEntity
                     .builder()
                     .name(fileName)
-                    .lot(lot)
+                    .lot(lotEntity)
                     .build()
             );
         } catch (Exception e) {
@@ -89,15 +87,15 @@ public class ImageServiceImpl implements ImageService {
 
     @Override
     @Transactional
-    public void remove(Image image) {
+    public void remove(ImageEntity imageEntity) {
         try {
             minioClient.removeObject(
                     RemoveObjectArgs.builder()
-                            .object(image.getName())
+                            .object(imageEntity.getName())
                             .bucket(minioProperties.getBucket())
                             .build()
             );
-            imageRepository.delete(image);
+            imageRepository.delete(imageEntity);
         }
         catch (Exception e){
             throw new ImageException("Error during deleting image: "+e.getMessage());
@@ -106,7 +104,7 @@ public class ImageServiceImpl implements ImageService {
 
     @SneakyThrows
     private void saveImage(InputStream inputStream, String fileName, MultipartFile file){
-        String extension = getFileExtension(file);
+        var extension = getFileExtension(file);
         if (!supportedExtensions.containsKey(extension))
             throw new ImageException("Incorrect image extension!");
         minioClient.putObject(
@@ -121,7 +119,7 @@ public class ImageServiceImpl implements ImageService {
 
     private void createBucket(){
         try (InputStream policyJson = getClass().getClassLoader().getResourceAsStream("minio/minio-config.json")){
-            boolean found = minioClient.bucketExists(
+            var found = minioClient.bucketExists(
                     BucketExistsArgs
                             .builder()
                             .bucket(minioProperties.getBucket())
@@ -133,7 +131,7 @@ public class ImageServiceImpl implements ImageService {
                                 .bucket(minioProperties.getBucket())
                                 .build()
                 );
-                SetBucketPolicyArgs policyArgs = SetBucketPolicyArgs.builder()
+                var policyArgs = SetBucketPolicyArgs.builder()
                         .bucket("images")
                         .config(new String(policyJson.readAllBytes()))
                         .build();
@@ -146,12 +144,12 @@ public class ImageServiceImpl implements ImageService {
     }
 
     private String generateStringFileName(MultipartFile multipartFile){
-        String extension = getFileExtension(multipartFile);
+        var extension = getFileExtension(multipartFile);
         return String.format("%s.%s", UUID.randomUUID(), extension);
     }
 
     private String getFileExtension(MultipartFile multipartFile){
-        String extension = StringUtils.getFilenameExtension(multipartFile.getOriginalFilename());
+        var extension = StringUtils.getFilenameExtension(multipartFile.getOriginalFilename());
         if (extension == null || extension.isEmpty()) {
             throw new ImageException("Invalid file name!");
         }

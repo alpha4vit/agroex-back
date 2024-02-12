@@ -1,14 +1,14 @@
 package com.vention.agroex.controller;
 
-import com.vention.agroex.dto.LotDTO;
-import com.vention.agroex.dto.ImageDTO;
-import com.vention.agroex.entity.Lot;
+import com.vention.agroex.dto.Image;
+import com.vention.agroex.dto.Lot;
 import com.vention.agroex.service.LotService;
 import com.vention.agroex.util.mapper.LotMapper;
 import com.vention.agroex.util.validator.LotDTOValidator;
 import io.swagger.v3.oas.annotations.tags.Tag;
 import jakarta.validation.Valid;
 import lombok.RequiredArgsConstructor;
+import lombok.extern.slf4j.Slf4j;
 import org.springframework.http.HttpStatus;
 import org.springframework.http.ResponseEntity;
 import org.springframework.validation.BindingResult;
@@ -17,9 +17,10 @@ import org.springframework.web.multipart.MultipartFile;
 
 import java.util.List;
 
+@Slf4j
 @RestController
-@RequestMapping("/lots")
 @RequiredArgsConstructor
+@RequestMapping("/lots")
 @Tag(name = "Lot controller")
 public class LotController {
 
@@ -28,34 +29,31 @@ public class LotController {
     private final LotDTOValidator lotDTOValidator;
 
     @PostMapping
-    public ResponseEntity<LotDTO> save(@RequestBody @Valid LotDTO lotDTO,
-                                       BindingResult bindingResult) {
-        lotDTOValidator.validate(lotDTO, bindingResult);
-        Lot entity = lotMapper.toEntity(lotDTO);
-        entity = lotService.save(entity);
-        return ResponseEntity.ok(lotMapper.toDTO(entity));
+    public ResponseEntity<Lot> save(@RequestBody @Valid Lot lot,
+                                    BindingResult bindingResult){
+        lotDTOValidator.validate(lot, bindingResult);
+        var saved = lotService.save(lotMapper.toEntity(lot));
+        return ResponseEntity.ok(lotMapper.toDTO(saved));
     }
 
-    @PutMapping({"/{id}"})
-    public ResponseEntity<LotDTO> update(@PathVariable Long id,
-                                         @RequestBody @Valid LotDTO lotDTO,
-                                         BindingResult bindingResult) {
-        lotDTOValidator.validate(lotDTO, bindingResult);
-        Lot entity = lotService.getById(id);
-        entity = lotMapper.update(entity, lotDTO);
-        entity = lotService.update(entity);
-        return ResponseEntity.ok(lotMapper.toDTO(entity));
+    @PutMapping("/{id}")
+    public ResponseEntity<Lot> update(@PathVariable Long id,
+                                      @RequestBody @Valid Lot lot,
+                                      BindingResult bindingResult) {
+        lotDTOValidator.validate(lot, bindingResult);
+        var saved = lotService.update(id, lotMapper.toEntity(lot));
+        return ResponseEntity.ok(lotMapper.toDTO(saved));
     }
 
     @GetMapping("/{id}")
-    public ResponseEntity<LotDTO> findById(@PathVariable Long id) {
-        Lot fetchedLot = lotService.getById(id);
-        return ResponseEntity.ok(lotMapper.toDTO(fetchedLot));
+    public ResponseEntity<Lot> findById(@PathVariable Long id) {
+        var fetchedLotEntity = lotService.getById(id);
+        return ResponseEntity.ok(lotMapper.toDTO(fetchedLotEntity));
     }
 
     @GetMapping()
-    public ResponseEntity<List<LotDTO>> findAll() {
-        List<Lot> fetchedLotsList = lotService.getAll();
+    public ResponseEntity<List<Lot>> findAll() {
+        var fetchedLotsList = lotService.getAll();
         return ResponseEntity.ok(lotMapper.toDTOs(fetchedLotsList));
     }
 
@@ -69,8 +67,8 @@ public class LotController {
     @PostMapping("/{id}/images")
     public ResponseEntity<String> uploadImageForLot(@PathVariable("id") Long lotId,
                                   @RequestParam("file") MultipartFile file){
-        ImageDTO image = new ImageDTO(file);
-        String saved = lotService.uploadImage(lotId, image);
+        var image = new Image(file);
+        var saved = lotService.uploadImage(lotId, image);
         return ResponseEntity.ok(saved);
     }
 

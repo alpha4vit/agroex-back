@@ -1,6 +1,6 @@
 package com.vention.agroex.controller;
 
-import com.vention.agroex.entity.ProductCategory;
+import com.vention.agroex.entity.ProductCategoryEntity;
 import com.vention.agroex.service.ProductCategoryService;
 import com.vention.agroex.util.validator.ProductCategoryValidator;
 import io.swagger.v3.oas.annotations.tags.Tag;
@@ -21,30 +21,30 @@ public class ProductCategoryController {
     private final ProductCategoryValidator productCategoryValidator;
 
     @PostMapping()
-    public ResponseEntity<ProductCategory> save(@RequestBody ProductCategory productCategory,
-                                                BindingResult bindingResult) {
-        productCategoryValidator.validate(productCategory, bindingResult);
-        var savedProductCategory = productCategoryService.save(productCategory);
+    public ResponseEntity<ProductCategoryEntity> save(@RequestBody ProductCategoryEntity productCategoryEntity,
+                                                      BindingResult bindingResult) {
+        productCategoryValidator.validate(productCategoryEntity, bindingResult);
+        var savedProductCategory = productCategoryService.save(productCategoryEntity);
         return ResponseEntity.ok(savedProductCategory);
     }
 
     @PutMapping("/{id}")
-    public ResponseEntity<ProductCategory> update(@PathVariable Long id,
-                                                  @RequestBody ProductCategory productCategory,
-                                                  BindingResult bindingResult) {
-        productCategoryValidator.validate(productCategory, bindingResult);
-        var updatedProductCategory = productCategoryService.update(id, productCategory);
+    public ResponseEntity<ProductCategoryEntity> update(@PathVariable Long id,
+                                                        @RequestBody ProductCategoryEntity productCategoryEntity,
+                                                        BindingResult bindingResult) {
+        productCategoryValidator.validate(productCategoryEntity, bindingResult);
+        var updatedProductCategory = productCategoryService.update(id, productCategoryEntity);
         return ResponseEntity.ok(updatedProductCategory);
     }
 
     @GetMapping()
-    public ResponseEntity<List<ProductCategory>> findAll() {
+    public ResponseEntity<List<ProductCategoryEntity>> findAll() {
         var fetchedProductCategoryList = productCategoryService.getAll();
         return ResponseEntity.ok(fetchedProductCategoryList);
     }
 
     @GetMapping("/{id}")
-    public ResponseEntity<List<ProductCategory>> findAllSubcategories(@PathVariable Long id) {
+    public ResponseEntity<List<ProductCategoryEntity>> findAllSubcategories(@PathVariable Long id) {
         var fetchedProductSubcategoryCategoryList = productCategoryService.getSubcategoriesById(id);
         return ResponseEntity.ok(fetchedProductSubcategoryCategoryList);
     }

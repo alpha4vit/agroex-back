@@ -15,7 +15,7 @@ import java.util.List;
 @NoArgsConstructor
 @AllArgsConstructor
 @Table(name = "users")
-public class User {
+public class UserEntity {
 
     @Id
     @GeneratedValue(strategy = GenerationType.IDENTITY)
@@ -41,6 +41,6 @@ public class User {
     private Boolean emailVerified;
 
     @OneToMany(mappedBy = "user", cascade = CascadeType.REMOVE)
-    private List<Lot> lots;
+    private List<LotEntity> lots;
 
 }

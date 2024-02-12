@@ -1,6 +1,6 @@
 package com.vention.agroex.service.impl;
 
-import com.vention.agroex.entity.Country;
+import com.vention.agroex.entity.CountryEntity;
 import com.vention.agroex.repository.CountryRepository;
 import com.vention.agroex.service.CountryService;
 import jakarta.persistence.EntityNotFoundException;
@@ -16,31 +16,31 @@ public class CountryServiceImpl implements CountryService {
     private final CountryRepository countryRepository;
 
     @Override
-    public List<Country> getAll() {
+    public List<CountryEntity> getAll() {
         return countryRepository.findAll();
     }
 
     @Override
-    public Country getById(Long id) {
+    public CountryEntity getById(Long id) {
         return countryRepository.findById(id)
                 .orElseThrow(() -> new EntityNotFoundException("Country with this id not found!"));
     }
 
     @Override
-    public Country save(Country country) {
-        return countryRepository.save(country);
+    public CountryEntity save(CountryEntity countryEntity) {
+        return countryRepository.save(countryEntity);
     }
 
     @Override
     public void deleteById(Long id) {
-        Country country = getById(id);
-        countryRepository.delete(country);
+        var countryEntity = getById(id);
+        countryRepository.delete(countryEntity);
     }
 
     @Override
-    public Country update(Country country, Long id) {
+    public CountryEntity update(Long id, CountryEntity countryEntity) {
         getById(id);
-        country.setId(id);
-        return countryRepository.save(country);
+        countryEntity.setId(id);
+        return countryRepository.save(countryEntity);
     }
 }

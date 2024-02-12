@@ -13,7 +13,7 @@ import lombok.NoArgsConstructor;
 @NoArgsConstructor
 @AllArgsConstructor
 @Table(name = "location")
-public class Location {
+public class LocationEntity {
 
     @Id
     @GeneratedValue(strategy = GenerationType.IDENTITY)
@@ -21,7 +21,7 @@ public class Location {
 
     @ManyToOne
     @JoinColumn(name = "country_id", referencedColumnName = "id")
-    private Country country;
+    private CountryEntity country;
 
     @Column(name = "region")
     private String region;

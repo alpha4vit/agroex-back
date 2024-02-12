@@ -1,7 +1,6 @@
 package com.vention.agroex.controller;
 
-import com.vention.agroex.dto.UserDTO;
-import com.vention.agroex.entity.User;
+import com.vention.agroex.dto.User;
 import com.vention.agroex.service.UserService;
 import com.vention.agroex.util.mapper.UserMapper;
 import com.vention.agroex.util.validator.UserDTOCreateValidator;
@@ -28,23 +27,22 @@ public class UserController {
     private final UserDTOUpdateValidator userDTOUpdateValidator;
 
     @GetMapping
-    public ResponseEntity<List<UserDTO>> getAll() {
+    public ResponseEntity<List<User>> getAll() {
         return ResponseEntity.ok(userMapper.toDtos(userService.getAll()));
     }
 
     @GetMapping("/{id}")
-    public ResponseEntity<UserDTO> getById(@PathVariable("id") Long id) {
-        User user = userService.getById(id);
-        return ResponseEntity.ok(userMapper.toDTO(user));
+    public ResponseEntity<User> getById(@PathVariable("id") Long id) {
+        var userEntity = userService.getById(id);
+        return ResponseEntity.ok(userMapper.toDTO(userEntity));
     }
 
     @PostMapping
-    public ResponseEntity<UserDTO> createUser(@RequestBody @Valid UserDTO userDTO,
-                                              BindingResult bindingResult) {
-        userDTOCreateValidator.validate(userDTO, bindingResult);
-        User entity = userMapper.toEntity(userDTO);
-        entity = userService.save(entity);
-        return ResponseEntity.ok(userMapper.toDTO(entity));
+    public ResponseEntity<User> createUser(@RequestBody @Valid User user,
+                                           BindingResult bindingResult) {
+        userDTOCreateValidator.validate(user, bindingResult);
+        var saved = userService.save(userMapper.toEntity(user));
+        return ResponseEntity.ok(userMapper.toDTO(saved));
     }
 
     @DeleteMapping("/{id}")
@@ -55,15 +53,13 @@ public class UserController {
     }
 
     @PutMapping("/{id}")
-    public ResponseEntity<UserDTO> updateUser(@PathVariable("id") Long id,
-                                              @RequestBody @Valid UserDTO userDTO,
-                                              BindingResult bindingResult) {
-        userDTO.setId(id);
-        userDTOUpdateValidator.validate(userDTO, bindingResult);
-        User entity = userService.getById(id);
-        entity = userMapper.update(entity, userDTO);
-        entity = userService.update(entity);
-        return ResponseEntity.ok(userMapper.toDTO(entity));
+    public ResponseEntity<User> updateUser(@PathVariable("id") Long id,
+                                           @RequestBody @Valid User user,
+                                           BindingResult bindingResult) {
+        user.setId(id);
+        userDTOUpdateValidator.validate(user, bindingResult);
+        var saved = userService.update(id, userMapper.toEntity(user));
+        return ResponseEntity.ok(userMapper.toDTO(saved));
     }
 
 

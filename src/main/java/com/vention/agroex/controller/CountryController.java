@@ -1,7 +1,6 @@
 package com.vention.agroex.controller;
 
-import com.vention.agroex.dto.CountryDTO;
-import com.vention.agroex.entity.Country;
+import com.vention.agroex.dto.Country;
 import com.vention.agroex.service.CountryService;
 import com.vention.agroex.util.mapper.CountryMapper;
 import com.vention.agroex.util.validator.CountryDTOValidator;
@@ -26,38 +25,36 @@ public class CountryController {
     private final CountryDTOValidator countryDTOValidator;
 
     @GetMapping
-    public ResponseEntity<List<CountryDTO>> getAll(){
+    public ResponseEntity<List<Country>> getAll(){
         return ResponseEntity.ok(countryMapper.toDtos(countryService.getAll()));
     }
 
     @GetMapping("/{id}")
-    public ResponseEntity<CountryDTO> getById(@PathVariable("id") Long id){
-        var user = countryService.getById(id);
-        return ResponseEntity.ok(countryMapper.toDTO(user));
+    public ResponseEntity<Country> getById(@PathVariable("id") Long id){
+        var countryEntity = countryService.getById(id);
+        return ResponseEntity.ok(countryMapper.toDTO(countryEntity));
     }
 
     @PostMapping
-    public ResponseEntity<CountryDTO> createUser(@RequestBody @Valid CountryDTO countryDTO,
-                                                 BindingResult bindingResult){
-        countryDTOValidator.validate(countryDTO, bindingResult);
-        Country entity = countryMapper.toEntity(countryDTO);
-        entity = countryService.save(entity);
-        return ResponseEntity.ok(countryMapper.toDTO(entity));
+    public ResponseEntity<Country> createCountry(@RequestBody @Valid Country country,
+                                              BindingResult bindingResult){
+        countryDTOValidator.validate(country, bindingResult);
+        var saved = countryService.save(countryMapper.toEntity(country));
+        return ResponseEntity.ok(countryMapper.toDTO(saved));
     }
 
     @DeleteMapping("/{id}")
     @ResponseStatus(HttpStatus.OK)
-    public void deleteUserById(@PathVariable("id") Long id){
+    public void deleteCountryById(@PathVariable("id") Long id){
         countryService.deleteById(id);
     }
 
     @PutMapping("/{id}")
-    public ResponseEntity<CountryDTO> updateUser(@PathVariable("id") Long id,
-                                              @RequestBody @Valid CountryDTO countryDTO,
-                                                 BindingResult bindingResult){
-        countryDTOValidator.validate(countryDTO, bindingResult);
-        Country entity = countryMapper.toEntity(countryDTO);
-        entity = countryService.update(entity, id);
-        return ResponseEntity.ok(countryMapper.toDTO(entity));
+    public ResponseEntity<Country> updateCountry(@PathVariable("id") Long id,
+                                              @RequestBody @Valid Country country,
+                                              BindingResult bindingResult){
+        countryDTOValidator.validate(country, bindingResult);
+        var saved = countryService.update(id, countryMapper.toEntity(country));
+        return ResponseEntity.ok(countryMapper.toDTO(saved));
     }
 }

@@ -1,52 +1,70 @@
 package com.vention.agroex.util.mapper;
 
-import com.vention.agroex.dto.LotDTO;
-import com.vention.agroex.entity.Lot;
-import com.vention.agroex.service.CountryService;
-import com.vention.agroex.service.ProductCategoryService;
-import com.vention.agroex.service.UserService;
+import com.vention.agroex.dto.Lot;
+import com.vention.agroex.entity.*;
 import org.mapstruct.Mapper;
 import org.mapstruct.Mapping;
 import org.mapstruct.MappingConstants;
-import org.mapstruct.MappingTarget;
-import org.springframework.beans.factory.annotation.Autowired;
 
 import java.util.List;
 
-@Mapper(componentModel = MappingConstants.ComponentModel.SPRING)
-public abstract class LotMapper {
+@Mapper(componentModel = MappingConstants.ComponentModel.SPRING, uses = LocationMapper.class)
+public interface LotMapper {
 
-    @Autowired
-    protected UserService userService;
-
-    @Autowired
-    protected ProductCategoryService productCategoryService;
-
-    @Autowired
-    protected CountryService countryService;
-
-    @Mapping(target = "user", expression = "java(userService.getById(lotDTO.getUserId()))")
-    @Mapping(target = "productCategory", expression = "java(productCategoryService.getById(lotDTO.getProductCategoryId()))")
-    @Mapping(target = "location.country", expression = "java(countryService.getById(locationDTO.getCountryId()))")
     @Mapping(target = "creationDate", ignore = true)
-    public abstract Lot toEntity(LotDTO lotDTO);
+    @Mapping(target = "user.id", source = "lot.userId")
+    @Mapping(target = "productCategory.id", source = "lot.productCategoryId")
+    LotEntity toEntity(Lot lot);
 
-    @Mapping(target = "userId", source = "lot.user.id")
-    @Mapping(target = "productCategoryId", source = "lot.productCategory.id")
-    @Mapping(target = "location.countryId", source = "lot.location.country.id")
-    @Mapping(target = "location.countryName", source = "lot.location.country.name")
-    public abstract LotDTO toDTO(Lot lot);
+    @Mapping(target = "userId", source = "lotEntity.user.id")
+    @Mapping(target = "productCategoryId", source = "lotEntity.productCategory.id")
+    Lot toDTO(LotEntity lotEntity);
 
-    public abstract List<Lot> toEntities(List<LotDTO> dtos);
+    List<LotEntity> toEntities(List<Lot> lots);
 
-    public abstract List<LotDTO> toDTOs(List<Lot> lots);
+    List<Lot> toDTOs(List<LotEntity> lotEntities);
 
-    @Mapping(target = "id", ignore = true)
-    @Mapping(target = "lotType", ignore = true)
-    @Mapping(target = "creationDate" ,ignore = true)
-    @Mapping(target = "user", expression = "java(userService.getById(lotDTO.getUserId()))")
-    @Mapping(target = "productCategory", expression = "java(productCategoryService.getById(lotDTO.getProductCategoryId()))")
-    @Mapping(target = "location.country", expression = "java(countryService.getById(locationDTO.getCountryId()))")
-    public abstract Lot update(@MappingTarget Lot lot, LotDTO lotDTO);
+    default LotEntity update(LotEntity before, LotEntity received) {
+        LotEntity result = LotEntity.builder()
+                .id(before.getId())
+                .title(received.getTitle() != null ? received.getTitle() : before.getTitle())
+                .description(received.getDescription() != null ? received.getDescription() : before.getDescription())
+                .currency(received.getCurrency() != null ? received.getCurrency() : before.getCurrency())
+                .lotType(before.getLotType())
+                .enabledByAdmin(before.getEnabledByAdmin())
+                .creationDate(before.getCreationDate())
+                .expirationDate(received.getExpirationDate() != null ? received.getExpirationDate() : before.getExpirationDate())
+                .pricePerTon(received.getPricePerTon() != 0.0 ? received.getPricePerTon() : before.getPricePerTon())
+                .size(received.getSize() != null ? received.getSize() : before.getSize())
+                .quantity(received.getQuantity() != 0 ? received.getQuantity() : before.getQuantity())
+                .packaging(received.getPackaging() != null ? received.getPackaging() : before.getPackaging())
+                .variety(received.getVariety() != null ? received.getVariety() : before.getVariety())
+                .images(before.getImages())
+                .tags(received.getTags())
+                .build();
+
+        LocationEntity locationEntity = LocationEntity.builder()
+                .id(received.getLocation().getId())
+                .country(
+                        CountryEntity.builder()
+                                .id(received.getLocation().getCountry().getId())
+                                .build()
+                )
+                .latitude(received.getLocation().getLatitude())
+                .longitude(received.getLocation().getLongitude())
+                .region(received.getLocation().getRegion())
+                .build();
+        result.setLocation(locationEntity);
+
+        result.setProductCategory(ProductCategoryEntity.builder()
+                .id(received.getProductCategory().getId())
+                .build());
+        result.setUser(UserEntity.builder()
+                .id(received.getUser().getId())
+                .build());
+
+        return result;
+    }
+
 
 }

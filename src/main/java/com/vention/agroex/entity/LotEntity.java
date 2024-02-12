@@ -15,7 +15,7 @@ import java.util.List;
 @NoArgsConstructor
 @AllArgsConstructor
 @Entity(name = "lot")
-public class Lot {
+public class LotEntity {
 
     @Id
     @GeneratedValue(strategy = GenerationType.IDENTITY)
@@ -56,17 +56,18 @@ public class Lot {
     private Instant expirationDate;
 
     @ManyToOne
-    private ProductCategory productCategory;
+    @JoinColumn(name = "product_category_id", referencedColumnName = "id")
+    private ProductCategoryEntity productCategory;
 
     @Column(name = "lot_type")
     private String lotType;
 
     @ManyToOne
     @JoinColumn(name = "user_id")
-    private User user;
+    private UserEntity user;
 
     @ManyToOne(cascade = CascadeType.ALL)
-    private Location location;
+    private LocationEntity location;
 
     @ManyToMany(cascade = CascadeType.ALL)
     @JoinTable(
@@ -74,9 +75,9 @@ public class Lot {
             joinColumns = @JoinColumn(name = "lot_id"),
             inverseJoinColumns = @JoinColumn(name = "tag_id"),
             uniqueConstraints = @UniqueConstraint(columnNames = {"lot_id", "tag_id"}))
-    private List<Tag> tags;
+    private List<TagEntity> tags;
 
     @OneToMany(mappedBy = "lot")
-    private List<Image> images;
+    private List<ImageEntity> images;
 
 }

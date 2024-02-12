@@ -1,17 +1,25 @@
 package com.vention.agroex.util.mapper;
 
-import com.vention.agroex.dto.LocationDTO;
-import com.vention.agroex.service.CountryService;
+import com.vention.agroex.dto.Location;
+import com.vention.agroex.entity.LocationEntity;
 import org.mapstruct.Mapper;
 import org.mapstruct.Mapping;
 import org.mapstruct.MappingConstants;
-import org.springframework.beans.factory.annotation.Autowired;
+
+import java.util.List;
 
 @Mapper(componentModel = MappingConstants.ComponentModel.SPRING)
-public abstract class LocationMapper {
-    @Autowired
-    protected CountryService countryService;
+public interface LocationMapper {
 
-    @Mapping(target = "countryName", expression = "java(countryService.getById(locationDTO.getCountryId()).getName())")
-    public abstract LocationDTO toResponse(LocationDTO locationDTO);
+    @Mapping(target = "country.id", source = "locationDTO.countryId")
+    LocationEntity toEntity(Location locationDTO);
+
+    @Mapping(target = "countryId", source = "location.country.id")
+    @Mapping(target = "countryName", source = "location.country.name")
+    Location toDTO(LocationEntity location);
+    List<LocationEntity> toEntities(List<Location> dtos);
+
+    List<Location> toDTOs(List<LocationEntity> lots);
+
+
 }

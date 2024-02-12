@@ -1,19 +1,19 @@
 package com.vention.agroex.service;
 
-import com.vention.agroex.entity.Country;
+import com.vention.agroex.entity.CountryEntity;
 
 import java.util.List;
 
 public interface CountryService {
 
-    List<Country> getAll();
+    List<CountryEntity> getAll();
 
-    Country getById(Long id);
+    CountryEntity getById(Long id);
 
-    Country save(Country country);
+    CountryEntity save(CountryEntity countryEntity);
 
     void deleteById(Long id);
 
-    Country update(Country country, Long id);
+    CountryEntity update(Long id, CountryEntity countryEntity);
 
 }

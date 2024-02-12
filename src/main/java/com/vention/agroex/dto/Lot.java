@@ -1,18 +1,19 @@
 package com.vention.agroex.dto;
 
 import com.fasterxml.jackson.annotation.JsonProperty;
-import com.vention.agroex.entity.Image;
-import com.vention.agroex.entity.Tag;
+import com.vention.agroex.entity.TagEntity;
 import jakarta.validation.constraints.*;
-import lombok.Builder;
-import lombok.Data;
+import lombok.*;
 
 import java.time.Instant;
 import java.util.List;
 
 @Data
 @Builder
-public class LotDTO {
+@ToString
+@NoArgsConstructor
+@AllArgsConstructor
+public class Lot {
 
     private Long id;
 
@@ -59,9 +60,9 @@ public class LotDTO {
 
     private Long userId;
 
-    private LocationDTO location;
+    private Location location;
 
-    private List<Tag> tags;
+    private List<TagEntity> tags;
 
-    private List<ImageResponseDTO> images;
+    private List<ImageResponse> images;
 }
