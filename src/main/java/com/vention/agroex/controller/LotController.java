@@ -5,13 +5,13 @@ import com.vention.agroex.model.LotRejectRequest;
 import com.vention.agroex.model.LotStatusResponse;
 import com.vention.agroex.service.LotService;
 import com.vention.agroex.util.mapper.LotMapper;
-import com.vention.agroex.util.validator.LotDTOValidator;
+import com.vention.agroex.util.validator.LotValidator;
 import io.swagger.v3.oas.annotations.tags.Tag;
 import jakarta.validation.Valid;
 import lombok.RequiredArgsConstructor;
 import lombok.extern.slf4j.Slf4j;
-import org.springframework.http.HttpStatus;
 import org.springframework.http.ResponseEntity;
+import org.springframework.security.access.prepost.PreAuthorize;
 import org.springframework.validation.BindingResult;
 import org.springframework.web.bind.annotation.*;
 import org.springframework.web.multipart.MultipartFile;
@@ -28,25 +28,26 @@ public class LotController {
 
     private final LotService lotService;
     private final LotMapper lotMapper;
-    private final LotDTOValidator lotDTOValidator;
+    private final LotValidator lotValidator;
 
     @PostMapping
     public ResponseEntity<Lot> save(@RequestPart(value = "file", required = false) MultipartFile[] files,
                                     @RequestHeader("currency") String currency,
                                     @RequestPart("data") @Valid Lot lot,
                                     BindingResult bindingResult) {
-        lotDTOValidator.validate(lot, bindingResult);
+        lotValidator.validate(lot, bindingResult);
         var saved = lotService.save(lotMapper.toEntity(lot), files, currency);
         return ResponseEntity.ok(lotMapper.toDTO(saved));
     }
 
     @PutMapping("/{id}")
+    @PreAuthorize("@customSecurityExpression.isLotOwner(#id)")
     public ResponseEntity<Lot> update(@PathVariable("id") Long id,
                                       @RequestHeader("currency") String currency,
                                       @RequestPart(value = "file", required = false) MultipartFile[] files,
                                       @RequestPart("data") @Valid Lot lot,
                                       BindingResult bindingResult) {
-        lotDTOValidator.validate(lot, bindingResult);
+        lotValidator.validate(lot, bindingResult);
         var saved = lotService.update(id, lotMapper.toEntity(lot), files, currency);
         return ResponseEntity.ok(lotMapper.toDTO(saved));
     }
@@ -68,16 +69,10 @@ public class LotController {
     }
 
     @DeleteMapping("/{id}")
+    @PreAuthorize("@customSecurityExpression.isLotOwner(#id)")
     public ResponseEntity<Void> deleteById(@PathVariable Long id) {
         lotService.deleteById(id);
         return ResponseEntity.noContent().build();
-    }
-
-    @DeleteMapping("/{id}/images")
-    @ResponseStatus(HttpStatus.OK)
-    public void deleteImageForLot(@PathVariable("id") Long lotId,
-                                  @RequestParam("fileName") String fileName) {
-        lotService.deleteImage(fileName);
     }
 
     @GetMapping("/{id}/status")

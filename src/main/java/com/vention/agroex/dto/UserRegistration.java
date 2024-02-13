@@ -11,13 +11,9 @@ import java.util.UUID;
 @Builder
 @NoArgsConstructor
 @AllArgsConstructor
-public class Bet {
-
-    private Long id;
-
-    private Long lotId;
-
-    private Float amount;
-
-    private UUID userId;
+public class UserRegistration {
+    private UUID sub;
+    private String name;
+    private String email;
+    private String zoneinfo;
 }

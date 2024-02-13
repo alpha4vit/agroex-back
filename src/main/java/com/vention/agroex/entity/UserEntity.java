@@ -2,10 +2,14 @@ package com.vention.agroex.entity;
 
 import jakarta.persistence.*;
 import lombok.*;
-import org.hibernate.annotations.CreationTimestamp;
+import org.hibernate.annotations.CurrentTimestamp;
+import org.hibernate.annotations.SourceType;
+import org.hibernate.generator.EventType;
 
 import java.time.Instant;
+import java.time.ZoneId;
 import java.util.List;
+import java.util.UUID;
 
 @Entity
 @Getter
@@ -18,8 +22,7 @@ import java.util.List;
 public class UserEntity {
 
     @Id
-    @GeneratedValue(strategy = GenerationType.IDENTITY)
-    private Long id;
+    private UUID id;
 
     @Column(name = "username")
     private String username;
@@ -27,14 +30,8 @@ public class UserEntity {
     @Column(name = "email")
     private String email;
 
-    @Column(name = "password")
-    private String password;
-
-    @Column(name = "phone_number")
-    private String phoneNumber;
-
-    @CreationTimestamp
     @Column(name = "creation_date")
+    @CurrentTimestamp(source = SourceType.VM, event = EventType.INSERT)
     private Instant creationDate;
 
     @Column(name = "email_verified")
@@ -46,5 +43,8 @@ public class UserEntity {
     @ToString.Exclude
     @OneToMany(mappedBy = "user", cascade = CascadeType.REMOVE)
     private List<LotEntity> lots;
+
+    @Column(name = "time_zone")
+    private ZoneId timeZone;
 
 }

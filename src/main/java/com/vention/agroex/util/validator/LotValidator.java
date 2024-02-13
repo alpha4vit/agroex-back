@@ -14,7 +14,7 @@ import static java.util.stream.Collectors.toMap;
 
 @Component
 @RequiredArgsConstructor
-public class LotDTOValidator implements Validator {
+public class LotValidator implements Validator {
 
     private final CurrencyRateService currencyRateService;
 

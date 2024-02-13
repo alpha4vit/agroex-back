@@ -13,7 +13,7 @@ import java.util.Map;
 
 @Component
 @RequiredArgsConstructor
-public class CountryDTOValidator implements Validator {
+public class CountryValidator implements Validator {
 
     private final CountryRepository countryRepository;
 

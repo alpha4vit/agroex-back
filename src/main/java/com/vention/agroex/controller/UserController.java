@@ -4,8 +4,8 @@ import com.vention.agroex.dto.Image;
 import com.vention.agroex.dto.User;
 import com.vention.agroex.service.UserService;
 import com.vention.agroex.util.mapper.UserMapper;
-import com.vention.agroex.util.validator.UserDTOCreateValidator;
-import com.vention.agroex.util.validator.UserDTOUpdateValidator;
+import com.vention.agroex.util.validator.UserCreateValidator;
+import com.vention.agroex.util.validator.UserUpdateValidator;
 import io.swagger.v3.oas.annotations.tags.Tag;
 import jakarta.validation.Valid;
 import lombok.RequiredArgsConstructor;
@@ -16,6 +16,7 @@ import org.springframework.web.bind.annotation.*;
 import org.springframework.web.multipart.MultipartFile;
 
 import java.util.List;
+import java.util.UUID;
 
 @RestController
 @RequiredArgsConstructor
@@ -25,16 +26,18 @@ public class UserController {
 
     private final UserService userService;
     private final UserMapper userMapper;
-    private final UserDTOCreateValidator userDTOCreateValidator;
-    private final UserDTOUpdateValidator userDTOUpdateValidator;
+    private final UserCreateValidator userCreateValidator;
+    private final UserUpdateValidator userUpdateValidator;
+
 
     @GetMapping
     public ResponseEntity<List<User>> getAll() {
-        return ResponseEntity.ok(userMapper.toDtos(userService.getAll()));
+        var users = userService.getAll();
+        return ResponseEntity.ok(userMapper.toDtos(users));
     }
 
     @GetMapping("/{id}")
-    public ResponseEntity<User> getById(@PathVariable("id") Long id) {
+    public ResponseEntity<User> getById(@PathVariable("id") UUID id) {
         var userEntity = userService.getById(id);
         return ResponseEntity.ok(userMapper.toDTO(userEntity));
     }
@@ -42,34 +45,37 @@ public class UserController {
     @PostMapping
     public ResponseEntity<User> createUser(@RequestBody @Valid User user,
                                            BindingResult bindingResult) {
-        userDTOCreateValidator.validate(user, bindingResult);
+        userCreateValidator.validate(user, bindingResult);
         var saved = userService.save(userMapper.toEntity(user));
         return ResponseEntity.ok(userMapper.toDTO(saved));
     }
 
     @DeleteMapping("/{id}")
     @ResponseStatus(HttpStatus.OK)
-    public ResponseEntity<Long> deleteUserById(@PathVariable("id") Long id) {
+    public ResponseEntity<UUID> deleteUserById(@PathVariable("id") UUID id) {
         userService.deleteById(id);
         return ResponseEntity.ok(id);
     }
 
     @PutMapping("/{id}")
-    public ResponseEntity<User> updateUser(@PathVariable("id") Long id,
-                                           @RequestBody @Valid User user,
-                                           BindingResult bindingResult) {
-        user.setId(id);
-        userDTOUpdateValidator.validate(user, bindingResult);
+    public ResponseEntity<User> updateUser(@PathVariable("id") UUID id,
+                                           @RequestBody User user) {
         var saved = userService.update(id, userMapper.toEntity(user));
         return ResponseEntity.ok(userMapper.toDTO(saved));
     }
 
     @PostMapping("/{id}/avatar")
-    public ResponseEntity<User> uploadAvatar(@PathVariable("id") Long id,
+    public ResponseEntity<User> uploadAvatar(@PathVariable("id") UUID id,
                                                 @RequestParam("file") MultipartFile file){
         var avatar = new Image(file);
         var user = userService.uploadAvatar(id, avatar);
         return ResponseEntity.ok(userMapper.toDTO(user));
+    }
+
+    @GetMapping("/updatedb")
+    @ResponseStatus(HttpStatus.OK)
+    public void udpateDatabase(){
+        userService.updateTable();
     }
 
 }

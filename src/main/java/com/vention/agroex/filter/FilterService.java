@@ -10,10 +10,7 @@ import lombok.RequiredArgsConstructor;
 import org.springframework.data.jpa.domain.Specification;
 import org.springframework.stereotype.Service;
 
-import java.util.Arrays;
-import java.util.Locale;
-import java.util.Map;
-import java.util.Objects;
+import java.util.*;
 import java.util.stream.Collectors;
 import java.util.stream.Stream;
 
@@ -60,7 +57,7 @@ public class FilterService {
                         .map(category -> Long.parseLong(category.trim()))
                         .forEach(category -> productCategoryBuilder.with("productCategory", EQUALS, category));
                 case "users" -> Arrays.stream(value.split(","))
-                        .map(user -> Long.parseLong(user.trim()))
+                        .map(user -> UUID.fromString(user.trim()))
                         .forEach(user -> userBuilder.with("user", EQUALS, user));
                 case "lotType" -> Arrays.stream(value.split(","))
                         .map(String::trim)
