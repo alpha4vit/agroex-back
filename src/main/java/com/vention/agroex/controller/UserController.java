@@ -5,7 +5,6 @@ import com.vention.agroex.dto.User;
 import com.vention.agroex.service.UserService;
 import com.vention.agroex.util.mapper.UserMapper;
 import com.vention.agroex.util.validator.UserCreateValidator;
-import com.vention.agroex.util.validator.UserUpdateValidator;
 import io.swagger.v3.oas.annotations.tags.Tag;
 import jakarta.validation.Valid;
 import lombok.RequiredArgsConstructor;
@@ -27,7 +26,6 @@ public class UserController {
     private final UserService userService;
     private final UserMapper userMapper;
     private final UserCreateValidator userCreateValidator;
-    private final UserUpdateValidator userUpdateValidator;
 
 
     @GetMapping
@@ -76,6 +74,18 @@ public class UserController {
     @ResponseStatus(HttpStatus.OK)
     public void udpateDatabase(){
         userService.updateTable();
+    }
+
+    @PostMapping("/{id}/disable")
+    @ResponseStatus(HttpStatus.OK)
+    public void disableUser(@PathVariable("id") UUID id){
+        userService.disable(id);
+    }
+
+    @PostMapping("/{id}/enable")
+    @ResponseStatus(HttpStatus.OK)
+    public void enableUser(@PathVariable("id") UUID id){
+        userService.enable(id);
     }
 
 }

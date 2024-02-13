@@ -6,10 +6,13 @@ import com.vention.agroex.repository.UserRepository;
 import com.vention.agroex.service.AwsCognitoService;
 import com.vention.agroex.service.ImageServiceStorage;
 import com.vention.agroex.service.UserService;
+import com.vention.agroex.util.constant.StatusConstants;
 import com.vention.agroex.util.mapper.UserMapper;
 import jakarta.persistence.EntityNotFoundException;
 import jakarta.transaction.Transactional;
 import lombok.RequiredArgsConstructor;
+import org.springframework.security.core.context.SecurityContextHolder;
+import org.springframework.security.oauth2.jwt.Jwt;
 import org.springframework.stereotype.Service;
 
 import java.util.List;
@@ -73,10 +76,35 @@ public class UserServiceImpl implements UserService {
     @Override
     @Transactional(rollbackOn = Exception.class)
     public void updateTable() {
-        userRepository.deleteAll();
         var userEntities = awsCognitoService.updateDb();
         userRepository.saveAll(userEntities);
     }
 
+    @Override
+    public UserEntity getAuthenticatedUser() {
+        var jwt = ((Jwt) SecurityContextHolder.getContext().getAuthentication().getPrincipal());
+        var uuid = UUID.fromString(jwt.getClaimAsString("sub"));
+        return getById(uuid);
+    }
+
+    @Override
+    @Transactional(rollbackOn = Exception.class)
+    public void disable(UUID id) {
+        var user = getById(id);
+        user.setEnabled(false);
+        for (var lot : user.getLots()){
+            lot.setStatus(StatusConstants.REJECTED_BY_ADMIN);
+            lot.setAdminComment(String.format("%s. Rejected due to user deactivation", lot.getAdminComment()));
+        }
+        awsCognitoService.setEnabled(id, false);
+    }
+
+    @Override
+    public void enable(UUID id) {
+        var user = getById(id);
+        user.setEnabled(true);
+        awsCognitoService.setEnabled(id, true);
+        userRepository.save(user);
+    }
 
 }

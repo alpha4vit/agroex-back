@@ -1,7 +1,6 @@
 package com.vention.agroex.util.mapper;
 
 import com.vention.agroex.dto.User;
-import com.vention.agroex.dto.UserRegistration;
 import com.vention.agroex.entity.UserEntity;
 import org.mapstruct.Mapper;
 import org.mapstruct.Mapping;
@@ -26,10 +25,5 @@ public interface UserMapper {
     @Mapping(target = "id", ignore = true)
     @Mapping(target = "creationDate", ignore = true)
     UserEntity update(@MappingTarget UserEntity target, UserEntity source);
-
-    @Mapping(target = "id", source = "user.sub")
-    @Mapping(target = "username", source = "user.name")
-    @Mapping(target = "timeZone", expression = "java(ZoneId.of(user.getZoneinfo()))")
-    UserEntity toEntity(UserRegistration user);
 
 }

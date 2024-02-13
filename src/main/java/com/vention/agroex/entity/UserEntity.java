@@ -2,9 +2,7 @@ package com.vention.agroex.entity;
 
 import jakarta.persistence.*;
 import lombok.*;
-import org.hibernate.annotations.CurrentTimestamp;
-import org.hibernate.annotations.SourceType;
-import org.hibernate.generator.EventType;
+import org.hibernate.annotations.CreationTimestamp;
 
 import java.time.Instant;
 import java.time.ZoneId;
@@ -30,8 +28,8 @@ public class UserEntity {
     @Column(name = "email")
     private String email;
 
+    @CreationTimestamp
     @Column(name = "creation_date")
-    @CurrentTimestamp(source = SourceType.VM, event = EventType.INSERT)
     private Instant creationDate;
 
     @Column(name = "email_verified")
@@ -46,5 +44,8 @@ public class UserEntity {
 
     @Column(name = "time_zone")
     private ZoneId timeZone;
+
+    @Column(name = "enabled")
+    private Boolean enabled;
 
 }

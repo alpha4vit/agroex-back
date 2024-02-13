@@ -8,35 +8,19 @@ import com.vention.agroex.entity.UserEntity;
 import org.springframework.stereotype.Component;
 
 import java.time.ZoneId;
+import java.time.ZonedDateTime;
 import java.util.List;
 import java.util.UUID;
 
 @Component
 public class CognitoUserMapper {
 
-    public User convertCognitoUserToUser(UserType awsCognitoUser) {
-
-        User.UserBuilder builder = User.builder();
-        awsCognitoUser.getAttributes().forEach(el -> System.out.println(el.getName()));
-        for (AttributeType userAttribute : awsCognitoUser.getAttributes()) {
-            switch (userAttribute.getName()) {
-                case "sub" -> builder.id(UUID.fromString(userAttribute.getValue()));
-                case "name" -> builder.username(userAttribute.getValue());
-                case "email" -> builder.email(userAttribute.getValue());
-                case "custom:avatar" -> builder.avatar(userAttribute.getValue());
-                case "zoneinfo" -> builder.timeZone(ZoneId.of(userAttribute.getValue()));
-                case "email_verified" -> builder.emailVerified(Boolean.valueOf(userAttribute.getValue()));
-            }
-        }
-
-        return builder.build();
-    }
-
     public UserEntity convertCognitoUserToUserEntity(UserType awsCognitoUser) {
         UserEntity.UserEntityBuilder builder = UserEntity.builder();
         mapUserAttributesToUserEntity(awsCognitoUser.getAttributes(), builder);
         builder.creationDate(
                 awsCognitoUser.getUserCreateDate().toInstant());
+        builder.enabled(awsCognitoUser.getEnabled());
         return builder.build();
     }
 
@@ -45,6 +29,7 @@ public class CognitoUserMapper {
         mapUserAttributesToUserEntity(adminGetUserResult.getUserAttributes(), builder);
         builder.creationDate(
                 adminGetUserResult.getUserCreateDate().toInstant());
+        builder.enabled(adminGetUserResult.getEnabled());
         return builder.build();
     }
 

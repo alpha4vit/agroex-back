@@ -1,6 +1,7 @@
 package com.vention.agroex.security;
 
 import com.vention.agroex.service.LotService;
+import com.vention.agroex.service.UserService;
 import lombok.RequiredArgsConstructor;
 import lombok.extern.slf4j.Slf4j;
 import org.springframework.security.core.context.SecurityContextHolder;
@@ -15,12 +16,17 @@ import java.util.UUID;
 public class CustomSecurityExpression {
 
     private final LotService lotService;
+    private final UserService userService;
 
     public boolean isLotOwner(Long lotId) {
-        var jwt = ((Jwt) SecurityContextHolder.getContext().getAuthentication().getPrincipal());
-        var uuid = UUID.fromString(jwt.getClaimAsString("sub"));
+        var authUser = userService.getAuthenticatedUser();
         var lotEntity = lotService.getById(lotId);
-        return lotEntity.getUser().getId().equals(uuid);
+        return lotEntity.getUser().getId().equals(authUser.getId());
+    }
+
+    public boolean isUserEnabled(){
+        var user = userService.getAuthenticatedUser();
+        return user.getEnabled();
     }
 
 }
