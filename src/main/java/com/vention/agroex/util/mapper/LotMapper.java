@@ -13,11 +13,11 @@ public interface LotMapper {
 
     @Mapping(target = "creationDate", ignore = true)
     @Mapping(target = "user.id", source = "lot.userId")
-    @Mapping(target = "productCategory.id", source = "lot.productCategoryId")
+    @Mapping(target = "productCategory.id", source = "lot.productCategory.id")
     LotEntity toEntity(Lot lot);
 
     @Mapping(target = "userId", source = "lotEntity.user.id")
-    @Mapping(target = "productCategoryId", source = "lotEntity.productCategory.id")
+    @Mapping(target = "productCategory.id", source = "lotEntity.productCategory.id")
     Lot toDTO(LotEntity lotEntity);
 
     List<LotEntity> toEntities(List<Lot> lots);

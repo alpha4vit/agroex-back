@@ -51,11 +51,10 @@ public class ProductCategoryServiceImpl implements ProductCategoryService {
     }
 
     @Override
-    public ProductCategoryEntity update(Long id, ProductCategoryEntity productCategoryEntity) {
-        if (productCategoryRepository.existsById(id)) {
-            return productCategoryRepository.save(productCategoryEntity);
-        } else {
-            throw new EntityNotFoundException(String.format("There is no category with id %d", id));
-        }
+    public ProductCategoryEntity update(Long id, ProductCategoryEntity productCategory) {
+        var fetchedCategory = productCategoryRepository.findById(id)
+                .orElseThrow(() -> new EntityNotFoundException(String.format("There is no category with id %d", id)));
+        productCategory.setParentId(fetchedCategory.getParentId());
+        return productCategoryRepository.save(productCategory);
     }
 }
