@@ -45,8 +45,10 @@ public class LotServiceImpl implements LotService {
         lotEntity.setProductCategory(productCategoryEntity);
 
         var saved = lotRepository.save(lotEntity);
-        if (files != null)
+        if (files != null && files.length >= 1 && !(files.length > 6))
             saved.setImages(uploadImages(saved.getId(), files));
+        else
+            throw new ImageLotException("Incorrect quantity of images must be from 1 to 6!");
 
         return saved;
     }
@@ -88,8 +90,10 @@ public class LotServiceImpl implements LotService {
 
         var saved = lotRepository.save(result);
 
-        if (files != null)
+        if (files != null && files.length >= 1 && !(files.length > 6))
             saved.setImages(uploadImages(saved.getId(), files));
+        else
+            throw new ImageLotException("Incorrect quantity of images must be from 1 to 6!");
 
         return saved;
     }

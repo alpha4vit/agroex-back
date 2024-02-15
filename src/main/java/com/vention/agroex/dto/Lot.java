@@ -19,20 +19,21 @@ public class Lot {
     private Long id;
 
     @NotBlank(message = "Lot title cant be blank")
-    @Size(min = 5, max = 64, message = "Lot title must be between 5 and 64 characters")
+    @Size(min = 1, max = 30, message = "The field should be from 1 to 30 characters long")
     private String title;
 
     @NotBlank(message = "Lot description cant be blank")
+    @Size(min = 20, max = 1000, message = "The field should be from 20 to 1000 characters long")
     private String description;
 
     @NotBlank(message = "Lot variety cant be blank")
-    @Size(max = 64, message = "Lot variety must be less than 64 characters")
+    @Size(max = 64, message = "The field should be less than 64 characters long")
     private String variety;
 
-    @Size(max = 64, message = "Lot size must be less than 64 characters")
+    @Size(max = 64, message = "The field should be less than 64 characters long")
     private String size;
 
-    @Size(max = 64, message = "Lot packaging must be less than 64 characters")
+    @Size(min = 1, max = 10, message = "The field should be from 1 to 10 characters long")
     private String packaging;
 
     private Boolean enabledByAdmin;
@@ -42,6 +43,7 @@ public class Lot {
     private float quantity;
 
     @NotNull
+    @DecimalMin(value = "1.0", message = "The field should contain only numbers from 1 to 9999 (integer or fractional)")
     private float price;
 
     @NotBlank(message = "Lot currency cant be blank")
@@ -51,6 +53,7 @@ public class Lot {
     @JsonProperty(access = JsonProperty.Access.READ_ONLY)
     private Instant creationDate;
 
+    @FutureOrPresent(message = "The field should be valid date greater or equal to current date ")
     private Instant expirationDate;
 
     private ProductCategoryModel productCategory;
