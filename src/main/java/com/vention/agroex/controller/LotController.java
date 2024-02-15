@@ -1,6 +1,5 @@
 package com.vention.agroex.controller;
 
-import com.vention.agroex.dto.Image;
 import com.vention.agroex.dto.Lot;
 import com.vention.agroex.service.LotService;
 import com.vention.agroex.util.mapper.LotMapper;
@@ -29,19 +28,21 @@ public class LotController {
     private final LotDTOValidator lotDTOValidator;
 
     @PostMapping
-    public ResponseEntity<Lot> save(@RequestBody @Valid Lot lot,
-                                    BindingResult bindingResult){
+    public ResponseEntity<Lot> save(@RequestPart(value = "file", required = false) MultipartFile[] files,
+                                    @RequestPart("data")  @Valid Lot lot,
+                                    BindingResult bindingResult) {
         lotDTOValidator.validate(lot, bindingResult);
-        var saved = lotService.save(lotMapper.toEntity(lot));
+        var saved = lotService.save(lotMapper.toEntity(lot), files);
         return ResponseEntity.ok(lotMapper.toDTO(saved));
     }
 
     @PutMapping("/{id}")
-    public ResponseEntity<Lot> update(@PathVariable Long id,
-                                      @RequestBody @Valid Lot lot,
+    public ResponseEntity<Lot> update(@PathVariable("id") Long id,
+                                      @RequestPart(value = "file", required = false) MultipartFile[] files,
+                                      @RequestPart("data") @Valid Lot lot,
                                       BindingResult bindingResult) {
         lotDTOValidator.validate(lot, bindingResult);
-        var saved = lotService.update(id, lotMapper.toEntity(lot));
+        var saved = lotService.update(id, lotMapper.toEntity(lot), files);
         return ResponseEntity.ok(lotMapper.toDTO(saved));
     }
 
@@ -63,19 +64,10 @@ public class LotController {
         return ResponseEntity.noContent().build();
     }
 
-
-    @PostMapping("/{id}/images")
-    public ResponseEntity<String> uploadImageForLot(@PathVariable("id") Long lotId,
-                                  @RequestParam("file") MultipartFile file){
-        var image = new Image(file);
-        var saved = lotService.uploadImage(lotId, image);
-        return ResponseEntity.ok(saved);
-    }
-
     @DeleteMapping("/{id}/images")
     @ResponseStatus(HttpStatus.OK)
     public void deleteImageForLot(@PathVariable("id") Long lotId,
-                                  @RequestParam("fileName") String fileName){
+                                  @RequestParam("fileName") String fileName) {
         lotService.deleteImage(fileName);
     }
 }

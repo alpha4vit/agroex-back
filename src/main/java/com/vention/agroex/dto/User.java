@@ -37,4 +37,6 @@ public class User {
 
     private Boolean emailVerified;
 
+    private String avatar;
+
 }

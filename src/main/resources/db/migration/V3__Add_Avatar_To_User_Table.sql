@@ -1,0 +1,1 @@
+alter table public.users add column avatar varchar(40);

@@ -6,6 +6,7 @@ import org.mapstruct.Mapper;
 import org.mapstruct.Mapping;
 import org.mapstruct.MappingConstants;
 
+import java.util.ArrayList;
 import java.util.List;
 
 @Mapper(componentModel = MappingConstants.ComponentModel.SPRING, uses = LocationMapper.class)
@@ -39,7 +40,7 @@ public interface LotMapper {
                 .quantity(received.getQuantity() != 0 ? received.getQuantity() : before.getQuantity())
                 .packaging(received.getPackaging() != null ? received.getPackaging() : before.getPackaging())
                 .variety(received.getVariety() != null ? received.getVariety() : before.getVariety())
-                .images(before.getImages())
+                .images(new ArrayList<>())
                 .tags(received.getTags())
                 .enabledByAdmin(received.getEnabledByAdmin())
                 .build();
