@@ -55,8 +55,8 @@
 - **size**: string, example: "70+"
 - **packaging**: string, example: "buckets"
 - **enbledByAdmin**: boolean, example: false
-- **quantity**: integer (int32), example: 10000
-- **pricePerTon**: number (float), example: 1299
+- **quantity**: number (float), example: 123.2
+- **price**: number (float), example: 1299
 - **currency**: string, example: "USD"
 - **creationDate**: string (date-time, read-only), example: "2024-01-26T15:52:08.8822866Z"
 - **expirationDate**: string (date-time), example: "2024-01-26T15:52:08.8822866Z"

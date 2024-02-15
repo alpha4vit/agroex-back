@@ -40,10 +40,10 @@ public class LotEntity {
     private Boolean enabledByAdmin;
 
     @Column(name = "quantity")
-    private int quantity;
+    private float quantity;
 
-    @Column(name = "price_per_ton")
-    private float pricePerTon;
+    @Column(name = "price")
+    private float price;
 
     @Column(name = "currency")
     private String currency;

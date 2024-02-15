@@ -38,11 +38,11 @@ public class Lot {
     private Boolean enabledByAdmin;
 
     @NotNull
-    @Min(value = 1, message = "Minimum quantity is 1")
-    private int quantity;
+    @DecimalMin(value = "0.01", message = "Minimum quantity is 0.01")
+    private float quantity;
 
     @NotNull
-    private float pricePerTon;
+    private float price;
 
     @NotBlank(message = "Lot currency cant be blank")
     @Size(max = 10, message = "Lot currency must be less than 10 characters")
