@@ -13,12 +13,12 @@ import java.util.List;
 public interface LotMapper {
 
     @Mapping(target = "creationDate", ignore = true)
-    @Mapping(target = "user.id", source = "lot.userId")
-    @Mapping(target = "productCategory.id", source = "lot.productCategory.id")
+    @Mapping(target = "user.id", source = "userId")
+    @Mapping(target = "productCategory.id", source = "productCategory.id")
     LotEntity toEntity(Lot lot);
 
-    @Mapping(target = "userId", source = "lotEntity.user.id")
-    @Mapping(target = "productCategory.id", source = "lotEntity.productCategory.id")
+    @Mapping(target = "userId", source = "user.id")
+    @Mapping(target = "productCategory.id", source = "productCategory.id")
     Lot toDTO(LotEntity lotEntity);
 
     List<LotEntity> toEntities(List<Lot> lots);
@@ -35,7 +35,7 @@ public interface LotMapper {
                 .enabledByAdmin(before.getEnabledByAdmin())
                 .creationDate(before.getCreationDate())
                 .expirationDate(received.getExpirationDate() != null ? received.getExpirationDate() : before.getExpirationDate())
-                .pricePerTon(received.getPricePerTon() != 0.0 ? received.getPricePerTon() : before.getPricePerTon())
+                .price(received.getPrice() != 0.0 ? received.getPrice() : before.getPrice())
                 .size(received.getSize() != null ? received.getSize() : before.getSize())
                 .quantity(received.getQuantity() != 0 ? received.getQuantity() : before.getQuantity())
                 .packaging(received.getPackaging() != null ? received.getPackaging() : before.getPackaging())
