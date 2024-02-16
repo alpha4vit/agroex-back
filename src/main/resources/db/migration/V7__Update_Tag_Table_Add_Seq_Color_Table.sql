@@ -1,5 +1,5 @@
 CREATE TABLE IF NOT EXISTS public.colors(
-    id BIGSERIAL,
+    id BIGSERIAL PRIMARY KEY ,
     bg_color_hex varchar(10),
     text_color_hex varchar(10)
 );
