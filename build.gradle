@@ -20,6 +20,12 @@ flyway {
     schemas = ['public']
 }
 
+def profiles = 'local'
+
+bootRun {
+    args = ["--spring.profiles.active=" + profiles]
+}
+
 repositories {
     mavenCentral()
 }
