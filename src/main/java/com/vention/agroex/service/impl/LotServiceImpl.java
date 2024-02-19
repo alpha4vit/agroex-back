@@ -3,8 +3,10 @@ package com.vention.agroex.service.impl;
 import com.vention.agroex.dto.Image;
 import com.vention.agroex.entity.ImageEntity;
 import com.vention.agroex.entity.LotEntity;
+import com.vention.agroex.entity.ProductCategoryEntity;
 import com.vention.agroex.exception.ImageException;
 import com.vention.agroex.exception.ImageLotException;
+import com.vention.agroex.exception.InvalidArgumentException;
 import com.vention.agroex.filter.FilterService;
 import com.vention.agroex.repository.LotRepository;
 import com.vention.agroex.service.*;
@@ -40,7 +42,15 @@ public class LotServiceImpl implements LotService {
     public LotEntity save(LotEntity lotEntity, MultipartFile[] files) {
         var userEntity = userService.getById(lotEntity.getUser().getId());
         var countryEntity = countryService.getById(lotEntity.getLocation().getCountry().getId());
-        var productCategoryEntity = productCategoryService.getById(lotEntity.getProductCategory().getId());
+
+        var productCategoryEntity = switch (lotEntity.getProductCategory()) {
+            case ProductCategoryEntity e when e.getId() != null ->
+                    productCategoryService.getById(lotEntity.getProductCategory().getId());
+            case ProductCategoryEntity e when e.getTitle() != null ->
+                    productCategoryService.save(lotEntity.getProductCategory());
+            case null, default ->
+                    throw new InvalidArgumentException("Provide productCategory.id or productCategory.title");
+        };
 
         lotEntity.setEnabledByAdmin(true);
         lotEntity.setUser(userEntity);
@@ -83,7 +93,15 @@ public class LotServiceImpl implements LotService {
 
         var userEntity = userService.getById(result.getUser().getId());
         var countryEntity = countryService.getById(result.getLocation().getCountry().getId());
-        var productCategoryEntity = productCategoryService.getById(result.getProductCategory().getId());
+
+        var productCategoryEntity = switch (entity.getProductCategory()) {
+            case ProductCategoryEntity e when e.getId() != null ->
+                    productCategoryService.getById(entity.getProductCategory().getId());
+            case ProductCategoryEntity e when e.getTitle() != null ->
+                    productCategoryService.save(entity.getProductCategory());
+            case null, default ->
+                    throw new InvalidArgumentException("Provide productCategory.id or productCategory.title");
+        };
 
         result.setUser(userEntity);
         result.getLocation().setCountry(countryEntity);
