@@ -43,6 +43,10 @@ public class ProductCategoryController {
         return ResponseEntity.ok(fetchedProductCategories);
     }
 
+    public ResponseEntity<List<ProductCategoryEntity>> findWithFilters(@RequestParam(value = "filters", required = false) String filters) {
+        return ResponseEntity.ok(productCategoryService.getWithFilters(filters));
+    }
+
     @GetMapping("/{id}")
     public ResponseEntity<List<ProductCategoryEntity>> findAllSubcategories(@PathVariable Long id) {
         var fetchedProductCategories = productCategoryService.getSubcategoriesById(id);
