@@ -5,8 +5,8 @@ import lombok.AllArgsConstructor;
 import lombok.Builder;
 import lombok.Data;
 import lombok.NoArgsConstructor;
-import org.hibernate.annotations.CreationTimestamp;
 import org.hibernate.annotations.Formula;
+import org.hibernate.annotations.CreationTimestamp;
 
 import java.time.Instant;
 import java.util.List;
@@ -81,7 +81,9 @@ public class LotEntity {
     @OneToMany(mappedBy = "lot", cascade = CascadeType.REMOVE)
     private List<ImageEntity> images;
 
+    @OneToMany(mappedBy = "lot", cascade = CascadeType.ALL)
+    private List<BetEntity> bets;
+
     @Formula("(SELECT ls.search_string FROM lot_search_view ls WHERE ls.id = id)")
     private String searchString;
-
 }

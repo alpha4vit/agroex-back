@@ -43,6 +43,7 @@ public interface LotMapper {
                 .images(new ArrayList<>())
                 .tags(received.getTags())
                 .enabledByAdmin(received.getEnabledByAdmin())
+                .bets(received.getBets())
                 .build();
 
         LocationEntity locationEntity = LocationEntity.builder()

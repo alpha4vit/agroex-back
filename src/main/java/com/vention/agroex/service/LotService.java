@@ -20,6 +20,8 @@ public interface LotService {
 
     LotEntity update(Long id, LotEntity entity, MultipartFile[] files);
 
+    LotEntity update(Long id, LotEntity entity);
+
     List<ImageEntity>  uploadImages(Long id, MultipartFile[] files);
 
     void deleteImage(String fileName);
