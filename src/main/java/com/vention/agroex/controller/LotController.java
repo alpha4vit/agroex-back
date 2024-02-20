@@ -30,7 +30,7 @@ public class LotController {
 
     @PostMapping
     public ResponseEntity<Lot> save(@RequestPart(value = "file", required = false) MultipartFile[] files,
-                                    @RequestPart("data")  @Valid Lot lot,
+                                    @RequestPart("data") @Valid Lot lot,
                                     BindingResult bindingResult) {
         lotDTOValidator.validate(lot, bindingResult);
         var saved = lotService.save(lotMapper.toEntity(lot), files);
