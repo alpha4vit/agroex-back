@@ -23,12 +23,12 @@ public class User {
     @Size(min = 3, max = 64, message = "Username must be between 3 and 64 characters")
     private String username;
 
-    @NotBlank(message = "Email cant be blank")
     @Email
+    @NotBlank(message = "Email cant be blank")
     private String email;
 
-    @JsonProperty(access = JsonProperty.Access.WRITE_ONLY)
     @NotBlank(message = "Password can`t be blank")
+    @JsonProperty(access = JsonProperty.Access.WRITE_ONLY)
     @Size(min = 8, max = 64, message = "Password must contain between 8 and 64 characters")
     private String password;
 
