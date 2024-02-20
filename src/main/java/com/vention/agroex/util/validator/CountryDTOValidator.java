@@ -30,7 +30,7 @@ public class CountryDTOValidator implements Validator {
             errorsMap.put("title", "Country with this title already exists!");
         errors.getFieldErrors()
                 .forEach(error -> errorsMap.put(error.getField(), error.getDefaultMessage()));
-        if (errorsMap.size() > 0)
+        if (!errorsMap.isEmpty())
             throw new InvalidArgumentException(errorsMap, "Invalid arguments!");
     }
 }

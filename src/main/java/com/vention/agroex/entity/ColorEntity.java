@@ -11,18 +11,16 @@ import lombok.NoArgsConstructor;
 @Builder
 @NoArgsConstructor
 @AllArgsConstructor
-@Table(name = "tags")
-public class TagEntity {
+@Table(name = "colors")
+public class ColorEntity {
 
     @Id
     @GeneratedValue(strategy = GenerationType.IDENTITY)
     private Long id;
 
-    @Column(name = "title")
-    private String title;
+    @Column(name = "bg_color_hex")
+    private String bgColorHex;
 
-    @ManyToOne(fetch = FetchType.EAGER)
-    @JoinColumn(name = "color_id", referencedColumnName = "id")
-    private ColorEntity color;
-
+    @Column(name = "text_color_hex")
+    private String textColorHex;
 }

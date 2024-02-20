@@ -28,14 +28,16 @@ import java.util.Map;
 @RequiredArgsConstructor
 public class LotServiceImpl implements LotService {
 
-    private final LotMapper lotMapper;
-    private final UserService userService;
-    private final ImageService imageService;
-    private final ImageServiceStorage imageServiceStorage;
-    private final FilterService filterService;
     private final LotRepository lotRepository;
+    private final ImageServiceStorage imageServiceStorage;
+    private final ImageService imageService;
+    private final FilterService filterService;
     private final ProductCategoryService productCategoryService;
     private final CountryService countryService;
+    private final UserService userService;
+    private final LotMapper lotMapper;
+    private final TagService tagService;
+
 
     @Override
     @Transactional(rollbackOn = ImageLotException.class)
@@ -56,6 +58,7 @@ public class LotServiceImpl implements LotService {
         lotEntity.setUser(userEntity);
         lotEntity.getLocation().setCountry(countryEntity);
         lotEntity.setProductCategory(productCategoryEntity);
+        lotEntity.getTags().forEach(tagService::save);
 
         var saved = lotRepository.save(lotEntity);
         if (files != null && files.length >= 1 && !(files.length > 6))
