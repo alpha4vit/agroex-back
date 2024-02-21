@@ -38,6 +38,17 @@ public class Lot {
 
     private Boolean enabledByAdmin;
 
+    private Long duration;
+
+    private float minPrice;
+
+    @Pattern(regexp = "\\b(?:new|on moderation|rejected by admin|approved)\\b", message = "Admin status can be only new/on moderation/rejected by admin/approved")
+    private String adminStatus;
+
+    private String userStatus;
+
+    private String status;
+
     @NotNull
     @DecimalMin(value = "0.01", message = "Minimum quantity is 0.01")
     private float quantity;
@@ -58,7 +69,7 @@ public class Lot {
 
     private ProductCategoryModel productCategory;
 
-    @Pattern(regexp = "\\b(?:buy|sell)\\b", message = "Lot type can be only buy/sell")
+    @Pattern(regexp = "\\b(?:buy|sell|auctionSell)\\b", message = "Lot type can be only buy/sell/auctionSell")
     private String lotType;
 
     private Long userId;

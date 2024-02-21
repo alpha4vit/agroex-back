@@ -2,6 +2,7 @@ package com.vention.agroex.util.mapper;
 
 import com.vention.agroex.dto.Lot;
 import com.vention.agroex.entity.*;
+import com.vention.agroex.util.constant.StatusConstants;
 import org.mapstruct.Mapper;
 import org.mapstruct.Mapping;
 import org.mapstruct.MappingConstants;
@@ -15,6 +16,10 @@ public interface LotMapper {
     @Mapping(target = "creationDate", ignore = true)
     @Mapping(target = "user.id", source = "userId")
     @Mapping(target = "productCategory.id", source = "productCategory.id")
+    @Mapping(target = "enabledByAdmin", defaultValue = "true")
+    @Mapping(target = "userStatus", defaultValue = StatusConstants.ACTIVE)
+    @Mapping(target = "status", defaultValue = StatusConstants.ACTIVE)
+    @Mapping(target = "adminStatus", defaultValue = StatusConstants.APPROVED)
     LotEntity toEntity(Lot lot);
 
     @Mapping(target = "userId", source = "user.id")
@@ -44,6 +49,7 @@ public interface LotMapper {
                 .tags(received.getTags())
                 .enabledByAdmin(received.getEnabledByAdmin())
                 .bets(received.getBets())
+                .status(received.getStatus())
                 .build();
 
         LocationEntity locationEntity = LocationEntity.builder()

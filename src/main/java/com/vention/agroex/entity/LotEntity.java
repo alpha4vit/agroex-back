@@ -5,8 +5,8 @@ import lombok.AllArgsConstructor;
 import lombok.Builder;
 import lombok.Data;
 import lombok.NoArgsConstructor;
-import org.hibernate.annotations.Formula;
 import org.hibernate.annotations.CreationTimestamp;
+import org.hibernate.annotations.Formula;
 
 import java.time.Instant;
 import java.util.List;
@@ -43,8 +43,23 @@ public class LotEntity {
     @Column(name = "quantity")
     private float quantity;
 
+    @Column(name = "min_price")
+    private float minPrice;
+
     @Column(name = "price")
     private float price;
+
+    @Column(name = "admin_status")
+    private String adminStatus;
+
+    @Column(name = "user_status")
+    private String userStatus;
+
+    @Column(name = "status")
+    private String status;
+
+    @Column(name = "duration")
+    private Long duration;
 
     @Column(name = "currency")
     private String currency;

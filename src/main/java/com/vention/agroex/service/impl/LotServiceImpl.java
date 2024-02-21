@@ -10,6 +10,7 @@ import com.vention.agroex.exception.InvalidArgumentException;
 import com.vention.agroex.filter.FilterService;
 import com.vention.agroex.repository.LotRepository;
 import com.vention.agroex.service.*;
+import com.vention.agroex.util.constant.StatusConstants;
 import com.vention.agroex.util.mapper.LotMapper;
 import jakarta.persistence.EntityNotFoundException;
 import jakarta.transaction.Transactional;
@@ -28,19 +29,21 @@ import java.util.Map;
 @RequiredArgsConstructor
 public class LotServiceImpl implements LotService {
 
-    private final LotRepository lotRepository;
-    private final ImageServiceStorage imageServiceStorage;
-    private final ImageService imageService;
-    private final FilterService filterService;
-    private final ProductCategoryService productCategoryService;
-    private final CountryService countryService;
-    private final UserService userService;
     private final LotMapper lotMapper;
     private final TagService tagService;
+    private final UserService userService;
+    private final ImageService imageService;
+    private final FilterService filterService;
+    private final LotRepository lotRepository;
+    private final CountryService countryService;
+    private final ImageServiceStorage imageServiceStorage;
+    private final ProductCategoryService productCategoryService;
 
     @Override
     @Transactional(rollbackOn = ImageLotException.class)
     public LotEntity save(LotEntity lotEntity, MultipartFile[] files) {
+        validateFields(lotEntity, files);
+
         var userEntity = userService.getById(lotEntity.getUser().getId());
         var countryEntity = countryService.getById(lotEntity.getLocation().getCountry().getId());
 
@@ -52,20 +55,36 @@ public class LotServiceImpl implements LotService {
             case null, default ->
                     throw new InvalidArgumentException("Provide productCategory.id or productCategory.title");
         };
+        tagService.saveList(lotEntity.getTags());
 
-        lotEntity.setEnabledByAdmin(true);
         lotEntity.setUser(userEntity);
         lotEntity.getLocation().setCountry(countryEntity);
         lotEntity.setProductCategory(productCategoryEntity);
-        lotEntity.getTags().forEach(tagService::save);
+
+        if (lotEntity.getLotType().equals("auctionSell")) {
+            lotEntity.setAdminStatus(StatusConstants.NEW);
+        }
 
         var saved = lotRepository.save(lotEntity);
-        if (files != null && files.length >= 1 && !(files.length > 6))
-            saved.setImages(uploadImages(saved.getId(), files));
-        else
-            throw new ImageLotException("Incorrect quantity of images must be from 1 to 6!");
+        saved.setImages(uploadImages(saved.getId(), files));
 
         return saved;
+    }
+
+    private void validateFields(LotEntity lotEntity, MultipartFile[] files) {
+        if (files == null || files.length < 1 || files.length > 6)
+            throw new ImageLotException("Incorrect quantity of images must be from 1 to 6!");
+        if (lotEntity.getLotType().equals("auctionSell")) {
+            if (lotEntity.getDuration() == null) {
+                throw new InvalidArgumentException("Duration of auction lot should not be null");
+            }
+            if (lotEntity.getDuration() < 36000000L) {
+                throw new InvalidArgumentException("Duration must be more than 10 minutes");
+            }
+            if (lotEntity.getMinPrice() >= lotEntity.getPrice()) {
+                throw new InvalidArgumentException("Min price can`t be less than lot price");
+            }
+        }
     }
 
     @Override
@@ -161,7 +180,7 @@ public class LotServiceImpl implements LotService {
         imageService.delete(imageEntity);
     }
 
-    public void clearImagesForLot(Long lotId){
+    public void clearImagesForLot(Long lotId) {
         var lotEntity = getById(lotId);
         lotEntity.getImages().forEach(image -> {
             imageService.delete(image);
@@ -173,6 +192,4 @@ public class LotServiceImpl implements LotService {
     public List<LotEntity> getWithCriteria(Map<String, String> filters) {
         return filterService.getWithCriteria(filters);
     }
-
-
 }

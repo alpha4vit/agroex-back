@@ -6,7 +6,6 @@ import com.vention.agroex.exception.InvalidBetException;
 import com.vention.agroex.repository.BetRepository;
 import com.vention.agroex.service.BetService;
 import com.vention.agroex.service.LotService;
-import jakarta.transaction.Transactional;
 import lombok.RequiredArgsConstructor;
 import lombok.extern.slf4j.Slf4j;
 import org.springframework.stereotype.Service;
@@ -23,10 +22,11 @@ public class BetServiceImpl implements BetService {
     private final BetRepository betRepository;
 
     @Override
-    @Transactional
     public BetEntity makeBet(Long lotId, BetEntity betEntity) {
         var lot = lotService.getById(lotId);
-
+        if (!lot.getLotType().equals("auctionSell")) {
+            throw new InvalidBetException("This lot is not an auction lot");
+        }
         saveBet(lot, betEntity);
 
         return betEntity;

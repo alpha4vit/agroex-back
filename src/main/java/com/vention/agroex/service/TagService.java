@@ -12,6 +12,8 @@ public interface TagService {
 
     TagEntity save(TagEntity tagEntity);
 
+    List<TagEntity> saveList(List<TagEntity> tagEntity);
+
     TagEntity update(Long id, TagEntity tagEntity);
 
     void delete(TagEntity tagEntity);

@@ -35,6 +35,13 @@ public class TagServiceImpl implements TagService {
     }
 
     @Override
+    public List<TagEntity> saveList(List<TagEntity> tagEntities) {
+        tagEntities.forEach(tag ->
+                tag.setColor(colorService.getNextColor()));
+        return tagRepository.saveAll(tagEntities);
+    }
+
+    @Override
     public TagEntity update(Long id, TagEntity tagEntity) {
         tagEntity.setId(id);
         return tagRepository.save(tagEntity);
