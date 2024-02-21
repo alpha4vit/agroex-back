@@ -27,6 +27,10 @@ public class BetServiceImpl implements BetService {
         if (!lot.getLotType().equals("auctionSell")) {
             throw new InvalidBetException("This lot is not an auction lot");
         }
+        if (lot.getMinPrice() > betEntity.getAmount()) {
+            throw new InvalidBetException(
+                    String.format("Your bet must be higher than the minimal price: %f", lot.getMinPrice()));
+        }
         saveBet(lot, betEntity);
 
         return betEntity;

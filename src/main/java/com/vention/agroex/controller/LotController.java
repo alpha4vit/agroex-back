@@ -1,6 +1,7 @@
 package com.vention.agroex.controller;
 
 import com.vention.agroex.dto.Lot;
+import com.vention.agroex.model.LotStatusResponse;
 import com.vention.agroex.service.LotService;
 import com.vention.agroex.util.mapper.LotMapper;
 import com.vention.agroex.util.validator.LotDTOValidator;
@@ -74,5 +75,10 @@ public class LotController {
     public void deleteImageForLot(@PathVariable("id") Long lotId,
                                   @RequestParam("fileName") String fileName) {
         lotService.deleteImage(fileName);
+    }
+
+    @GetMapping("/{id}/status")
+    public ResponseEntity<LotStatusResponse> getLotStatus(@PathVariable Long id) {
+        return ResponseEntity.ok(lotService.getLotStatus(id));
     }
 }

@@ -2,6 +2,7 @@ package com.vention.agroex.service;
 
 import com.vention.agroex.entity.ImageEntity;
 import com.vention.agroex.entity.LotEntity;
+import com.vention.agroex.model.LotStatusResponse;
 import org.springframework.web.multipart.MultipartFile;
 
 import java.util.List;
@@ -29,4 +30,6 @@ public interface LotService {
     List<LotEntity> getWithCriteria(Map<String, String> filters);
 
     void clearImagesForLot(Long lotId);
+
+    LotStatusResponse getLotStatus(Long id);
 }

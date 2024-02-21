@@ -43,6 +43,7 @@ public class UserEntity {
     @Column(name = "avatar")
     private String avatar;
 
+    @ToString.Exclude
     @OneToMany(mappedBy = "user", cascade = CascadeType.REMOVE)
     private List<LotEntity> lots;
 

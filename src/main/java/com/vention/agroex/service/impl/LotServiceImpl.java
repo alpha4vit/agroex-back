@@ -8,6 +8,7 @@ import com.vention.agroex.exception.ImageException;
 import com.vention.agroex.exception.ImageLotException;
 import com.vention.agroex.exception.InvalidArgumentException;
 import com.vention.agroex.filter.FilterService;
+import com.vention.agroex.model.LotStatusResponse;
 import com.vention.agroex.repository.LotRepository;
 import com.vention.agroex.service.*;
 import com.vention.agroex.util.constant.StatusConstants;
@@ -186,6 +187,25 @@ public class LotServiceImpl implements LotService {
             imageService.delete(image);
             imageServiceStorage.remove(image);
         });
+    }
+
+    @Override
+    public LotStatusResponse getLotStatus(Long id) {
+        var lot = getById(id);
+        if (!lot.getLotType().equals("auctionSell")) {
+            throw new InvalidArgumentException("This lot is not an auction lot");
+        }
+        var bets = lot.getBets();
+        var statusBuilder = LotStatusResponse.builder()
+                .lotId(id)
+                .userid(lot.getUser().getId())
+                .status(lot.getStatus());
+        if (!bets.isEmpty()) {
+            statusBuilder
+                    .betAmount(bets.getFirst().getAmount())
+                    .betTime(bets.getFirst().getBetTime());
+        }
+        return statusBuilder.build();
     }
 
     @Override
