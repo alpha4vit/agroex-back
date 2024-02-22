@@ -11,12 +11,7 @@ import lombok.RequiredArgsConstructor;
 import org.springframework.data.jpa.domain.Specification;
 import org.springframework.stereotype.Service;
 
-import java.util.Arrays;
-import java.util.List;
-import java.util.Locale;
-import java.util.Map;
-import java.util.Objects;
-import java.util.Optional;
+import java.util.*;
 import java.util.stream.Stream;
 
 @Service
@@ -70,7 +65,33 @@ public class FilterService {
                         .ifPresent(categories -> categories.forEach(category ->
                                 productCategoryBuilder.with("productCategory", EQUALS, category)
                         ));
-
+                case "adminStatus" -> Optional.ofNullable(value)
+                        .filter(v -> !v.isEmpty())
+                        .map(v -> Arrays.stream(v.split(","))
+                                .map(String::trim)
+                                .map(String::toString)
+                                .toList())
+                        .ifPresent(statuses -> statuses.forEach(status ->
+                                typeBuilder.with("adminStatus", EQUALS, status)
+                        ));
+                case "status" -> Optional.ofNullable(value)
+                        .filter(v -> !v.isEmpty())
+                        .map(v -> Arrays.stream(v.split(","))
+                                .map(String::trim)
+                                .map(String::toString)
+                                .toList())
+                        .ifPresent(statuses -> statuses.forEach(status ->
+                                typeBuilder.with("status", EQUALS, status)
+                        ));
+                case "userStatus" -> Optional.ofNullable(value)
+                        .filter(v -> !v.isEmpty())
+                        .map(v -> Arrays.stream(v.split(","))
+                                .map(String::trim)
+                                .map(String::toString)
+                                .toList())
+                        .ifPresent(statuses -> statuses.forEach(status ->
+                                typeBuilder.with("userStatus", EQUALS, status)
+                        ));
                 case "users" -> Optional.ofNullable(value)
                         .filter(v -> !v.isEmpty())
                         .map(v -> Arrays.stream(v.split(","))

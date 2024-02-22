@@ -211,6 +211,26 @@ public class LotServiceImpl implements LotService {
     }
 
     @Override
+    public LotEntity putOnModeration(Long id) {
+        var lot = getById(id);
+        if (!lot.getLotType().equals("auctionSell")) {
+            throw new InvalidArgumentException("This lot is not an auction lot");
+        }
+        lot.setAdminStatus(StatusConstants.ON_MODERATION);
+        return update(id, lot);
+    }
+
+    @Override
+    public LotEntity approve(Long id) {
+        var lot = getById(id);
+        if (!lot.getLotType().equals("auctionSell")) {
+            throw new InvalidArgumentException("This lot is not an auction lot");
+        }
+        lot.setAdminStatus(StatusConstants.APPROVED);
+        return update(id, lot);
+    }
+
+    @Override
     public List<LotEntity> getWithCriteria(Map<String, String> filters) {
         return filterService.getWithCriteria(filters);
     }

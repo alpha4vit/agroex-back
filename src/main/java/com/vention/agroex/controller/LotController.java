@@ -81,4 +81,16 @@ public class LotController {
     public ResponseEntity<LotStatusResponse> getLotStatus(@PathVariable Long id) {
         return ResponseEntity.ok(lotService.getLotStatus(id));
     }
+
+    @PostMapping("/{id}/moderate")
+    public ResponseEntity<Lot> putOnModeration(@PathVariable("id") Long lotId) {
+        var moderated = lotService.putOnModeration(lotId);
+        return ResponseEntity.ok(lotMapper.toDTO(moderated));
+    }
+
+    @PostMapping("/{id}/approve")
+    public ResponseEntity<Lot> approve(@PathVariable("id") Long lotId) {
+        var approved = lotService.approve(lotId);
+        return ResponseEntity.ok(lotMapper.toDTO(approved));
+    }
 }

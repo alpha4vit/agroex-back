@@ -32,4 +32,8 @@ public interface LotService {
     void clearImagesForLot(Long lotId);
 
     LotStatusResponse getLotStatus(Long id);
+
+    LotEntity putOnModeration(Long lotId);
+
+    LotEntity approve(Long lotId);
 }

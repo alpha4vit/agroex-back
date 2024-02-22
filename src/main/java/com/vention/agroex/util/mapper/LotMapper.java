@@ -50,6 +50,9 @@ public interface LotMapper {
                 .enabledByAdmin(received.getEnabledByAdmin())
                 .bets(received.getBets())
                 .status(received.getStatus())
+                .userStatus((received.getUserStatus()))
+                .adminStatus((received.getAdminStatus()))
+                .duration(received.getDuration())
                 .build();
 
         LocationEntity locationEntity = LocationEntity.builder()
