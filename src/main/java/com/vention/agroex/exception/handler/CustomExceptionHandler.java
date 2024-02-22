@@ -62,7 +62,7 @@ public class CustomExceptionHandler extends ResponseEntityExceptionHandler {
             case EntityNotFoundException e -> createResponse(e, HttpStatus.NOT_FOUND, new HashMap<>());
             case InvalidArgumentException e -> createResponse(e, HttpStatus.BAD_REQUEST, e.getErrors());
             case InvalidBetException e -> createResponse(e, HttpStatus.BAD_REQUEST, new HashMap<>());
-            case ImageLotException e -> createResponse(e, HttpStatus.BAD_REQUEST, new HashMap<>());
+            case ImageLotException e -> createResponse(e, HttpStatus.BAD_REQUEST, e.getErrors());
             case ImageException e -> createResponse(e, HttpStatus.BAD_REQUEST, new HashMap<>());
             default -> createResponse(exception, HttpStatus.INTERNAL_SERVER_ERROR, new HashMap<>());
         };

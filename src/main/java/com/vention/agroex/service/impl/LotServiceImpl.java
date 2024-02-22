@@ -75,7 +75,7 @@ public class LotServiceImpl implements LotService {
 
     private void validateFields(LotEntity lotEntity, MultipartFile[] files) {
         if (files == null || files.length < 1 || files.length > 6)
-            throw new ImageLotException("Incorrect quantity of images must be from 1 to 6!");
+            throw new InvalidArgumentException(Map.of("images", "Incorrect quantity of images must be from 1 to 6!"), "Invalid arguments!");
         if (lotEntity.getLotType().equals("auctionSell")) {
             if (lotEntity.getDuration() == null) {
                 throw new InvalidArgumentException("Duration of auction lot should not be null");
@@ -111,6 +111,7 @@ public class LotServiceImpl implements LotService {
     }
 
     @Override
+    @Transactional(rollbackOn = ImageLotException.class)
     public LotEntity update(Long id, LotEntity entity, MultipartFile[] files) {
         clearImagesForLot(id);
 
@@ -172,7 +173,7 @@ public class LotServiceImpl implements LotService {
             return images;
         } catch (ImageException e) {
             images.forEach(imageServiceStorage::remove);
-            throw new ImageLotException(id, e.getMessage());
+            throw new ImageLotException(e.getMessage(), Map.of("images", e.getMessage()));
         }
     }
 
