@@ -1,5 +1,6 @@
 package com.vention.agroex.entity;
 
+import com.vention.agroex.exception.InvalidArgumentException;
 import jakarta.persistence.*;
 import lombok.AllArgsConstructor;
 import lombok.Builder;
@@ -46,8 +47,11 @@ public class LotEntity {
     @Column(name = "min_price")
     private float minPrice;
 
-    @Column(name = "price")
-    private float price;
+    @Column(name = "original_price")
+    private float originalPrice;
+
+    @Column(name = "original_currency")
+    private String originalCurrency;
 
     @Column(name = "admin_status")
     private String adminStatus;
@@ -60,9 +64,6 @@ public class LotEntity {
 
     @Column(name = "duration")
     private Long duration;
-
-    @Column(name = "currency")
-    private String currency;
 
     @CreationTimestamp
     @Column(name = "creation_date")
@@ -101,4 +102,25 @@ public class LotEntity {
 
     @Formula("(SELECT ls.search_string FROM lot_search_view ls WHERE ls.id = id)")
     private String searchString;
+
+    @Transient
+    private String currency;
+
+    @Transient
+    private float price;
+
+    public void updatePrice(String targetCurrency, List<CurrencyRateEntity> currencies) {
+        var sourceCurrency = this.getOriginalCurrency();
+        if (!sourceCurrency.equals(targetCurrency)) {
+            var rateList = currencies.stream()
+                    .filter(el ->
+                            el.getTargetCurrency().equals(targetCurrency) && el.getSourceCurrency().equals(sourceCurrency))
+                    .toList();
+            if (rateList.isEmpty())
+                throw new InvalidArgumentException("Currency with this name is not supported!");
+            this.setPrice(this.getOriginalPrice() * rateList.getFirst().getRate());
+        } else
+            this.setPrice(this.getOriginalPrice());
+        this.setCurrency(targetCurrency);
+    }
 }

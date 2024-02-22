@@ -17,6 +17,7 @@ public interface LotService {
 
     List<LotEntity> getAll();
 
+
     void delete(LotEntity entity);
 
     LotEntity update(Long id, LotEntity entity, MultipartFile[] files);

@@ -1,6 +1,7 @@
 package com.vention.agroex.config;
 
 import com.fasterxml.jackson.core.type.TypeReference;
+import com.fasterxml.jackson.databind.DeserializationFeature;
 import com.fasterxml.jackson.databind.ObjectMapper;
 import com.fasterxml.jackson.databind.SerializationFeature;
 import com.fasterxml.jackson.databind.json.JsonMapper;
@@ -11,6 +12,8 @@ import lombok.RequiredArgsConstructor;
 import lombok.extern.slf4j.Slf4j;
 import org.springframework.context.annotation.Bean;
 import org.springframework.context.annotation.Configuration;
+import org.springframework.scheduling.annotation.EnableScheduling;
+import org.springframework.web.client.RestTemplate;
 
 import java.io.IOException;
 import java.io.InputStream;
@@ -18,6 +21,7 @@ import java.util.Map;
 
 @Slf4j
 @Configuration
+@EnableScheduling
 @RequiredArgsConstructor
 public class BeanConfig {
 
@@ -37,6 +41,7 @@ public class BeanConfig {
         return JsonMapper.builder()
                 .addModule(new JavaTimeModule())
                 .disable(SerializationFeature.WRITE_DATES_AS_TIMESTAMPS)
+                .disable(DeserializationFeature.FAIL_ON_UNKNOWN_PROPERTIES)
                 .build();
     }
 
@@ -46,5 +51,10 @@ public class BeanConfig {
         var extensions = mapper.readValue(supportedExtensionsFile, new TypeReference<Map<String, String>>() {});
         log.info("Supported file extensions uploaded from JSON file");
         return extensions;
+    }
+
+    @Bean
+    public RestTemplate restTemplate(){
+        return new RestTemplate();
     }
 }

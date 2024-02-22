@@ -31,15 +31,15 @@ import java.util.Map;
 @RequiredArgsConstructor
 public class LotServiceImpl implements LotService {
 
-    private final LotMapper lotMapper;
-    private final TagService tagService;
-    private final UserService userService;
+    private final LotRepository lotRepository;
+    private final ImageServiceStorage imageServiceStorage;
     private final ImageService imageService;
     private final FilterService filterService;
-    private final LotRepository lotRepository;
-    private final CountryService countryService;
-    private final ImageServiceStorage imageServiceStorage;
     private final ProductCategoryService productCategoryService;
+    private final CountryService countryService;
+    private final UserService userService;
+    private final LotMapper lotMapper;
+    private final TagService tagService;
 
     @Override
     @Transactional(rollbackOn = ImageLotException.class)
@@ -184,7 +184,8 @@ public class LotServiceImpl implements LotService {
         imageService.delete(imageEntity);
     }
 
-    public void clearImagesForLot(Long lotId) {
+    @Override
+    public void clearImagesForLot(Long lotId){
         var lotEntity = getById(lotId);
         lotEntity.getImages().forEach(image -> {
             imageService.delete(image);

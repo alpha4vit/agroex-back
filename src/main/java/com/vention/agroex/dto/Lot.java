@@ -57,11 +57,11 @@ public class Lot {
 
     @NotNull
     @DecimalMin(value = "1.0", message = "The field should contain only numbers from 1 to 9999 (integer or fractional)")
-    private float price;
+    private float originalPrice;
 
     @NotBlank(message = "Lot currency cant be blank")
     @Size(max = 10, message = "Lot currency must be less than 10 characters")
-    private String currency;
+    private String originalCurrency;
 
     @JsonProperty(access = JsonProperty.Access.READ_ONLY)
     private Instant creationDate;
@@ -82,4 +82,8 @@ public class Lot {
 
     @JsonProperty(access = JsonProperty.Access.READ_ONLY)
     private List<ImageResponse> images;
+
+    private String currency;
+
+    private float price;
 }
