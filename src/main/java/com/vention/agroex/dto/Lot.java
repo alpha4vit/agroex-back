@@ -42,11 +42,13 @@ public class Lot {
 
     private float minPrice;
 
-    @Pattern(regexp = "\\b(?:new|on moderation|rejected by admin|approved)\\b", message = "Admin status can be only new/on moderation/rejected by admin/approved")
+    @JsonProperty(access = JsonProperty.Access.READ_ONLY)
     private String adminStatus;
 
+    @JsonProperty(access = JsonProperty.Access.READ_ONLY)
     private String userStatus;
 
+    @JsonProperty(access = JsonProperty.Access.READ_ONLY)
     private String status;
 
     @NotNull

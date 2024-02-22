@@ -64,6 +64,7 @@ public class LotServiceImpl implements LotService {
 
         if (lotEntity.getLotType().equals("auctionSell")) {
             lotEntity.setAdminStatus(StatusConstants.NEW);
+            lotEntity.setStatus(StatusConstants.INACTIVE);
         }
 
         var saved = lotRepository.save(lotEntity);
