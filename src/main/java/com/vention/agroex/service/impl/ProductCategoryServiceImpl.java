@@ -8,6 +8,7 @@ import jakarta.persistence.EntityNotFoundException;
 import jakarta.transaction.Transactional;
 import lombok.RequiredArgsConstructor;
 import lombok.extern.slf4j.Slf4j;
+import org.apache.commons.lang3.StringUtils;
 import org.springframework.data.jpa.domain.Specification;
 import org.springframework.stereotype.Service;
 
@@ -26,6 +27,7 @@ public class ProductCategoryServiceImpl implements ProductCategoryService {
         if (productCategoryEntity.getParentId() == null) {
             productCategoryEntity.setParentId(0L);
         }
+        productCategoryEntity.setTitle(StringUtils.normalizeSpace(productCategoryEntity.getTitle()));
         return productCategoryRepository.save(productCategoryEntity);
     }
 

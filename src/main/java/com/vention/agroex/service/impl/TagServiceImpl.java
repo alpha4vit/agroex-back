@@ -6,6 +6,7 @@ import com.vention.agroex.service.ColorService;
 import com.vention.agroex.service.TagService;
 import jakarta.persistence.EntityNotFoundException;
 import lombok.RequiredArgsConstructor;
+import org.apache.commons.lang3.StringUtils;
 import org.springframework.stereotype.Service;
 
 import java.util.List;
@@ -31,13 +32,17 @@ public class TagServiceImpl implements TagService {
     @Override
     public TagEntity save(TagEntity tagEntity) {
         tagEntity.setColor(colorService.getNextColor());
+        tagEntity.setTitle(StringUtils.normalizeSpace(tagEntity.getTitle()));
         return tagRepository.save(tagEntity);
     }
 
     @Override
     public List<TagEntity> saveList(List<TagEntity> tagEntities) {
-        tagEntities.forEach(tag ->
-                tag.setColor(colorService.getNextColor()));
+        tagEntities.forEach(tag -> {
+                    tag.setColor(colorService.getNextColor());
+                    tag.setTitle(StringUtils.normalizeSpace(tag.getTitle()));
+                }
+        );
         return tagRepository.saveAll(tagEntities);
     }
 
