@@ -55,8 +55,10 @@ public class LotController {
     }
 
     @GetMapping()
-    public List<Lot> search(@RequestParam Map<String, String> filters) {
-        return lotMapper.toDTOs(lotService.getWithCriteria(filters));
+    public List<Lot> search(@RequestParam Map<String, String> filters,
+                            @RequestParam(defaultValue = "0") int pageNumber,
+                            @RequestParam(defaultValue = "50") int pageSize) {
+        return lotMapper.toDTOs(lotService.getWithCriteria(filters, pageNumber, pageSize));
     }
 
     public ResponseEntity<List<Lot>> findAll() {

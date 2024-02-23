@@ -27,7 +27,7 @@ public interface LotService {
 
     void deleteImage(String fileName);
 
-    List<LotEntity> getWithCriteria(Map<String, String> filters);
+    List<LotEntity> getWithCriteria(Map<String, String> filters, int pageNumber, int pageSize);
 
     void clearImagesForLot(Long lotId);
 

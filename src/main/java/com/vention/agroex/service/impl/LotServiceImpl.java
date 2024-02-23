@@ -17,6 +17,7 @@ import jakarta.persistence.EntityNotFoundException;
 import jakarta.transaction.Transactional;
 import lombok.RequiredArgsConstructor;
 import lombok.extern.slf4j.Slf4j;
+import org.springframework.data.domain.PageRequest;
 import org.springframework.stereotype.Service;
 import org.springframework.web.multipart.MultipartFile;
 
@@ -231,7 +232,8 @@ public class LotServiceImpl implements LotService {
     }
 
     @Override
-    public List<LotEntity> getWithCriteria(Map<String, String> filters) {
-        return filterService.getWithCriteria(filters);
+    public List<LotEntity> getWithCriteria(Map<String, String> filters, int pageNumber, int pageSize) {
+        var searchCriteria = filterService.getCriteria(filters);
+        return lotRepository.findAll(searchCriteria, PageRequest.of(pageNumber, pageSize)).toList();
     }
 }

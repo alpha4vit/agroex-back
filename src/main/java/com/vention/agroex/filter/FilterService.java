@@ -2,7 +2,6 @@ package com.vention.agroex.filter;
 
 import com.vention.agroex.entity.LotEntity;
 import com.vention.agroex.exception.InvalidArgumentException;
-import com.vention.agroex.repository.LotRepository;
 import jakarta.persistence.criteria.CriteriaBuilder;
 import jakarta.persistence.criteria.Expression;
 import jakarta.persistence.criteria.Predicate;
@@ -11,7 +10,11 @@ import lombok.RequiredArgsConstructor;
 import org.springframework.data.jpa.domain.Specification;
 import org.springframework.stereotype.Service;
 
-import java.util.*;
+import java.util.Arrays;
+import java.util.Locale;
+import java.util.Map;
+import java.util.Objects;
+import java.util.stream.Collectors;
 import java.util.stream.Stream;
 
 @Service
@@ -22,108 +25,59 @@ public class FilterService {
     private final String GREATER = ">";
     private final String LOWER = "<";
 
-    private final LotRepository lotRepository;
+    public Specification<LotEntity> getCriteria(Map<String, String> filters) {
 
-    public List<LotEntity> getWithCriteria(Map<String, String> filters) {
+        clearNonSearchFields(filters);
+
         var mainFieldsBuilder = new LotSpecificationsBuilder();
         var productCategoryBuilder = new LotSpecificationsBuilder();
         var userBuilder = new LotSpecificationsBuilder();
         var typeBuilder = new LotSpecificationsBuilder();
         var countryBuilder = new LotSpecificationsBuilder();
+        var userStatusBuilder = new LotSpecificationsBuilder();
+        var adminStatusBuilder = new LotSpecificationsBuilder();
+        var statusBuilder = new LotSpecificationsBuilder();
         keyword = "";
 
-        filters.forEach((field, value) -> {
+        var nonNullFilters = filters.entrySet().stream()
+                .filter(entry -> entry.getValue() != null && !entry.getValue().isEmpty())
+                .collect(Collectors.toMap(Map.Entry::getKey, Map.Entry::getValue));
+
+        if (!nonNullFilters.containsKey("enabledByAdmin")) {
+            mainFieldsBuilder.with("enabledByAdmin", EQUALS, true);
+        }
+
+        nonNullFilters.forEach((field, value) -> {
             switch (field) {
                 case "title" -> mainFieldsBuilder.with("title", EQUALS, value);
-                case "minQuantity" -> Optional.ofNullable(value)
-                        .filter(v -> !v.isEmpty())
-                        .map(Float::parseFloat)
-                        .ifPresent(minQuantity -> mainFieldsBuilder.with("quantity", GREATER, minQuantity));
-                case "maxQuantity" -> Optional.ofNullable(value)
-                        .filter(v -> !v.isEmpty())
-                        .map(Float::parseFloat)
-                        .ifPresent(maxQuantity -> mainFieldsBuilder.with("quantity", LOWER, maxQuantity));
-                case "minPrice" -> Optional.ofNullable(value)
-                        .filter(v -> !v.isEmpty())
-                        .map(Float::parseFloat)
-                        .ifPresent(minPrice -> mainFieldsBuilder.with("price", GREATER, minPrice));
-                case "maxPrice" -> Optional.ofNullable(value)
-                        .filter(v -> !v.isEmpty())
-                        .map(Float::parseFloat)
-                        .ifPresent(maxPrice -> mainFieldsBuilder.with("price", LOWER, maxPrice));
-                case "enabledByAdmin" -> {
-                    var enabledByAdmin = value.isEmpty() || Boolean.parseBoolean(value);
-                    mainFieldsBuilder.with("enabledByAdmin", EQUALS, enabledByAdmin);
-                }
+                case "minQuantity" -> mainFieldsBuilder.with("quantity", GREATER, Float.parseFloat(value));
+                case "maxQuantity" -> mainFieldsBuilder.with("quantity", LOWER, Float.parseFloat(value));
+                case "minPrice" -> mainFieldsBuilder.with("price", GREATER, Float.parseFloat(value));
+                case "maxPrice" -> mainFieldsBuilder.with("price", LOWER, Float.parseFloat(value));
+                case "enabledByAdmin" -> mainFieldsBuilder.with("enabledByAdmin", EQUALS, Boolean.parseBoolean(value));
 
-                case "categories" -> Optional.ofNullable(value)
-                        .filter(v -> !v.isEmpty())
-                        .map(v -> Arrays.stream(v.split(","))
-                                .map(String::trim)
-                                .map(Long::parseLong)
-                                .toList())
-                        .ifPresent(categories -> categories.forEach(category ->
-                                productCategoryBuilder.with("productCategory", EQUALS, category)
-                        ));
-                case "adminStatus" -> Optional.ofNullable(value)
-                        .filter(v -> !v.isEmpty())
-                        .map(v -> Arrays.stream(v.split(","))
-                                .map(String::trim)
-                                .map(String::toString)
-                                .toList())
-                        .ifPresent(statuses -> statuses.forEach(status ->
-                                typeBuilder.with("adminStatus", EQUALS, status)
-                        ));
-                case "status" -> Optional.ofNullable(value)
-                        .filter(v -> !v.isEmpty())
-                        .map(v -> Arrays.stream(v.split(","))
-                                .map(String::trim)
-                                .map(String::toString)
-                                .toList())
-                        .ifPresent(statuses -> statuses.forEach(status ->
-                                typeBuilder.with("status", EQUALS, status)
-                        ));
-                case "userStatus" -> Optional.ofNullable(value)
-                        .filter(v -> !v.isEmpty())
-                        .map(v -> Arrays.stream(v.split(","))
-                                .map(String::trim)
-                                .map(String::toString)
-                                .toList())
-                        .ifPresent(statuses -> statuses.forEach(status ->
-                                typeBuilder.with("userStatus", EQUALS, status)
-                        ));
-                case "users" -> Optional.ofNullable(value)
-                        .filter(v -> !v.isEmpty())
-                        .map(v -> Arrays.stream(v.split(","))
-                                .map(String::trim)
-                                .map(Long::parseLong)
-                                .toList())
-                        .ifPresent(users -> users.forEach(user ->
-                                userBuilder.with("user", EQUALS, user)
-                        ));
-
-                case "lotType" -> Optional.ofNullable(value)
-                        .filter(v -> !v.isEmpty())
-                        .map(v -> Arrays.stream(v.split(","))
-                                .map(String::trim)
-                                .map(String::toString)
-                                .toList())
-                        .ifPresent(types -> types.forEach(type ->
-                                typeBuilder.with("lotType", EQUALS, type)
-                        ));
-
-                case "countries" -> Optional.ofNullable(value)
-                        .filter(v -> !v.isEmpty())
-                        .map(v -> Arrays.stream(v.split(","))
-                                .map(String::trim)
-                                .map(Long::parseLong)
-                                .toList())
-                        .ifPresent(countries -> countries.forEach(country ->
-                                countryBuilder.with("country", EQUALS, country)
-                        ));
-
+                case "categories" -> Arrays.stream(value.split(","))
+                        .map(category -> Long.parseLong(category.trim()))
+                        .forEach(category -> productCategoryBuilder.with("productCategory", EQUALS, category));
+                case "users" -> Arrays.stream(value.split(","))
+                        .map(user -> Long.parseLong(user.trim()))
+                        .forEach(user -> userBuilder.with("user", EQUALS, user));
+                case "lotType" -> Arrays.stream(value.split(","))
+                        .map(String::trim)
+                        .forEach(type -> typeBuilder.with("lotType", EQUALS, type));
+                case "countries" -> Arrays.stream(value.split(","))
+                        .map(country -> Long.parseLong(country.trim()))
+                        .forEach(country -> countryBuilder.with("country", EQUALS, country));
+                case "adminStatus" -> Arrays.stream(value.split(","))
+                        .map(String::trim)
+                        .forEach(status -> adminStatusBuilder.with("adminStatus", EQUALS, status));
+                case "status" -> Arrays.stream(value.split(","))
+                        .map(String::trim)
+                        .forEach(status -> statusBuilder.with("status", EQUALS, status));
+                case "userStatus" -> Arrays.stream(value.split(","))
+                        .map(String::trim)
+                        .forEach(status -> userStatusBuilder.with("userStatus", EQUALS, status));
                 case "keyword" -> keyword = value;
-
                 default -> throw new InvalidArgumentException(
                         String.format("There are no parameters with name %s", field));
             }
@@ -134,14 +88,22 @@ public class FilterService {
         var userSpec = userBuilder.buildOr();
         var typeSpec = typeBuilder.buildOr();
         var countrySpec = countryBuilder.buildOr();
+        var userStatusSpec = userStatusBuilder.buildOr();
+        var statusSpec = statusBuilder.buildOr();
+        var adminsStatusSpec = adminStatusBuilder.buildOr();
         var keywordPredicateSpec = (Specification<LotEntity>) (root, query, criteriaBuilder) ->
                 getKeywordPredicate(criteriaBuilder, root, keyword);
 
-        var resultingSpec = Stream.of(mainSpec, categorySpec, userSpec, typeSpec, countrySpec, keywordPredicateSpec)
+        return Stream.of(mainSpec, categorySpec, userSpec, typeSpec, countrySpec, keywordPredicateSpec,
+                        userStatusSpec, statusSpec, adminsStatusSpec)
                 .filter(Objects::nonNull)
                 .reduce(Specification::and)
                 .orElse((root, query, criteriaBuilder) -> criteriaBuilder.conjunction());
-        return lotRepository.findAll(resultingSpec);
+    }
+
+    private void clearNonSearchFields(Map<String, String> filters) {
+        filters.remove("pageNumber");
+        filters.remove("pageSize");
     }
 
     private Predicate getKeywordPredicate(CriteriaBuilder criteriaBuilder, Root<LotEntity> root, String keyword) {
