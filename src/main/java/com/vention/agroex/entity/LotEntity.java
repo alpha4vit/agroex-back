@@ -1,6 +1,5 @@
 package com.vention.agroex.entity;
 
-import com.vention.agroex.exception.InvalidArgumentException;
 import jakarta.persistence.*;
 import lombok.AllArgsConstructor;
 import lombok.Builder;
@@ -109,18 +108,18 @@ public class LotEntity {
     @Transient
     private float price;
 
-    public void updatePrice(String targetCurrency, List<CurrencyRateEntity> currencies) {
+    @PostLoad
+    private void init(){
+        this.currency = this.getOriginalCurrency();
+        this.price = this.getOriginalPrice();
+    }
+
+    public void updatePrice(CurrencyRateEntity currencyRate) {
         var sourceCurrency = this.getOriginalCurrency();
-        if (!sourceCurrency.equals(targetCurrency)) {
-            var rateList = currencies.stream()
-                    .filter(el ->
-                            el.getTargetCurrency().equals(targetCurrency) && el.getSourceCurrency().equals(sourceCurrency))
-                    .toList();
-            if (rateList.isEmpty())
-                throw new InvalidArgumentException("Currency with this name is not supported!");
-            this.setPrice(this.getOriginalPrice() * rateList.getFirst().getRate());
+        if (!sourceCurrency.equals(currencyRate.getTargetCurrency())) {
+            this.setPrice(this.getOriginalPrice() * currencyRate.getRate());
         } else
             this.setPrice(this.getOriginalPrice());
-        this.setCurrency(targetCurrency);
+        this.setCurrency(currencyRate.getTargetCurrency());
     }
 }
