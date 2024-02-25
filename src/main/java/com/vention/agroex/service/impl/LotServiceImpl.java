@@ -1,10 +1,7 @@
 package com.vention.agroex.service.impl;
 
-import com.vention.agroex.dto.Image;
-import com.vention.agroex.entity.ImageEntity;
 import com.vention.agroex.entity.LotEntity;
 import com.vention.agroex.entity.ProductCategoryEntity;
-import com.vention.agroex.exception.ImageException;
 import com.vention.agroex.exception.ImageLotException;
 import com.vention.agroex.exception.InvalidArgumentException;
 import com.vention.agroex.exception.LotEditException;
@@ -47,7 +44,7 @@ public class LotServiceImpl implements LotService {
     private final CurrencyRateService currencyRateService;
 
     @Override
-    @Transactional
+    @Transactional(rollbackOn = Exception.class)
     public LotEntity save(LotEntity lotEntity, MultipartFile[] files) {
         validateFields(lotEntity, files);
 
@@ -76,7 +73,7 @@ public class LotServiceImpl implements LotService {
         }
 
         var saved = lotRepository.save(lotEntity);
-        saved.setImages(uploadImages(saved.getId(), files));
+        saved.setImages(imageService.uploadImages(saved, files));
 
         return saved;
     }
@@ -87,7 +84,6 @@ public class LotServiceImpl implements LotService {
         var saved = save(lotEntity, files);
         return updatePrice(saved, currency);
     }
-
 
     private void validateFields(LotEntity lotEntity, MultipartFile[] files) {
         if (files == null || files.length < 1 || files.length > 6)
@@ -128,19 +124,20 @@ public class LotServiceImpl implements LotService {
     @Override
     @Transactional(rollbackOn = ImageLotException.class)
     public LotEntity update(Long id, LotEntity entity, MultipartFile[] files) {
-        var lot = getById(id);
-        if (lot.getInnerStatus().equals(StatusConstants.ON_MODERATION)) {
+        var lotToUpdate = getById(id);
+
+        imageService.updateImagesForLot(lotToUpdate, updatedLot, files);
+        if (lotToUpdate.getInnerStatus().equals(StatusConstants.ON_MODERATION)) {
             throw new LotEditException("You can`t edit this lot while moderation");
         }
-        if (lot.getInnerStatus().equals(StatusConstants.FINISHED)) {
+        if (lotToUpdate.getInnerStatus().equals(StatusConstants.FINISHED)) {
             throw new LotEditException("This auction has already ended");
         }
-        clearImagesForLot(id);
-        validateFields(entity, files);
-        var result = lotMapper.update(lot, entity);
+        var updatedLot = lotMapper.update(lotToUpdate, entity);
+        imageService.updateImagesForLot(lotToUpdate, updatedLot, files);
 
-        var userEntity = userService.getById(result.getUser().getId());
-        var countryEntity = countryService.getById(result.getLocation().getCountry().getId());
+        var userEntity = userService.getById(updatedLot.getUser().getId());
+        var countryEntity = countryService.getById(updatedLot.getLocation().getCountry().getId());
 
         var productCategoryEntity = switch (entity.getProductCategory()) {
             case ProductCategoryEntity e when e.getId() != null ->
@@ -151,21 +148,14 @@ public class LotServiceImpl implements LotService {
                     throw new InvalidArgumentException("Provide productCategory.id or productCategory.title");
         };
 
-        result.setUser(userEntity);
-        result.getLocation().setCountry(countryEntity);
-        result.setProductCategory(productCategoryEntity);
-        result.setTags(result.getTags()
+        updatedLot.setUser(userEntity);
+        updatedLot.getLocation().setCountry(countryEntity);
+        updatedLot.setProductCategory(productCategoryEntity);
+        updatedLot.setTags(updatedLot.getTags()
                 .stream().map(tagService::save)
                 .toList());
 
-        var saved = lotRepository.save(result);
-
-        if (files != null && files.length >= 1 && !(files.length > 6))
-            saved.setImages(uploadImages(saved.getId(), files));
-        else
-            throw new ImageLotException("Incorrect quantity of images must be from 1 to 6!");
-
-        return saved;
+        return lotRepository.save(updatedLot);
     }
 
     @Override
@@ -191,37 +181,9 @@ public class LotServiceImpl implements LotService {
     }
 
     @Override
-    public List<ImageEntity> uploadImages(Long id, MultipartFile[] files) {
-        var lotEntity = getById(id);
-        List<ImageEntity> images = new ArrayList<>();
-        try {
-            Arrays.stream(files).forEach(file -> {
-                String imageName = imageServiceStorage.uploadToStorage(new Image(file));
-                images.add(imageService.save(ImageEntity.builder()
-                        .lot(lotEntity)
-                        .name(imageName)
-                        .build()));
-            });
-            return images;
-        } catch (ImageException e) {
-            images.forEach(imageServiceStorage::remove);
-            throw new ImageLotException(e.getMessage(), Map.of("images", e.getMessage()));
-        }
-    }
-
-    @Override
     public void deleteImage(String fileName) {
         var imageEntity = imageService.getByName(fileName);
         imageService.delete(imageEntity);
-    }
-
-    @Override
-    public void clearImagesForLot(Long lotId) {
-        var lotEntity = getById(lotId);
-        lotEntity.getImages().forEach(image -> {
-            imageService.delete(image);
-            imageServiceStorage.remove(image);
-        });
     }
 
     @Override

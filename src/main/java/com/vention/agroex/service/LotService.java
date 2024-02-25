@@ -1,6 +1,5 @@
 package com.vention.agroex.service;
 
-import com.vention.agroex.entity.ImageEntity;
 import com.vention.agroex.entity.LotEntity;
 import com.vention.agroex.model.LotRejectRequest;
 import com.vention.agroex.model.LotStatusResponse;
@@ -30,14 +29,10 @@ public interface LotService {
 
     LotEntity update(Long id, LotEntity entity);
 
-    List<ImageEntity>  uploadImages(Long id, MultipartFile[] files);
-
     void deleteImage(String fileName);
 
     List<LotEntity> getWithCriteria(Map<String, String> filters, int pageNumber, int pageSize);
     List<LotEntity> getWithCriteria(Map<String, String> filters, int pageNumber, int pageSize, String currency);
-
-    void clearImagesForLot(Long lotId);
 
     LotStatusResponse getLotStatus(Long id);
 
