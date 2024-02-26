@@ -25,8 +25,9 @@ public class CountryController {
     private final CountryDTOValidator countryDTOValidator;
 
     @GetMapping
-    public ResponseEntity<List<Country>> getAll(){
-        return ResponseEntity.ok(countryMapper.toDtos(countryService.getAll()));
+    public ResponseEntity<List<Country>> getAll(@RequestParam(value = "lot_existed", required = false) Boolean lotExisted){
+        var fetchedCountries = countryService.getAll(lotExisted);
+        return ResponseEntity.ok(countryMapper.toDtos(fetchedCountries));
     }
 
     @GetMapping("/{id}")
