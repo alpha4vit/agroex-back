@@ -1,7 +1,9 @@
 package com.vention.agroex.controller;
 
+import com.vention.agroex.dto.ProductCategory;
 import com.vention.agroex.entity.ProductCategoryEntity;
 import com.vention.agroex.service.ProductCategoryService;
+import com.vention.agroex.util.mapper.ProductCategoryMapper;
 import com.vention.agroex.util.validator.ProductCategoryValidator;
 import io.swagger.v3.oas.annotations.tags.Tag;
 import lombok.RequiredArgsConstructor;
@@ -19,46 +21,46 @@ public class ProductCategoryController {
 
     private final ProductCategoryService productCategoryService;
     private final ProductCategoryValidator productCategoryValidator;
+    private final ProductCategoryMapper productCategoryMapper;
 
     @PostMapping()
-    public ResponseEntity<ProductCategoryEntity> save(@RequestBody ProductCategoryEntity productCategoryEntity,
-                                                      BindingResult bindingResult) {
+    public ResponseEntity<ProductCategory> save(@RequestBody ProductCategoryEntity productCategoryEntity,
+                                                BindingResult bindingResult) {
         productCategoryValidator.validate(productCategoryEntity, bindingResult);
         var savedProductCategory = productCategoryService.save(productCategoryEntity);
-        return ResponseEntity.ok(savedProductCategory);
+        return ResponseEntity.ok(productCategoryMapper.toDTO(savedProductCategory));
     }
 
     @PutMapping("/{id}")
-    public ResponseEntity<ProductCategoryEntity> update(@PathVariable Long id,
+    public ResponseEntity<ProductCategory> update(@PathVariable Long id,
                                                         @RequestBody ProductCategoryEntity productCategoryEntity,
                                                         BindingResult bindingResult) {
         productCategoryValidator.validate(productCategoryEntity, bindingResult);
         var updatedProductCategory = productCategoryService.update(id, productCategoryEntity);
-        return ResponseEntity.ok(updatedProductCategory);
-    }
-
-    public ResponseEntity<List<ProductCategoryEntity>> findWithFilters(@RequestParam(value = "filters", required = false) String filters) {
-        return ResponseEntity.ok(productCategoryService.getWithFilters(filters));
+        return ResponseEntity.ok(productCategoryMapper.toDTO(updatedProductCategory));
     }
 
     @GetMapping("/all")
-    public ResponseEntity<List<ProductCategoryEntity>> findAll() {
+    public ResponseEntity<List<ProductCategory>> findAll() {
         var fetchedProductCategories = productCategoryService.getAll();
-        return ResponseEntity.ok(fetchedProductCategories);
+        return ResponseEntity.ok(productCategoryMapper.toDTOs(fetchedProductCategories));
+    }
+
+    public ResponseEntity<List<ProductCategory>> findWithFilters(@RequestParam(value = "filters", required = false) String filters) {
+        return ResponseEntity.ok(productCategoryMapper.toDTOs(productCategoryService.getWithFilters(filters)));
     }
 
     @GetMapping("/{id}")
-    public ResponseEntity<List<ProductCategoryEntity>> findSubcategoriesById(
-            @PathVariable Long id, @RequestParam(value = "lot_existed", required = false, defaultValue = "true") Boolean lotExisted) {
+    public ResponseEntity<List<ProductCategory>> findAllSubcategories(@PathVariable Long id,
+                                                                      @RequestParam(value = "lot_existed", required = false, defaultValue = "true") Boolean lotExisted) {
         var fetchedProductCategories = productCategoryService.getSubcategoriesById(id, lotExisted);
-        return ResponseEntity.ok(fetchedProductCategories);
+        return ResponseEntity.ok(productCategoryMapper.toDTOs(fetchedProductCategories));
     }
 
-    @GetMapping
-    public ResponseEntity<List<ProductCategoryEntity>> findAllMainCategories(
-            @RequestParam(value = "lot_existed", required = false, defaultValue = "true") Boolean lotExisted) {
+    @GetMapping()
+    public ResponseEntity<List<ProductCategory>> findAllMainCategories(@RequestParam(value = "lot_existed", required = false, defaultValue = "true") Boolean lotExisted) {
         var fetchedProductCategories = productCategoryService.getSubcategoriesById(0L, lotExisted);
-        return ResponseEntity.ok(fetchedProductCategories);
+        return ResponseEntity.ok(productCategoryMapper.toDTOs(fetchedProductCategories));
     }
 
     @DeleteMapping("/{id}")

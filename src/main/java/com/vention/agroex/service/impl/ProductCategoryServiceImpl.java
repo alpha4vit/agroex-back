@@ -24,8 +24,10 @@ public class ProductCategoryServiceImpl implements ProductCategoryService {
 
     @Override
     public ProductCategoryEntity save(ProductCategoryEntity productCategoryEntity) {
-        if (productCategoryEntity.getParentId() == null) {
-            productCategoryEntity.setParentId(0L);
+        if (productCategoryEntity.getParent() == null) {
+            productCategoryEntity.setParent(
+                    productCategoryRepository.getRootCategory()
+            );
         }
         productCategoryEntity.setTitle(StringUtils.normalizeSpace(productCategoryEntity.getTitle()));
         return productCategoryRepository.save(productCategoryEntity);
@@ -62,7 +64,8 @@ public class ProductCategoryServiceImpl implements ProductCategoryService {
     public ProductCategoryEntity update(Long id, ProductCategoryEntity productCategory) {
         var fetchedCategory = productCategoryRepository.findById(id)
                 .orElseThrow(() -> new EntityNotFoundException(String.format("There is no category with id %d", id)));
-        productCategory.setParentId(fetchedCategory.getParentId());
+        productCategory.setId(id);
+        productCategory.setParent(fetchedCategory.getParent());
         return productCategoryRepository.save(productCategory);
     }
 
