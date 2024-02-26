@@ -58,11 +58,13 @@ public class LotServiceImpl implements LotService {
             case null, default ->
                     throw new InvalidArgumentException("Provide productCategory.id or productCategory.title");
         };
-        tagService.saveList(lotEntity.getTags());
 
         lotEntity.setUser(userEntity);
         lotEntity.getLocation().setCountry(countryEntity);
         lotEntity.setProductCategory(productCategoryEntity);
+        lotEntity.setTags(lotEntity.getTags()
+                .stream().map(tagService::save)
+                .toList());
 
         if (lotEntity.getLotType().equals("auctionSell")) {
             lotEntity.setAdminStatus(StatusConstants.NEW);
@@ -151,6 +153,9 @@ public class LotServiceImpl implements LotService {
         result.setUser(userEntity);
         result.getLocation().setCountry(countryEntity);
         result.setProductCategory(productCategoryEntity);
+        result.setTags(result.getTags()
+                .stream().map(tagService::save)
+                .toList());
 
         var saved = lotRepository.save(result);
 
