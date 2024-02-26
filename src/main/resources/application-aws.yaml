@@ -3,6 +3,11 @@ spring:
     activate:
       on-profile: aws
     import: optional:file:.env[.properties]
+  servlet:
+    multipart:
+      max-file-size: 30MB
+      max-request-size: 30MB
+      enabled: true
   datasource:
     username: ${AWS_RDS_USERNAME}
     password: ${AWS_RDS_PASSWORD}
@@ -21,3 +26,4 @@ minio:
   url: ${AWS_S3_URL}
   accessKey: ${AWS_S3_ACCESS_KEY}
   secretKey: ${AWS_S3_SECRET_KEY}
+currency-api-key: ${CURRENCY_API_KEY}

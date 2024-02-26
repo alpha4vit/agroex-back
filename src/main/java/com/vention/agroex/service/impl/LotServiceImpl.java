@@ -31,18 +31,19 @@ import java.util.Map;
 @RequiredArgsConstructor
 public class LotServiceImpl implements LotService {
 
-    private final LotMapper lotMapper;
-    private final TagService tagService;
-    private final UserService userService;
+    private final LotRepository lotRepository;
+    private final ImageServiceStorage imageServiceStorage;
     private final ImageService imageService;
     private final FilterService filterService;
-    private final LotRepository lotRepository;
-    private final CountryService countryService;
-    private final ImageServiceStorage imageServiceStorage;
     private final ProductCategoryService productCategoryService;
+    private final CountryService countryService;
+    private final UserService userService;
+    private final LotMapper lotMapper;
+    private final TagService tagService;
+    private final CurrencyRateService currencyRateService;
 
     @Override
-    @Transactional(rollbackOn = ImageLotException.class)
+    @Transactional
     public LotEntity save(LotEntity lotEntity, MultipartFile[] files) {
         validateFields(lotEntity, files);
 
@@ -74,6 +75,13 @@ public class LotServiceImpl implements LotService {
         return saved;
     }
 
+    @Override
+    @Transactional(rollbackOn = ImageLotException.class)
+    public LotEntity save(LotEntity lotEntity, MultipartFile[] files, String currency) {
+        var saved = save(lotEntity, files);
+        return updatePrice(saved, currency);
+    }
+
     private void validateFields(LotEntity lotEntity, MultipartFile[] files) {
         if (files == null || files.length < 1 || files.length > 6)
             throw new InvalidArgumentException(Map.of("images", "Incorrect quantity of images must be from 1 to 6!"), "Invalid arguments!");
@@ -97,6 +105,11 @@ public class LotServiceImpl implements LotService {
     }
 
     @Override
+    public LotEntity getById(Long id, String currency) {
+        return updatePrice(getById(id), currency);
+    }
+
+    @Override
     public void deleteById(Long id) {
         lotRepository.deleteById(id);
     }
@@ -109,6 +122,11 @@ public class LotServiceImpl implements LotService {
     @Override
     public List<LotEntity> getAll() {
         return lotRepository.findAll();
+    }
+
+    @Override
+    public List<LotEntity> getAll(String currency) {
+        return null;
     }
 
     @Override
@@ -142,6 +160,13 @@ public class LotServiceImpl implements LotService {
             throw new ImageLotException("Incorrect quantity of images must be from 1 to 6!");
 
         return saved;
+    }
+
+    @Override
+    @Transactional(rollbackOn = ImageLotException.class)
+    public LotEntity update(Long id, LotEntity entity, MultipartFile[] files, String currency) {
+        var updated = update(id, entity, files);
+        return updatePrice(updated, currency);
     }
 
     @Override
@@ -184,7 +209,8 @@ public class LotServiceImpl implements LotService {
         imageService.delete(imageEntity);
     }
 
-    public void clearImagesForLot(Long lotId) {
+    @Override
+    public void clearImagesForLot(Long lotId){
         var lotEntity = getById(lotId);
         lotEntity.getImages().forEach(image -> {
             imageService.delete(image);
@@ -222,6 +248,12 @@ public class LotServiceImpl implements LotService {
     }
 
     @Override
+    public LotEntity putOnModeration(Long lotId, String currency) {
+        var lot = putOnModeration(lotId);
+        return updatePrice(lot, currency);
+    }
+
+    @Override
     public LotEntity approve(Long id) {
         var lot = getById(id);
         if (!lot.getLotType().equals("auctionSell")) {
@@ -232,8 +264,28 @@ public class LotServiceImpl implements LotService {
     }
 
     @Override
+    public LotEntity approve(Long lotId, String currency) {
+        var lot = approve(lotId);
+        return updatePrice(lot, currency);
+    }
+
+    @Override
     public List<LotEntity> getWithCriteria(Map<String, String> filters, int pageNumber, int pageSize) {
         var searchCriteria = filterService.getCriteria(filters);
         return lotRepository.findAll(searchCriteria, PageRequest.of(pageNumber, pageSize)).toList();
+    }
+
+    @Override
+    public List<LotEntity> getWithCriteria(Map<String, String> filters, int pageNumber, int pageSize, String currency) {
+        var lots = getWithCriteria(filters, pageNumber, pageSize);
+        return lots.stream().map(lot -> updatePrice(lot, currency)).toList();
+    }
+
+    private LotEntity updatePrice(LotEntity lotEntity, String currency){
+        if (!lotEntity.getOriginalCurrency().equals(currency)) {
+            var currencyRate = currencyRateService.getByCurrencies(lotEntity.getOriginalCurrency(), currency);
+            lotEntity.updatePrice(currencyRate);
+        }
+        return lotEntity;
     }
 }

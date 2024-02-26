@@ -1,6 +1,4 @@
 spring:
-  activate:
-    on-profile: local
   config:
     activate:
       on-profile: local
@@ -29,3 +27,6 @@ minio:
   accessKey: ${MINIO_ACCESS_KEY}
   secretKey: ${MINIO_SECRET_KEY}
 #  supported-extensions-path:
+currency-api:
+  key: ${CURRENCY_API_KEY}
+  url: ${CURRENCY_URL}

@@ -31,39 +31,39 @@ public class LotController {
 
     @PostMapping
     public ResponseEntity<Lot> save(@RequestPart(value = "file", required = false) MultipartFile[] files,
+                                    @RequestHeader("currency") String currency,
                                     @RequestPart("data") @Valid Lot lot,
                                     BindingResult bindingResult) {
         lotDTOValidator.validate(lot, bindingResult);
-        var saved = lotService.save(lotMapper.toEntity(lot), files);
+        var saved = lotService.save(lotMapper.toEntity(lot), files, currency);
         return ResponseEntity.ok(lotMapper.toDTO(saved));
     }
 
     @PutMapping("/{id}")
     public ResponseEntity<Lot> update(@PathVariable("id") Long id,
+                                      @RequestHeader("currency") String currency,
                                       @RequestPart(value = "file", required = false) MultipartFile[] files,
                                       @RequestPart("data") @Valid Lot lot,
                                       BindingResult bindingResult) {
         lotDTOValidator.validate(lot, bindingResult);
-        var saved = lotService.update(id, lotMapper.toEntity(lot), files);
+        var saved = lotService.update(id, lotMapper.toEntity(lot), files, currency);
         return ResponseEntity.ok(lotMapper.toDTO(saved));
     }
 
     @GetMapping("/{id}")
-    public ResponseEntity<Lot> findById(@PathVariable Long id) {
-        var fetchedLotEntity = lotService.getById(id);
+    public ResponseEntity<Lot> findById(@PathVariable Long id,
+                                        @RequestHeader("currency") String currency) {
+        var fetchedLotEntity = lotService.getById(id, currency);
         return ResponseEntity.ok(lotMapper.toDTO(fetchedLotEntity));
     }
 
     @GetMapping()
-    public List<Lot> search(@RequestParam Map<String, String> filters,
-                            @RequestParam(defaultValue = "0") int pageNumber,
-                            @RequestParam(defaultValue = "50") int pageSize) {
-        return lotMapper.toDTOs(lotService.getWithCriteria(filters, pageNumber, pageSize));
-    }
-
-    public ResponseEntity<List<Lot>> findAll() {
-        var fetchedLotsList = lotService.getAll();
-        return ResponseEntity.ok(lotMapper.toDTOs(fetchedLotsList));
+    public ResponseEntity<List<Lot>> search(@RequestParam Map<String, String> filters,
+                                            @RequestHeader("currency") String currency,
+                                            @RequestParam(defaultValue = "0") int pageNumber,
+                                            @RequestParam(defaultValue = "50") int pageSize) {
+        var lots = lotService.getWithCriteria(filters, pageNumber, pageSize, currency);
+        return ResponseEntity.ok(lotMapper.toDTOs(lots));
     }
 
     @DeleteMapping("/{id}")
@@ -85,14 +85,16 @@ public class LotController {
     }
 
     @PostMapping("/{id}/moderate")
-    public ResponseEntity<Lot> putOnModeration(@PathVariable("id") Long lotId) {
-        var moderated = lotService.putOnModeration(lotId);
+    public ResponseEntity<Lot> putOnModeration(@PathVariable("id") Long lotId,
+                                               @RequestHeader("currency") String currency) {
+        var moderated = lotService.putOnModeration(lotId, currency);
         return ResponseEntity.ok(lotMapper.toDTO(moderated));
     }
 
     @PostMapping("/{id}/approve")
-    public ResponseEntity<Lot> approve(@PathVariable("id") Long lotId) {
-        var approved = lotService.approve(lotId);
+    public ResponseEntity<Lot> approve(@PathVariable("id") Long lotId,
+                                       @RequestHeader("currency") String currency) {
+        var approved = lotService.approve(lotId, currency);
         return ResponseEntity.ok(lotMapper.toDTO(approved));
     }
 }

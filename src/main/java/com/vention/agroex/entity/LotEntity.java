@@ -46,8 +46,11 @@ public class LotEntity {
     @Column(name = "min_price")
     private float minPrice;
 
-    @Column(name = "price")
-    private float price;
+    @Column(name = "original_price")
+    private float originalPrice;
+
+    @Column(name = "original_currency")
+    private String originalCurrency;
 
     @Column(name = "admin_status")
     private String adminStatus;
@@ -60,9 +63,6 @@ public class LotEntity {
 
     @Column(name = "duration")
     private Long duration;
-
-    @Column(name = "currency")
-    private String currency;
 
     @CreationTimestamp
     @Column(name = "creation_date")
@@ -101,4 +101,25 @@ public class LotEntity {
 
     @Formula("(SELECT ls.search_string FROM lot_search_view ls WHERE ls.id = id)")
     private String searchString;
+
+    @Transient
+    private String currency;
+
+    @Transient
+    private float price;
+
+    @PostLoad
+    private void init(){
+        this.currency = this.getOriginalCurrency();
+        this.price = this.getOriginalPrice();
+    }
+
+    public void updatePrice(CurrencyRateEntity currencyRate) {
+        var sourceCurrency = this.getOriginalCurrency();
+        if (!sourceCurrency.equals(currencyRate.getTargetCurrency())) {
+            this.setPrice(this.getOriginalPrice() * currencyRate.getRate());
+        } else
+            this.setPrice(this.getOriginalPrice());
+        this.setCurrency(currencyRate.getTargetCurrency());
+    }
 }
