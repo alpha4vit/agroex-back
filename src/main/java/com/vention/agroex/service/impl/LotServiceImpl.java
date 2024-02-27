@@ -11,6 +11,7 @@ import com.vention.agroex.filter.FilterService;
 import com.vention.agroex.model.LotStatusResponse;
 import com.vention.agroex.repository.LotRepository;
 import com.vention.agroex.service.*;
+import com.vention.agroex.util.constant.LotTypeConstants;
 import com.vention.agroex.util.constant.StatusConstants;
 import com.vention.agroex.util.mapper.LotMapper;
 import jakarta.persistence.EntityNotFoundException;
@@ -66,7 +67,7 @@ public class LotServiceImpl implements LotService {
                 .stream().map(tagService::save)
                 .toList());
 
-        if (lotEntity.getLotType().equals("auctionSell")) {
+        if (lotEntity.getLotType().equals(LotTypeConstants.AUCTION_SELL)) {
             lotEntity.setAdminStatus(StatusConstants.NEW);
             lotEntity.setStatus(StatusConstants.INACTIVE);
         }
@@ -87,7 +88,7 @@ public class LotServiceImpl implements LotService {
     private void validateFields(LotEntity lotEntity, MultipartFile[] files) {
         if (files == null || files.length < 1 || files.length > 6)
             throw new InvalidArgumentException(Map.of("images", "Incorrect quantity of images must be from 1 to 6!"), "Invalid arguments!");
-        if (lotEntity.getLotType().equals("auctionSell")) {
+        if (lotEntity.getLotType().equals(LotTypeConstants.AUCTION_SELL)) {
             if (lotEntity.getDuration() == null) {
                 throw new InvalidArgumentException("Duration of auction lot should not be null");
             }
@@ -226,7 +227,7 @@ public class LotServiceImpl implements LotService {
     @Override
     public LotStatusResponse getLotStatus(Long id) {
         var lot = getById(id);
-        if (!lot.getLotType().equals("auctionSell")) {
+        if (!lot.getLotType().equals(LotTypeConstants.AUCTION_SELL)) {
             throw new InvalidArgumentException("This lot is not an auction lot");
         }
         var bets = lot.getBets();
@@ -245,7 +246,7 @@ public class LotServiceImpl implements LotService {
     @Override
     public LotEntity putOnModeration(Long id) {
         var lot = getById(id);
-        if (!lot.getLotType().equals("auctionSell")) {
+        if (!lot.getLotType().equals(LotTypeConstants.AUCTION_SELL)) {
             throw new InvalidArgumentException("This lot is not an auction lot");
         }
         lot.setAdminStatus(StatusConstants.ON_MODERATION);
@@ -261,7 +262,7 @@ public class LotServiceImpl implements LotService {
     @Override
     public LotEntity approve(Long id) {
         var lot = getById(id);
-        if (!lot.getLotType().equals("auctionSell")) {
+        if (!lot.getLotType().equals(LotTypeConstants.AUCTION_SELL)) {
             throw new InvalidArgumentException("This lot is not an auction lot");
         }
         lot.setAdminStatus(StatusConstants.APPROVED);

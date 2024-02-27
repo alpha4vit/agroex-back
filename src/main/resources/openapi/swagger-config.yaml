@@ -1,600 +1,1964 @@
-openapi: 3.0.1
-info:
-  title: Agroex API
-  description: Spring Boot Application
-  version: "1.0"
-servers:
-  - url: http://localhost:8080
-    description: Generated server url
-tags:
-  - name: Lot controller
-    description: Lot API
-  - name: User controller
-    description: User API
-paths:
-  /users/{id}:
-    get:
-      tags:
-        - User controller
-      summary: Get user by its id
-      operationId: getById_1
-      parameters:
-        - name: id
-          in: path
-          required: true
-          schema:
-            type: integer
-            format: int64
-      responses:
-        "200":
-          description: Successfully returned
-          content:
-            '*/*':
-              schema:
-                $ref: '#/components/schemas/UserDTO'
-        "404":
-          description: User with this id not found
-    put:
-      tags:
-        - User controller
-      summary: Update existing user by its id (must send all fields)
-      operationId: updateUser_1
-      parameters:
-        - name: id
-          in: path
-          required: true
-          schema:
-            type: integer
-            format: int64
-      requestBody:
-        content:
-          application/json:
-            schema:
-              $ref: '#/components/schemas/UserDTO'
-        required: true
-      responses:
-        "200":
-          description: Successfully updated
-          content:
-            '*/*':
-              schema:
-                $ref: '#/components/schemas/UserDTO'
-        "404":
-          description: User with this id not found
-    delete:
-      tags:
-        - User controller
-      summary: Delete user by its id
-      operationId: deleteUserById_1
-      parameters:
-        - name: id
-          in: path
-          required: true
-          schema:
-            type: integer
-            format: int64
-      responses:
-        "200":
-          description: Successfully deleted
-        "404":
-          description: User with this id not found
-  /lots/{id}:
-    get:
-      tags:
-        - Lot controller
-      summary: Get lot by its id
-      operationId: findById_1
-      parameters:
-        - name: id
-          in: path
-          required: true
-          schema:
-            type: integer
-            format: int64
-      responses:
-        "200":
-          description: Successfully returned
-          content:
-            '*/*':
-              schema:
-                $ref: '#/components/schemas/LotDTO'
-        "404":
-          description: Lot with this id not found
-    put:
-      tags:
-        - Lot controller
-      summary: Update existing lot (must send all fields)
-      operationId: update_1
-      parameters:
-        - name: id
-          in: path
-          required: true
-          schema:
-            type: integer
-            format: int64
-      requestBody:
-        content:
-          application/json:
-            schema:
-              $ref: '#/components/schemas/LotDTO'
-        required: true
-      responses:
-        "404":
-          description: Lot with this id not found
-        "200":
-          description: Successfully updated
-          content:
-            '*/*':
-              schema:
-                $ref: '#/components/schemas/LotDTO'
-    delete:
-      tags:
-        - Lot controller
-      summary: Delete lot by its id
-      operationId: deleteById_1
-      parameters:
-        - name: id
-          in: path
-          required: true
-          schema:
-            type: integer
-            format: int64
-      responses:
-        "200":
-          description: Successfully deleted
-  /users:
-    get:
-      tags:
-        - User controller
-      summary: Get all created users
-      operationId: getAll_1
-      responses:
-        "200":
-          description: OK
-          content:
-            '*/*':
-              schema:
-                type: array
-                items:
-                  $ref: '#/components/schemas/UserDTO'
-    post:
-      tags:
-        - User controller
-      summary: Create user
-      operationId: createUser_1
-      requestBody:
-        content:
-          application/json:
-            schema:
-              $ref: '#/components/schemas/UserDTO'
-        required: true
-      responses:
-        "200":
-          description: Successfully created
-          content:
-            '*/*':
-              schema:
-                $ref: '#/components/schemas/UserDTO'
-  /lots:
-    get:
-      tags:
-        - Lot controller
-      summary: Get all lots by its id
-      operationId: findAll_1
-      responses:
-        "200":
-          description: OK
-          content:
-            '*/*':
-              schema:
-                oneOf:
-                  - type: array
-                    items:
-                      $ref: '#/components/schemas/LotDTO'
-                  - type: array
-                    items:
-                      $ref: '#/components/schemas/Lot'
-    post:
-      tags:
-        - Lot controller
-      summary: Create lot
-      operationId: save_1
-      requestBody:
-        content:
-          application/json:
-            schema:
-              $ref: '#/components/schemas/LotDTO'
-        required: true
-      responses:
-        "200":
-          description: Successfully created
-          content:
-            '*/*':
-              schema:
-               $ref: '#/components/schemas/LotDTO'
-  /countries/{id}:
-    get:
-      tags:
-        - Country controller
-      summary: Get country by its id
-      operationId: getById
-      parameters:
-        - name: id
-          in: path
-          required: true
-          schema:
-            type: integer
-            format: int64
-      responses:
-        "200":
-          description: OK
-          content:
-            '*/*':
-              schema:
-                $ref: '#/components/schemas/CountryDTO'
-    put:
-      tags:
-        - Country controller
-      summary: Update country by its id
-      operationId: updateUser
-      parameters:
-        - name: id
-          in: path
-          required: true
-          schema:
-            type: integer
-            format: int64
-      requestBody:
-        content:
-          application/json:
-            schema:
-              $ref: '#/components/schemas/CountryDTO'
-        required: true
-      responses:
-        "200":
-          description: OK
-          content:
-            '*/*':
-              schema:
-                $ref: '#/components/schemas/CountryDTO'
-    delete:
-      tags:
-        - Country controller
-      summary: Delete country by its id
-      operationId: deleteUserById
-      parameters:
-        - name: id
-          in: path
-          required: true
-          schema:
-            type: integer
-            format: int64
-      responses:
-        "200":
-          description: OK
-  /categories/{id}:
-    get:
-      tags:
-        - Product Category Controller
-      summary: Get product category by its id
-      operationId: findAllSubcategories
-      parameters:
-        - name: id
-          in: path
-          required: true
-          schema:
-            type: integer
-            format: int64
-      responses:
-        "200":
-          description: OK
-          content:
-            '*/*':
-              schema:
-                type: array
-                items:
-                  $ref: '#/components/schemas/ProductCategory'
-    put:
-      tags:
-        - Product Category Controller
-      summary: Update product category by its id (all fields must be sent)
-      operationId: update
-      parameters:
-        - name: id
-          in: path
-          required: true
-          schema:
-            type: integer
-            format: int64
-      requestBody:
-        content:
-          application/json:
-            schema:
-              $ref: '#/components/schemas/ProductCategory'
-        required: true
-      responses:
-        "200":
-          description: OK
-          content:
-            '*/*':
-              schema:
-                $ref: '#/components/schemas/ProductCategory'
-    delete:
-      tags:
-        - Product Category Controller
-      summary: Delete product category by its id
-      operationId: deleteById
-      parameters:
-        - name: id
-          in: path
-          required: true
-          schema:
-            type: integer
-            format: int64
-      responses:
-        "200":
-          description: OK
-  /countries:
-    get:
-      tags:
-        - Country controller
-      summary: Get all countries
-      operationId: getAll
-      responses:
-        "200":
-          description: OK
-          content:
-            '*/*':
-              schema:
-                type: array
-                items:
-                  $ref: '#/components/schemas/CountryDTO'
-    post:
-      tags:
-        - Country controller
-      summary: Create country
-      operationId: createUser
-      requestBody:
-        content:
-          application/json:
-            schema:
-              $ref: '#/components/schemas/CountryDTO'
-        required: true
-      responses:
-        "200":
-          description: OK
-          content:
-            '*/*':
-              schema:
-                $ref: '#/components/schemas/CountryDTO'
-  /categories:
-    get:
-      tags:
-        - Product Category Controller
-      summary: Get category by its id
-      operationId: findAll
-      responses:
-        "200":
-          description: OK
-          content:
-            '*/*':
-              schema:
-                type: array
-                items:
-                  $ref: '#/components/schemas/ProductCategory'
-    post:
-      tags:
-        - Product Category Controller
-      summary: Create category
-      operationId: save
-      requestBody:
-        content:
-          application/json:
-            schema:
-              $ref: '#/components/schemas/ProductCategory'
-        required: true
-      responses:
-        "200":
-          description: OK
-          content:
-            '*/*':
-              schema:
-                $ref: '#/components/schemas/ProductCategory'
-components:
-  schemas:
-    UserDTO:
-      required:
-        - email
-        - phoneNumber
-        - username
-      type: object
-      properties:
-        id:
-          type: integer
-          format: int64
-          example: 1
-        username:
-          type: string
-          example: 123_user_321
-          maxLength: 64
-          minLength: 3
-        email:
-          type: string
-          example: user_test@gmail.com
-        password:
-          type: string
-          writeOnly: true
-          example: user-test123321
-          maxLength: 2147483647
-          minLength: 10
-        phoneNumber:
-          type: string
-          example: "+375448901238"
-        registrationDate:
-          type: string
-          format: date-time
-          readOnly: true
-          example: 2024-01-26T15:52:08.8822866Z
-        emailVerified:
-          type: boolean
-          readOnly: true
-          example: true
-    Image:
-      type: string
-      example: 0776a0db-200e-40ca-a353-980b92785346.jpg
-    ProductCategory:
-      type: object
-      properties:
-        id:
-          type: integer
-          format: int64
-          example: 2
-        title:
-          type: string
-          example: Fruits
-
-        parentId:
-          type: integer
-          format: int64
-          example: 1
-    Tag:
-      type: object
-      properties:
-        id:
-          type: integer
-          format: int64
-          example: 1
-        title:
-          type: string
-          example: fresh
-          maxLength: 64
-          minLength: 1
-    User:
-      type: object
-      properties:
-        id:
-          type: integer
-          format: int64
-        username:
-          type: string
-        email:
-          type: string
-        password:
-          type: string
-        phoneNumber:
-          type: string
-        registrationDate:
-          type: string
-          format: date-time
-        emailVerified:
-          type: boolean
-    LocationDTO:
-      type: object
-      properties:
-        countryId:
-          type: integer
-          format: int64
-          example: 1
-        region:
-          type: string
-          example: "Minsk region"
-          maxLength: 64
-          minLength: 0
-        latitude:
-          type: string
-          example: "53.902284"
-        longitude:
-          type: string
-          example: "27.561831"
-    LotDTO:
-      type: object
-      properties:
-        id:
-          type: integer
-          format: int64
-          example: 1
-        title:
-          type: string
-          example: "Orange Lot"
-          maxLength: 64
-          minLength: 5
-        description:
-          type: string
-          example: "Fresh oranges from the orchard"
-          maxLength: 1000
-          minLength: 0
-        variety:
-          type: string
-          maxLength: 64
-          minLength: 0
-          example: "varient"
-        size:
-          type: string
-          maxLength: 64
-          minLength: 0
-          example: "70+"
-        packaging:
-          maxLength: 64
-          minLength: 0
-          type: string
-          example: "Container"
-        enabledByAdmin:
-          type: boolean
-          example: true
-        quantity:
-          type: integer
-          format: int32
-          example: 10000
-          minimum: 1
-        pricePerTon:
-          type: number
-          format: float
-          example: 1.5
-        currency:
-          maxLength: 10
-          minLength: 0
-          type: string
-          example: "USD"
-        creationDate:
-          type: string
-          format: date-time
-          example: "2024-01-31T21:16:32.739066Z"
-        expirationDate:
-          type: string
-          format: date-time
-          example: "2024-01-31T21:16:32.739066Z"
-        productCategoryId:
-          type: integer
-          format: int64
-          example: 1
-        lotType:
-          pattern: \b(?:buy|sell)\b
-          type: string
-          example: "sell"
-        userId:
-          type: integer
-          format: int64
-          example: 1
-        location:
-          $ref: '#/components/schemas/LocationDTO'
-        tags:
-          type: array
-          items:
-            $ref: '#/components/schemas/Tag'
-        images:
-          type: array
-          items:
-            $ref: '#/components/schemas/Image'
-    CountryDTO:
-      type: object
-      properties:
-        id:
-          type: integer
-          format: int64
-          readOnly: true
-          example: 1
-        title:
-          type: string
-          example: "Belarus"
-          maxLength: 64
-          minLength: 1
+{
+  "openapi": "3.0.1",
+  "info": {
+    "title": "Agroex API",
+    "description": "Spring Boot Application",
+    "version": "1.0"
+  },
+  "servers": [
+    {
+      "url": "http://localhost:8080",
+      "description": "Generated server url"
+    }
+  ],
+  "tags": [
+    {
+      "name": "Lot controller",
+      "description": "Lot API"
+    },
+    {
+      "name": "User controller",
+      "description": "User API"
+    }
+  ],
+  "paths": {
+    "/users/{id}": {
+      "get": {
+        "tags": [
+          "User controller"
+        ],
+        "summary": "Get user by its id",
+        "operationId": "getById_1_1",
+        "parameters": [
+          {
+            "name": "id",
+            "in": "path",
+            "required": true,
+            "schema": {
+              "type": "integer",
+              "format": "int64"
+            }
+          }
+        ],
+        "responses": {
+          "200": {
+            "description": "Successfully returned",
+            "content": {
+              "*/*": {
+                "schema": {
+                  "oneOf": [
+                    {
+                      "$ref": "#/components/schemas/User"
+                    },
+                    {
+                      "$ref": "#/components/schemas/UserDTO"
+                    }
+                  ]
+                }
+              }
+            }
+          },
+          "404": {
+            "description": "User with this id not found"
+          }
+        }
+      },
+      "put": {
+        "tags": [
+          "User controller"
+        ],
+        "summary": "Update existing user by its id (must send all fields)",
+        "operationId": "updateUser_1_1",
+        "parameters": [
+          {
+            "name": "id",
+            "in": "path",
+            "required": true,
+            "schema": {
+              "type": "integer",
+              "format": "int64"
+            }
+          }
+        ],
+        "requestBody": {
+          "content": {
+            "application/json": {
+              "schema": {
+                "$ref": "#/components/schemas/User"
+              }
+            }
+          },
+          "required": true
+        },
+        "responses": {
+          "200": {
+            "description": "Successfully updated",
+            "content": {
+              "*/*": {
+                "schema": {
+                  "oneOf": [
+                    {
+                      "$ref": "#/components/schemas/User"
+                    },
+                    {
+                      "$ref": "#/components/schemas/UserDTO"
+                    }
+                  ]
+                }
+              }
+            }
+          },
+          "404": {
+            "description": "User with this id not found"
+          }
+        }
+      },
+      "delete": {
+        "tags": [
+          "User controller"
+        ],
+        "summary": "Delete user by its id",
+        "operationId": "deleteUserById_1_1",
+        "parameters": [
+          {
+            "name": "id",
+            "in": "path",
+            "required": true,
+            "schema": {
+              "type": "integer",
+              "format": "int64"
+            }
+          }
+        ],
+        "responses": {
+          "200": {
+            "description": "Successfully deleted",
+            "content": {
+              "*/*": {
+                "schema": {
+                  "type": "integer",
+                  "format": "int64"
+                }
+              }
+            }
+          },
+          "404": {
+            "description": "User with this id not found"
+          }
+        }
+      }
+    },
+    "/lots/{id}": {
+      "get": {
+        "tags": [
+          "Lot controller"
+        ],
+        "summary": "Get lot by its id",
+        "operationId": "findById_1_1",
+        "parameters": [
+          {
+            "name": "id",
+            "in": "path",
+            "required": true,
+            "schema": {
+              "type": "integer",
+              "format": "int64"
+            }
+          }
+        ],
+        "responses": {
+          "200": {
+            "description": "Successfully returned",
+            "content": {
+              "*/*": {
+                "schema": {
+                  "oneOf": [
+                    {
+                      "$ref": "#/components/schemas/Lot"
+                    },
+                    {
+                      "$ref": "#/components/schemas/LotDTO"
+                    }
+                  ]
+                }
+              }
+            }
+          },
+          "404": {
+            "description": "Lot with this id not found"
+          }
+        }
+      },
+      "put": {
+        "tags": [
+          "Lot controller"
+        ],
+        "summary": "Update existing lot (must send all fields)",
+        "operationId": "update_1_1",
+        "parameters": [
+          {
+            "name": "id",
+            "in": "path",
+            "required": true,
+            "schema": {
+              "type": "integer",
+              "format": "int64"
+            }
+          }
+        ],
+        "requestBody": {
+          "content": {
+            "application/json": {
+              "schema": {
+                "required": [
+                  "data"
+                ],
+                "type": "object",
+                "properties": {
+                  "file": {
+                    "type": "array",
+                    "items": {
+                      "type": "string",
+                      "format": "binary"
+                    }
+                  },
+                  "data": {
+                    "$ref": "#/components/schemas/Lot"
+                  }
+                }
+              }
+            }
+          },
+          "required": true
+        },
+        "responses": {
+          "404": {
+            "description": "Lot with this id not found"
+          },
+          "200": {
+            "description": "Successfully updated",
+            "content": {
+              "*/*": {
+                "schema": {
+                  "oneOf": [
+                    {
+                      "$ref": "#/components/schemas/Lot"
+                    },
+                    {
+                      "$ref": "#/components/schemas/LotDTO"
+                    }
+                  ]
+                }
+              }
+            }
+          }
+        }
+      },
+      "delete": {
+        "tags": [
+          "Lot controller"
+        ],
+        "summary": "Delete lot by its id",
+        "operationId": "deleteById_1_1",
+        "parameters": [
+          {
+            "name": "id",
+            "in": "path",
+            "required": true,
+            "schema": {
+              "type": "integer",
+              "format": "int64"
+            }
+          }
+        ],
+        "responses": {
+          "200": {
+            "description": "Successfully deleted"
+          }
+        }
+      }
+    },
+    "/users": {
+      "get": {
+        "tags": [
+          "User controller"
+        ],
+        "summary": "Get all created users",
+        "operationId": "getAll_1_1",
+        "responses": {
+          "200": {
+            "description": "OK",
+            "content": {
+              "*/*": {
+                "schema": {
+                  "oneOf": [
+                    {
+                      "type": "array",
+                      "items": {
+                        "$ref": "#/components/schemas/User"
+                      }
+                    },
+                    {
+                      "type": "array",
+                      "items": {
+                        "$ref": "#/components/schemas/UserDTO"
+                      }
+                    }
+                  ]
+                }
+              }
+            }
+          }
+        }
+      },
+      "post": {
+        "tags": [
+          "User controller"
+        ],
+        "summary": "Create user",
+        "operationId": "createUser_1_1",
+        "requestBody": {
+          "content": {
+            "application/json": {
+              "schema": {
+                "$ref": "#/components/schemas/User"
+              }
+            }
+          },
+          "required": true
+        },
+        "responses": {
+          "200": {
+            "description": "Successfully created",
+            "content": {
+              "*/*": {
+                "schema": {
+                  "oneOf": [
+                    {
+                      "$ref": "#/components/schemas/User"
+                    },
+                    {
+                      "$ref": "#/components/schemas/UserDTO"
+                    }
+                  ]
+                }
+              }
+            }
+          }
+        }
+      }
+    },
+    "/lots": {
+      "get": {
+        "tags": [
+          "Lot controller"
+        ],
+        "summary": "Get all lots",
+        "operationId": "findAll_1_1",
+        "parameters": [
+          {
+            "name": "filters",
+            "in": "query",
+            "required": true
+          },
+          {
+            "name": "pageNumber",
+            "in": "query",
+            "required": false,
+            "schema": {
+              "type": "integer",
+              "format": "int32",
+              "default": 0
+            }
+          },
+          {
+            "name": "pageSize",
+            "in": "query",
+            "required": false,
+            "schema": {
+              "type": "integer",
+              "format": "int32",
+              "default": 50
+            }
+          }
+        ],
+        "responses": {
+          "200": {
+            "description": "OK",
+            "content": {
+              "*/*": {
+                "schema": {
+                  "oneOf": [
+                    {
+                      "type": "array",
+                      "items": {
+                        "$ref": "#/components/schemas/LotDTO"
+                      }
+                    },
+                    {
+                      "type": "array",
+                      "items": {
+                        "$ref": "#/components/schemas/Lot"
+                      }
+                    }
+                  ]
+                }
+              }
+            }
+          }
+        }
+      },
+      "post": {
+        "tags": [
+          "Lot controller"
+        ],
+        "summary": "Create lot",
+        "operationId": "save_1_1",
+        "requestBody": {
+          "content": {
+            "application/json": {
+              "schema": {
+                "required": [
+                  "data"
+                ],
+                "type": "object",
+                "properties": {
+                  "file": {
+                    "type": "array",
+                    "items": {
+                      "type": "string",
+                      "format": "binary"
+                    }
+                  },
+                  "data": {
+                    "$ref": "#/components/schemas/Lot"
+                  }
+                }
+              }
+            }
+          },
+          "required": true
+        },
+        "responses": {
+          "200": {
+            "description": "Successfully created",
+            "content": {
+              "*/*": {
+                "schema": {
+                  "oneOf": [
+                    {
+                      "$ref": "#/components/schemas/Lot"
+                    },
+                    {
+                      "$ref": "#/components/schemas/LotDTO"
+                    }
+                  ]
+                }
+              }
+            }
+          }
+        }
+      }
+    },
+    "/countries/{id}": {
+      "get": {
+        "tags": [
+          "Country controller"
+        ],
+        "summary": "Get country by its id",
+        "operationId": "getById_2",
+        "parameters": [
+          {
+            "name": "id",
+            "in": "path",
+            "required": true,
+            "schema": {
+              "type": "integer",
+              "format": "int64"
+            }
+          }
+        ],
+        "responses": {
+          "200": {
+            "description": "OK",
+            "content": {
+              "*/*": {
+                "schema": {
+                  "oneOf": [
+                    {
+                      "$ref": "#/components/schemas/Country"
+                    },
+                    {
+                      "$ref": "#/components/schemas/CountryDTO"
+                    }
+                  ]
+                }
+              }
+            }
+          }
+        }
+      },
+      "put": {
+        "tags": [
+          "Country controller"
+        ],
+        "summary": "Update country by its id",
+        "operationId": "updateUser_1",
+        "parameters": [
+          {
+            "name": "id",
+            "in": "path",
+            "required": true,
+            "schema": {
+              "type": "integer",
+              "format": "int64"
+            }
+          }
+        ],
+        "requestBody": {
+          "content": {
+            "application/json": {
+              "schema": {
+                "$ref": "#/components/schemas/Country"
+              }
+            }
+          },
+          "required": true
+        },
+        "responses": {
+          "200": {
+            "description": "OK",
+            "content": {
+              "*/*": {
+                "schema": {
+                  "oneOf": [
+                    {
+                      "$ref": "#/components/schemas/Country"
+                    },
+                    {
+                      "$ref": "#/components/schemas/CountryDTO"
+                    }
+                  ]
+                }
+              }
+            }
+          }
+        }
+      },
+      "delete": {
+        "tags": [
+          "Country controller"
+        ],
+        "summary": "Delete country by its id",
+        "operationId": "deleteUserById_1",
+        "parameters": [
+          {
+            "name": "id",
+            "in": "path",
+            "required": true,
+            "schema": {
+              "type": "integer",
+              "format": "int64"
+            }
+          }
+        ],
+        "responses": {
+          "200": {
+            "description": "OK"
+          }
+        }
+      }
+    },
+    "/categories/{id}": {
+      "get": {
+        "tags": [
+          "Product Category Controller"
+        ],
+        "summary": "Get product category by its id",
+        "operationId": "findAllSubcategories_1",
+        "parameters": [
+          {
+            "name": "id",
+            "in": "path",
+            "required": true,
+            "schema": {
+              "type": "integer",
+              "format": "int64"
+            }
+          }
+        ],
+        "responses": {
+          "200": {
+            "description": "OK",
+            "content": {
+              "*/*": {
+                "schema": {
+                  "oneOf": [
+                    {
+                      "type": "array",
+                      "items": {
+                        "$ref": "#/components/schemas/ProductCategoryEntity"
+                      }
+                    },
+                    {
+                      "type": "array",
+                      "items": {
+                        "$ref": "#/components/schemas/ProductCategory"
+                      }
+                    }
+                  ]
+                }
+              }
+            }
+          }
+        }
+      },
+      "put": {
+        "tags": [
+          "Product Category Controller"
+        ],
+        "summary": "Update product category by its id (all fields must be sent)",
+        "operationId": "update_1",
+        "parameters": [
+          {
+            "name": "id",
+            "in": "path",
+            "required": true,
+            "schema": {
+              "type": "integer",
+              "format": "int64"
+            }
+          }
+        ],
+        "requestBody": {
+          "content": {
+            "application/json": {
+              "schema": {
+                "$ref": "#/components/schemas/ProductCategoryEntity"
+              }
+            }
+          },
+          "required": true
+        },
+        "responses": {
+          "200": {
+            "description": "OK",
+            "content": {
+              "*/*": {
+                "schema": {
+                  "oneOf": [
+                    {
+                      "$ref": "#/components/schemas/ProductCategoryEntity"
+                    },
+                    {
+                      "$ref": "#/components/schemas/ProductCategory"
+                    }
+                  ]
+                }
+              }
+            }
+          }
+        }
+      },
+      "delete": {
+        "tags": [
+          "Product Category Controller"
+        ],
+        "summary": "Delete product category by its id",
+        "operationId": "deleteById_1",
+        "parameters": [
+          {
+            "name": "id",
+            "in": "path",
+            "required": true,
+            "schema": {
+              "type": "integer",
+              "format": "int64"
+            }
+          }
+        ],
+        "responses": {
+          "200": {
+            "description": "OK",
+            "content": {
+              "*/*": {
+                "schema": {
+                  "type": "integer",
+                  "format": "int64"
+                }
+              }
+            }
+          }
+        }
+      }
+    },
+    "/countries": {
+      "get": {
+        "tags": [
+          "Country controller"
+        ],
+        "summary": "Get all countries",
+        "operationId": "getAll_2",
+        "responses": {
+          "200": {
+            "description": "OK",
+            "content": {
+              "*/*": {
+                "schema": {
+                  "oneOf": [
+                    {
+                      "type": "array",
+                      "items": {
+                        "$ref": "#/components/schemas/Country"
+                      }
+                    },
+                    {
+                      "type": "array",
+                      "items": {
+                        "$ref": "#/components/schemas/CountryDTO"
+                      }
+                    }
+                  ]
+                }
+              }
+            }
+          }
+        }
+      },
+      "post": {
+        "tags": [
+          "Country controller"
+        ],
+        "summary": "Create country",
+        "operationId": "createUser_1",
+        "requestBody": {
+          "content": {
+            "application/json": {
+              "schema": {
+                "$ref": "#/components/schemas/Country"
+              }
+            }
+          },
+          "required": true
+        },
+        "responses": {
+          "200": {
+            "description": "OK",
+            "content": {
+              "*/*": {
+                "schema": {
+                  "oneOf": [
+                    {
+                      "$ref": "#/components/schemas/Country"
+                    },
+                    {
+                      "$ref": "#/components/schemas/CountryDTO"
+                    }
+                  ]
+                }
+              }
+            }
+          }
+        }
+      }
+    },
+    "/categories": {
+      "get": {
+        "tags": [
+          "Product Category Controller"
+        ],
+        "summary": "Get category by its id",
+        "operationId": "findAll",
+        "responses": {
+          "200": {
+            "description": "OK",
+            "content": {
+              "*/*": {
+                "schema": {
+                  "type": "array",
+                  "items": {
+                    "$ref": "#/components/schemas/ProductCategory"
+                  }
+                }
+              }
+            }
+          }
+        }
+      },
+      "post": {
+        "tags": [
+          "Product Category Controller"
+        ],
+        "summary": "Create category",
+        "operationId": "save_1",
+        "requestBody": {
+          "content": {
+            "application/json": {
+              "schema": {
+                "$ref": "#/components/schemas/ProductCategoryEntity"
+              }
+            }
+          },
+          "required": true
+        },
+        "responses": {
+          "200": {
+            "description": "OK",
+            "content": {
+              "*/*": {
+                "schema": {
+                  "oneOf": [
+                    {
+                      "$ref": "#/components/schemas/ProductCategoryEntity"
+                    },
+                    {
+                      "$ref": "#/components/schemas/ProductCategory"
+                    }
+                  ]
+                }
+              }
+            }
+          }
+        }
+      }
+    },
+    "/tags/{id}": {
+      "get": {
+        "tags": [
+          "tag-controller"
+        ],
+        "operationId": "getById_1",
+        "parameters": [
+          {
+            "name": "id",
+            "in": "path",
+            "required": true,
+            "schema": {
+              "type": "integer",
+              "format": "int64"
+            }
+          }
+        ],
+        "responses": {
+          "200": {
+            "description": "OK",
+            "content": {
+              "*/*": {
+                "schema": {
+                  "$ref": "#/components/schemas/Tag"
+                }
+              }
+            }
+          }
+        }
+      },
+      "put": {
+        "tags": [
+          "tag-controller"
+        ],
+        "operationId": "update_2",
+        "parameters": [
+          {
+            "name": "id",
+            "in": "path",
+            "required": true,
+            "schema": {
+              "type": "integer",
+              "format": "int64"
+            }
+          }
+        ],
+        "requestBody": {
+          "content": {
+            "application/json": {
+              "schema": {
+                "$ref": "#/components/schemas/Tag"
+              }
+            }
+          },
+          "required": true
+        },
+        "responses": {
+          "200": {
+            "description": "OK",
+            "content": {
+              "*/*": {
+                "schema": {
+                  "$ref": "#/components/schemas/Tag"
+                }
+              }
+            }
+          }
+        }
+      }
+    },
+    "/users/{id}/avatar": {
+      "post": {
+        "tags": [
+          "User controller"
+        ],
+        "operationId": "uploadAvatar",
+        "parameters": [
+          {
+            "name": "id",
+            "in": "path",
+            "required": true,
+            "schema": {
+              "type": "integer",
+              "format": "int64"
+            }
+          }
+        ],
+        "requestBody": {
+          "content": {
+            "application/json": {
+              "schema": {
+                "required": [
+                  "file"
+                ],
+                "type": "object",
+                "properties": {
+                  "file": {
+                    "type": "string",
+                    "format": "binary"
+                  }
+                }
+              }
+            }
+          }
+        },
+        "responses": {
+          "200": {
+            "description": "OK",
+            "content": {
+              "*/*": {
+                "schema": {
+                  "$ref": "#/components/schemas/User"
+                }
+              }
+            }
+          }
+        }
+      }
+    },
+    "/tags": {
+      "get": {
+        "tags": [
+          "tag-controller"
+        ],
+        "operationId": "getAll_1",
+        "responses": {
+          "200": {
+            "description": "OK",
+            "content": {
+              "*/*": {
+                "schema": {
+                  "type": "array",
+                  "items": {
+                    "$ref": "#/components/schemas/Tag"
+                  }
+                }
+              }
+            }
+          }
+        }
+      },
+      "post": {
+        "tags": [
+          "tag-controller"
+        ],
+        "operationId": "save_2",
+        "requestBody": {
+          "content": {
+            "application/json": {
+              "schema": {
+                "$ref": "#/components/schemas/Tag"
+              }
+            }
+          },
+          "required": true
+        },
+        "responses": {
+          "200": {
+            "description": "OK",
+            "content": {
+              "*/*": {
+                "schema": {
+                  "$ref": "#/components/schemas/Tag"
+                }
+              }
+            }
+          }
+        }
+      }
+    },
+    "/lots/{id}/moderate": {
+      "post": {
+        "tags": [
+          "Lot controller"
+        ],
+        "summary": "Put lot on moderation",
+        "operationId": "putOnModeration",
+        "parameters": [
+          {
+            "name": "id",
+            "in": "path",
+            "required": true,
+            "schema": {
+              "type": "integer",
+              "format": "int64"
+            }
+          }
+        ],
+        "responses": {
+          "200": {
+            "description": "OK",
+            "content": {
+              "*/*": {
+                "schema": {
+                  "$ref": "#/components/schemas/Lot"
+                }
+              }
+            }
+          }
+        }
+      }
+    },
+    "/lots/{id}/approve": {
+      "post": {
+        "tags": [
+          "Lot controller"
+        ],
+        "operationId": "approve",
+        "summary": "Approve lot",
+        "parameters": [
+          {
+            "name": "id",
+            "in": "path",
+            "required": true,
+            "schema": {
+              "type": "integer",
+              "format": "int64"
+            }
+          }
+        ],
+        "responses": {
+          "200": {
+            "description": "OK",
+            "content": {
+              "*/*": {
+                "schema": {
+                  "$ref": "#/components/schemas/Lot"
+                }
+              }
+            }
+          }
+        }
+      }
+    },
+    "/bets/{id}": {
+      "get": {
+        "tags": [
+          "Bets controller"
+        ],
+        "operationId": "getBetsList",
+        "parameters": [
+          {
+            "name": "id",
+            "in": "path",
+            "required": true,
+            "schema": {
+              "type": "integer",
+              "format": "int64"
+            }
+          }
+        ],
+        "responses": {
+          "200": {
+            "description": "OK",
+            "content": {
+              "*/*": {
+                "schema": {
+                  "type": "array",
+                  "items": {
+                    "$ref": "#/components/schemas/Bet"
+                  }
+                }
+              }
+            }
+          }
+        }
+      },
+      "post": {
+        "tags": [
+          "Bets controller"
+        ],
+        "operationId": "makeBet",
+        "parameters": [
+          {
+            "name": "id",
+            "in": "path",
+            "required": true,
+            "schema": {
+              "type": "integer",
+              "format": "int64"
+            }
+          }
+        ],
+        "requestBody": {
+          "content": {
+            "application/json": {
+              "schema": {
+                "$ref": "#/components/schemas/BetRequest"
+              }
+            }
+          },
+          "required": true
+        },
+        "responses": {
+          "200": {
+            "description": "OK",
+            "content": {
+              "*/*": {
+                "schema": {
+                  "$ref": "#/components/schemas/Bet"
+                }
+              }
+            }
+          }
+        }
+      }
+    },
+    "/lots/{id}/status": {
+      "get": {
+        "tags": [
+          "Lot controller"
+        ],
+        "operationId": "getLotStatus",
+        "parameters": [
+          {
+            "name": "id",
+            "in": "path",
+            "required": true,
+            "schema": {
+              "type": "integer",
+              "format": "int64"
+            }
+          }
+        ],
+        "responses": {
+          "200": {
+            "description": "OK",
+            "content": {
+              "*/*": {
+                "schema": {
+                  "$ref": "#/components/schemas/LotStatusResponse"
+                }
+              }
+            }
+          }
+        }
+      }
+    },
+    "/categories/{id}/sell": {
+      "get": {
+        "tags": [
+          "Product Category Controller"
+        ],
+        "summary": "Find subcategories where lots type is sell",
+        "operationId": "findNonEmptySellSubcategories",
+        "parameters": [
+          {
+            "name": "id",
+            "in": "path",
+            "required": true,
+            "schema": {
+              "type": "integer",
+              "format": "int64"
+            }
+          }
+        ],
+        "responses": {
+          "200": {
+            "description": "OK",
+            "content": {
+              "*/*": {
+                "schema": {
+                  "type": "array",
+                  "items": {
+                    "$ref": "#/components/schemas/ProductCategoryEntity"
+                  }
+                }
+              }
+            }
+          }
+        }
+      }
+    },
+    "/categories/{id}/buy": {
+      "get": {
+        "tags": [
+          "Product Category Controller"
+        ],
+        "operationId": "findNonEmptyButSubcategories",
+        "summary": "Find subcategories where lots type is buy",
+        "parameters": [
+          {
+            "name": "id",
+            "in": "path",
+            "required": true,
+            "schema": {
+              "type": "integer",
+              "format": "int64"
+            }
+          }
+        ],
+        "responses": {
+          "200": {
+            "description": "OK",
+            "content": {
+              "*/*": {
+                "schema": {
+                  "type": "array",
+                  "items": {
+                    "$ref": "#/components/schemas/ProductCategoryEntity"
+                  }
+                }
+              }
+            }
+          }
+        }
+      }
+    },
+    "/categories/{id}/all": {
+      "get": {
+        "tags": [
+          "Product Category Controller"
+        ],
+        "summary": "Find all subcategories (even empty)",
+        "operationId": "findAllSubcategories",
+        "parameters": [
+          {
+            "name": "id",
+            "in": "path",
+            "required": true,
+            "schema": {
+              "type": "integer",
+              "format": "int64"
+            }
+          }
+        ],
+        "responses": {
+          "200": {
+            "description": "OK",
+            "content": {
+              "*/*": {
+                "schema": {
+                  "type": "array",
+                  "items": {
+                    "$ref": "#/components/schemas/ProductCategoryEntity"
+                  }
+                }
+              }
+            }
+          }
+        }
+      }
+    },
+    "/categories/main": {
+      "get": {
+        "tags": [
+          "Product Category Controller"
+        ],
+        "summary": "Find all non empty mainCategories",
+        "operationId": "findNonEmptyMainCategories",
+        "responses": {
+          "200": {
+            "description": "OK",
+            "content": {
+              "*/*": {
+                "schema": {
+                  "type": "array",
+                  "items": {
+                    "$ref": "#/components/schemas/ProductCategoryEntity"
+                  }
+                }
+              }
+            }
+          }
+        }
+      }
+    },
+    "/categories/main/all": {
+      "get": {
+        "tags": [
+          "Product Category Controller"
+        ],
+        "summary": "Find all mainCategories (even empty)",
+        "operationId": "findAllMainCategories",
+        "responses": {
+          "200": {
+            "description": "OK",
+            "content": {
+              "*/*": {
+                "schema": {
+                  "type": "array",
+                  "items": {
+                    "$ref": "#/components/schemas/ProductCategoryEntity"
+                  }
+                }
+              }
+            }
+          }
+        }
+      }
+    },
+    "/categories/all": {
+      "get": {
+        "tags": [
+          "Product Category Controller"
+        ],
+        "summary": "Find all categories and subcategories (even empty)",
+        "operationId": "findAll_1",
+        "responses": {
+          "200": {
+            "description": "OK",
+            "content": {
+              "*/*": {
+                "schema": {
+                  "type": "array",
+                  "items": {
+                    "$ref": "#/components/schemas/ProductCategoryEntity"
+                  }
+                }
+              }
+            }
+          }
+        }
+      }
+    },
+    "/lots/{id}/images": {
+      "delete": {
+        "tags": [
+          "Lot controller"
+        ],
+        "operationId": "deleteImageForLot",
+        "parameters": [
+          {
+            "name": "id",
+            "in": "path",
+            "required": true,
+            "schema": {
+              "type": "integer",
+              "format": "int64"
+            }
+          },
+          {
+            "name": "fileName",
+            "in": "query",
+            "required": true,
+            "schema": {
+              "type": "string"
+            }
+          }
+        ],
+        "responses": {
+          "200": {
+            "description": "OK"
+          }
+        }
+      }
+    }
+  },
+  "components": {
+    "schemas": {
+      "UserDTO": {
+        "required": [
+          "email",
+          "phoneNumber",
+          "username"
+        ],
+        "type": "object",
+        "properties": {
+          "id": {
+            "type": "integer",
+            "format": "int64",
+            "example": 1
+          },
+          "username": {
+            "maxLength": 64,
+            "minLength": 3,
+            "type": "string",
+            "example": "123_user_321"
+          },
+          "email": {
+            "type": "string",
+            "example": "user_test@gmail.com"
+          },
+          "password": {
+            "maxLength": 2147483647,
+            "minLength": 10,
+            "type": "string",
+            "writeOnly": true,
+            "example": "user-test123321"
+          },
+          "phoneNumber": {
+            "type": "string",
+            "example": "+375448901238"
+          },
+          "registrationDate": {
+            "type": "string",
+            "format": "date-time",
+            "readOnly": true,
+            "example": "2024-01-26T15:52:08.8822866Z"
+          },
+          "emailVerified": {
+            "type": "boolean",
+            "readOnly": true,
+            "example": true
+          }
+        }
+      },
+      "Image": {
+        "type": "string",
+        "example": "0776a0db-200e-40ca-a353-980b92785346.jpg"
+      },
+      "ProductCategory": {
+        "type": "object",
+        "properties": {
+          "id": {
+            "type": "integer",
+            "format": "int64",
+            "example": 2
+          },
+          "title": {
+            "type": "string",
+            "example": "Fruits"
+          },
+          "parentId": {
+            "type": "integer",
+            "format": "int64",
+            "example": 1
+          }
+        }
+      },
+      "Tag": {
+        "type": "object",
+        "properties": {
+          "id": {
+            "type": "integer",
+            "format": "int64",
+            "example": 1
+          },
+          "title": {
+            "maxLength": 64,
+            "minLength": 1,
+            "type": "string",
+            "example": "fresh"
+          }
+        }
+      },
+      "User": {
+        "type": "object",
+        "properties": {
+          "id": {
+            "type": "integer",
+            "format": "int64"
+          },
+          "username": {
+            "type": "string"
+          },
+          "email": {
+            "type": "string"
+          },
+          "password": {
+            "type": "string"
+          },
+          "phoneNumber": {
+            "type": "string"
+          },
+          "registrationDate": {
+            "type": "string",
+            "format": "date-time"
+          },
+          "emailVerified": {
+            "type": "boolean"
+          }
+        }
+      },
+      "LocationDTO": {
+        "type": "object",
+        "properties": {
+          "countryId": {
+            "type": "integer",
+            "format": "int64",
+            "example": 1
+          },
+          "region": {
+            "maxLength": 64,
+            "minLength": 0,
+            "type": "string",
+            "example": "Minsk region"
+          },
+          "latitude": {
+            "type": "string",
+            "example": "53.902284"
+          },
+          "longitude": {
+            "type": "string",
+            "example": "27.561831"
+          }
+        }
+      },
+      "LotDTO": {
+        "type": "object",
+        "properties": {
+          "id": {
+            "type": "integer",
+            "format": "int64",
+            "example": 1
+          },
+          "title": {
+            "maxLength": 64,
+            "minLength": 5,
+            "type": "string",
+            "example": "Orange Lot"
+          },
+          "description": {
+            "maxLength": 1000,
+            "minLength": 20,
+            "type": "string",
+            "example": "Fresh oranges from the orchard"
+          },
+          "variety": {
+            "maxLength": 64,
+            "minLength": 0,
+            "type": "string",
+            "example": "varient"
+          },
+          "size": {
+            "maxLength": 64,
+            "minLength": 0,
+            "type": "string",
+            "example": "70+"
+          },
+          "packaging": {
+            "maxLength": 64,
+            "minLength": 0,
+            "type": "boolean",
+            "example": true
+          },
+          "quantity": {
+            "minimum": 0.01,
+            "type": "number",
+            "format": "float",
+            "example": 123.1
+          },
+          "duration": {
+            "minimum": 1,
+            "type": "integer",
+            "format": "int64",
+            "example": 1000000
+          },
+          "price": {
+            "type": "number",
+            "format": "float",
+            "example": 1.5
+          },
+          "minPrice": {
+            "type": "number",
+            "format": "float",
+            "example": 1.5
+          },
+          "currency": {
+            "maxLength": 10,
+            "minLength": 0,
+            "type": "string",
+            "example": "USD"
+          },
+          "adminStatus": {
+            "maxLength": 10,
+            "minLength": 0,
+            "type": "string",
+            "example": "approved"
+          },
+          "userStatus": {
+            "maxLength": 10,
+            "minLength": 0,
+            "type": "string",
+            "example": "active"
+          },
+          "status": {
+            "maxLength": 10,
+            "minLength": 0,
+            "type": "string",
+            "example": "active"
+          },
+          "creationDate": {
+            "type": "string",
+            "format": "date-time",
+            "example": "2024-01-31T21:16:32.739066Z"
+          },
+          "expirationDate": {
+            "type": "string",
+            "format": "date-time",
+            "example": "2024-01-31T21:16:32.739066Z"
+          },
+          "productCategoryId": {
+            "type": "integer",
+            "format": "int64",
+            "example": 1
+          },
+          "lotType": {
+            "pattern": "\\b(?:buy|sell|auctionSell)\\b",
+            "type": "string",
+            "example": "sell"
+          },
+          "userId": {
+            "type": "integer",
+            "format": "int64",
+            "example": 1
+          },
+          "location": {
+            "$ref": "#/components/schemas/LocationDTO"
+          },
+          "tags": {
+            "type": "array",
+            "items": {
+              "$ref": "#/components/schemas/Tag"
+            }
+          },
+          "images": {
+            "type": "array",
+            "items": {
+              "$ref": "#/components/schemas/Image"
+            }
+          }
+        }
+      },
+      "CountryDTO": {
+        "type": "object",
+        "properties": {
+          "id": {
+            "type": "integer",
+            "format": "int64",
+            "readOnly": true,
+            "example": 1
+          },
+          "title": {
+            "maxLength": 64,
+            "minLength": 1,
+            "type": "string",
+            "example": "Belarus"
+          }
+        }
+      },
+      "ColorEntity": {
+        "type": "object",
+        "properties": {
+          "id": {
+            "type": "integer",
+            "format": "int64"
+          },
+          "bgColorHex": {
+            "type": "string"
+          },
+          "textColorHex": {
+            "type": "string"
+          }
+        }
+      },
+      "ImageResponse": {
+        "type": "object",
+        "properties": {
+          "id": {
+            "type": "integer",
+            "format": "int64"
+          },
+          "name": {
+            "type": "string"
+          }
+        }
+      },
+      "Location": {
+        "required": [
+          "region"
+        ],
+        "type": "object",
+        "properties": {
+          "id": {
+            "type": "integer",
+            "format": "int64"
+          },
+          "countryId": {
+            "type": "integer",
+            "format": "int64"
+          },
+          "countryName": {
+            "type": "string"
+          },
+          "region": {
+            "maxLength": 64,
+            "minLength": 0,
+            "type": "string"
+          },
+          "latitude": {
+            "type": "string"
+          },
+          "longitude": {
+            "type": "string"
+          }
+        }
+      },
+      "Lot": {
+        "required": [
+          "currency",
+          "description",
+          "price",
+          "quantity",
+          "title",
+          "variety"
+        ],
+        "type": "object",
+        "properties": {
+          "id": {
+            "type": "integer",
+            "format": "int64"
+          },
+          "title": {
+            "maxLength": 30,
+            "minLength": 1,
+            "type": "string"
+          },
+          "description": {
+            "maxLength": 1000,
+            "minLength": 20,
+            "type": "string"
+          },
+          "variety": {
+            "maxLength": 64,
+            "minLength": 0,
+            "type": "string"
+          },
+          "size": {
+            "maxLength": 64,
+            "minLength": 0,
+            "type": "string"
+          },
+          "packaging": {
+            "maxLength": 10,
+            "minLength": 1,
+            "type": "string"
+          },
+          "enabledByAdmin": {
+            "type": "boolean"
+          },
+          "duration": {
+            "type": "integer",
+            "format": "int64"
+          },
+          "minPrice": {
+            "type": "number",
+            "format": "float"
+          },
+          "adminStatus": {
+            "type": "string",
+            "readOnly": true
+          },
+          "userStatus": {
+            "type": "string",
+            "readOnly": true
+          },
+          "status": {
+            "type": "string",
+            "readOnly": true
+          },
+          "quantity": {
+            "minimum": 0.01,
+            "exclusiveMinimum": false,
+            "type": "number",
+            "format": "float"
+          },
+          "price": {
+            "minimum": 1.0,
+            "exclusiveMinimum": false,
+            "type": "number",
+            "format": "float"
+          },
+          "currency": {
+            "maxLength": 10,
+            "minLength": 0,
+            "type": "string"
+          },
+          "creationDate": {
+            "type": "string",
+            "format": "date-time",
+            "readOnly": true
+          },
+          "expirationDate": {
+            "type": "string",
+            "format": "date-time"
+          },
+          "productCategory": {
+            "$ref": "#/components/schemas/ProductCategoryModel"
+          },
+          "lotType": {
+            "pattern": "\\b(?:buy|sell|auctionSell)\\b",
+            "type": "string"
+          },
+          "userId": {
+            "type": "integer",
+            "format": "int64"
+          },
+          "location": {
+            "$ref": "#/components/schemas/Location"
+          },
+          "tags": {
+            "type": "array",
+            "items": {
+              "$ref": "#/components/schemas/TagEntity"
+            }
+          },
+          "images": {
+            "type": "array",
+            "readOnly": true,
+            "items": {
+              "$ref": "#/components/schemas/ImageResponse"
+            }
+          }
+        }
+      },
+      "ProductCategoryModel": {
+        "type": "object",
+        "properties": {
+          "id": {
+            "type": "integer",
+            "format": "int64"
+          },
+          "title": {
+            "type": "string"
+          },
+          "parentId": {
+            "type": "integer",
+            "format": "int64"
+          }
+        }
+      },
+      "TagEntity": {
+        "type": "object",
+        "properties": {
+          "id": {
+            "type": "integer",
+            "format": "int64"
+          },
+          "title": {
+            "type": "string"
+          },
+          "color": {
+            "$ref": "#/components/schemas/ColorEntity"
+          }
+        }
+      },
+      "Country": {
+        "required": [
+          "name"
+        ],
+        "type": "object",
+        "properties": {
+          "id": {
+            "type": "integer",
+            "format": "int64",
+            "readOnly": true
+          },
+          "name": {
+            "maxLength": 64,
+            "minLength": 1,
+            "type": "string"
+          }
+        }
+      },
+      "ProductCategoryEntity": {
+        "type": "object",
+        "properties": {
+          "id": {
+            "type": "integer",
+            "format": "int64"
+          },
+          "title": {
+            "type": "string"
+          },
+          "parentId": {
+            "type": "integer",
+            "format": "int64"
+          }
+        }
+      },
+      "BetRequest": {
+        "type": "object",
+        "properties": {
+          "id": {
+            "type": "integer",
+            "format": "int64"
+          },
+          "userId": {
+            "type": "integer",
+            "format": "int64"
+          },
+          "amount": {
+            "type": "integer",
+            "format": "int64"
+          },
+          "betTime": {
+            "type": "string",
+            "format": "date-time"
+          }
+        }
+      },
+      "Bet": {
+        "type": "object",
+        "properties": {
+          "id": {
+            "type": "integer",
+            "format": "int64"
+          },
+          "lotId": {
+            "type": "integer",
+            "format": "int64"
+          },
+          "amount": {
+            "type": "integer",
+            "format": "int64"
+          },
+          "userId": {
+            "type": "integer",
+            "format": "int64"
+          }
+        }
+      },
+      "LotStatusResponse": {
+        "type": "object",
+        "properties": {
+          "lotId": {
+            "type": "integer",
+            "format": "int64"
+          },
+          "userid": {
+            "type": "integer",
+            "format": "int64"
+          },
+          "betAmount": {
+            "type": "integer",
+            "format": "int64"
+          },
+          "betTime": {
+            "type": "string",
+            "format": "date-time"
+          },
+          "status": {
+            "type": "string"
+          }
+        }
+      }
+    }
+  }
+}

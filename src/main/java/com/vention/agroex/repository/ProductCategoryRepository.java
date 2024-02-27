@@ -10,9 +10,13 @@ import java.util.Optional;
 
 @Repository
 public interface ProductCategoryRepository extends JpaRepository<ProductCategoryEntity, Long>, JpaSpecificationExecutor<ProductCategoryEntity> {
-    List<ProductCategoryEntity> findProductCategoryListByParentId(Long parentId);
+    Optional<List<ProductCategoryEntity>> findProductCategoryListByParentId(Long parentId);
 
     void deleteByParentId(Long parentId);
 
     Optional<ProductCategoryEntity> findByTitle(String title);
+
+
+    Optional<List<ProductCategoryEntity>> findProductCategoryListByParentIdAndLotsIsNotEmpty(Long parentId);
+
 }

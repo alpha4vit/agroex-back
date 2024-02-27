@@ -1,10 +1,10 @@
 package com.vention.agroex.entity;
 
+import com.fasterxml.jackson.annotation.JsonIgnore;
 import jakarta.persistence.*;
-import lombok.AllArgsConstructor;
-import lombok.Builder;
-import lombok.Data;
-import lombok.NoArgsConstructor;
+import lombok.*;
+
+import java.util.List;
 
 
 @Data
@@ -23,4 +23,9 @@ public class ProductCategoryEntity {
 
     @Column(name = "parent_id")
     private Long parentId;
+
+    @JsonIgnore
+    @ToString.Exclude
+    @OneToMany(mappedBy = "productCategory", cascade = CascadeType.REMOVE)
+    private List<LotEntity> lots;
 }

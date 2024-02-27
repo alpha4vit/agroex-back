@@ -11,7 +11,7 @@ public interface ProductCategoryService {
 
     ProductCategoryEntity getById(Long id);
 
-    List<ProductCategoryEntity> getSubcategoriesById(Long id);
+    List<ProductCategoryEntity> getSubcategoriesById(Long id, Boolean lotExisted);
 
     void deleteById(Long id);
 

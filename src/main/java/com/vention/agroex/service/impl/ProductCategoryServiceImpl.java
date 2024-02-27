@@ -39,8 +39,11 @@ public class ProductCategoryServiceImpl implements ProductCategoryService {
     }
 
     @Override
-    public List<ProductCategoryEntity> getSubcategoriesById(Long parentId) {
-        return productCategoryRepository.findProductCategoryListByParentId(parentId);
+    public List<ProductCategoryEntity> getSubcategoriesById(Long parentId, Boolean lotExisted) {
+        var categories = lotExisted ? productCategoryRepository.findProductCategoryListByParentIdAndLotsIsNotEmpty(parentId) :
+                productCategoryRepository.findProductCategoryListByParentId(parentId);
+        return categories.orElseThrow(
+                () -> new EntityNotFoundException(String.format("There is no product category with parentId %d", parentId)));
     }
 
     @Override

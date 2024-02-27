@@ -37,25 +37,27 @@ public class ProductCategoryController {
         return ResponseEntity.ok(updatedProductCategory);
     }
 
+    public ResponseEntity<List<ProductCategoryEntity>> findWithFilters(@RequestParam(value = "filters", required = false) String filters) {
+        return ResponseEntity.ok(productCategoryService.getWithFilters(filters));
+    }
+
     @GetMapping("/all")
     public ResponseEntity<List<ProductCategoryEntity>> findAll() {
         var fetchedProductCategories = productCategoryService.getAll();
         return ResponseEntity.ok(fetchedProductCategories);
     }
 
-    public ResponseEntity<List<ProductCategoryEntity>> findWithFilters(@RequestParam(value = "filters", required = false) String filters) {
-        return ResponseEntity.ok(productCategoryService.getWithFilters(filters));
-    }
-
     @GetMapping("/{id}")
-    public ResponseEntity<List<ProductCategoryEntity>> findAllSubcategories(@PathVariable Long id) {
-        var fetchedProductCategories = productCategoryService.getSubcategoriesById(id);
+    public ResponseEntity<List<ProductCategoryEntity>> findSubcategoriesById(
+            @PathVariable Long id, @RequestParam(value = "lot_existed", required = false, defaultValue = "true") Boolean lotExisted) {
+        var fetchedProductCategories = productCategoryService.getSubcategoriesById(id, lotExisted);
         return ResponseEntity.ok(fetchedProductCategories);
     }
 
-    @GetMapping()
-    public ResponseEntity<List<ProductCategoryEntity>> findAllMainCategories() {
-        var fetchedProductCategories = productCategoryService.getSubcategoriesById(0L);
+    @GetMapping
+    public ResponseEntity<List<ProductCategoryEntity>> findAllMainCategories(
+            @RequestParam(value = "lot_existed", required = false, defaultValue = "true") Boolean lotExisted) {
+        var fetchedProductCategories = productCategoryService.getSubcategoriesById(0L, lotExisted);
         return ResponseEntity.ok(fetchedProductCategories);
     }
 
