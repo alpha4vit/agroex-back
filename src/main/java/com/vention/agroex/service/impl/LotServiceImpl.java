@@ -22,8 +22,6 @@ import org.springframework.stereotype.Service;
 import org.springframework.web.multipart.MultipartFile;
 
 import java.time.Instant;
-import java.util.ArrayList;
-import java.util.Arrays;
 import java.util.List;
 import java.util.Map;
 
@@ -33,7 +31,6 @@ import java.util.Map;
 public class LotServiceImpl implements LotService {
 
     private final LotRepository lotRepository;
-    private final ImageServiceStorage imageServiceStorage;
     private final ImageService imageService;
     private final FilterService filterService;
     private final ProductCategoryService productCategoryService;
@@ -126,7 +123,6 @@ public class LotServiceImpl implements LotService {
     public LotEntity update(Long id, LotEntity entity, MultipartFile[] files) {
         var lotToUpdate = getById(id);
 
-        imageService.updateImagesForLot(lotToUpdate, updatedLot, files);
         if (lotToUpdate.getInnerStatus().equals(StatusConstants.ON_MODERATION)) {
             throw new LotEditException("You can`t edit this lot while moderation");
         }
