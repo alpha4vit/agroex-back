@@ -66,8 +66,10 @@ public class ImageServiceImpl implements ImageService {
 
     @Override
     public void updateImagesForLot(LotEntity before, LotEntity result, MultipartFile[] files) {
-        if (validateImages(result, files))
-            result.getImages().addAll(uploadImages(before, files));
+        if (validateImages(result, files)) {
+            if (files != null)
+                result.getImages().addAll(uploadImages(before, files));
+        }
         else
             throw new ImageLotException("Invalid arguments!", Map.of("images", "Incorrect quantity of images must be from 1 to 6!"));
 
@@ -81,7 +83,7 @@ public class ImageServiceImpl implements ImageService {
     private boolean validateImages(LotEntity result, MultipartFile[] files){
         return files != null &&
                 files.length + result.getImages().size() >= 1 &&
-                !(files.length + result.getImages().size() > 6);
+                !(files.length + result.getImages().size() > 6) || !result.getImages().isEmpty() && result.getImages().size() <= 6;
     }
 
     @Override

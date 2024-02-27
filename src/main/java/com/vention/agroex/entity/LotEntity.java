@@ -43,8 +43,8 @@ public class LotEntity {
     @Column(name = "quantity")
     private float quantity;
 
-    @Column(name = "min_price")
-    private float minPrice;
+    @Column(name = "original_min_price")
+    private float originalMinPrice;
 
     @Column(name = "original_price")
     private float originalPrice;
@@ -108,6 +108,9 @@ public class LotEntity {
     @Transient
     private float price;
 
+    @Transient
+    private float minPrice;
+
     @PostLoad
     private void init(){
         this.currency = this.getOriginalCurrency();
@@ -118,8 +121,11 @@ public class LotEntity {
         var sourceCurrency = this.getOriginalCurrency();
         if (!sourceCurrency.equals(currencyRate.getTargetCurrency())) {
             this.setPrice(this.getOriginalPrice() * currencyRate.getRate());
-        } else
+            this.setMinPrice(this.getOriginalMinPrice() * currencyRate.getRate());
+        } else {
             this.setPrice(this.getOriginalPrice());
+            this.setMinPrice(this.getOriginalMinPrice());
+        }
         this.setCurrency(currencyRate.getTargetCurrency());
     }
 
