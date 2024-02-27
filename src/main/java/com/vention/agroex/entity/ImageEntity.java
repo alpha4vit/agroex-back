@@ -11,6 +11,7 @@ import lombok.*;
 @NoArgsConstructor
 @AllArgsConstructor
 @Table(name = "lot_images")
+@EqualsAndHashCode(of = {"id"})
 public class ImageEntity {
 
     @Id
@@ -25,4 +26,6 @@ public class ImageEntity {
     @ToString.Exclude
     @JoinColumn(name = "lot_id")
     private LotEntity lot;
+
+
 }

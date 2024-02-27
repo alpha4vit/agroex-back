@@ -17,6 +17,7 @@ import org.springframework.util.StringUtils;
 import org.springframework.web.multipart.MultipartFile;
 
 import java.io.InputStream;
+import java.util.List;
 import java.util.Map;
 import java.util.UUID;
 
@@ -69,6 +70,11 @@ public class ImageServiceStorageImpl implements ImageServiceStorage {
         catch (Exception e){
             throw new ImageException("Error during deleting image: "+e.getMessage());
         }
+    }
+
+    @Override
+    public void removeAll(List<ImageEntity> imageEntities) {
+        imageEntities.forEach(this::remove);
     }
 
     @SneakyThrows
