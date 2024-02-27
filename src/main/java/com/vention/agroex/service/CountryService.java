@@ -6,7 +6,7 @@ import java.util.List;
 
 public interface CountryService {
 
-    List<CountryEntity> getAll();
+    List<CountryEntity> getAll(Boolean lotExisted);
 
     CountryEntity getById(Long id);
 

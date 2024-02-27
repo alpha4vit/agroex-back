@@ -6,6 +6,8 @@ import lombok.Builder;
 import lombok.Data;
 import lombok.NoArgsConstructor;
 
+import java.util.List;
+
 @Data
 @Entity
 @Builder
@@ -19,5 +21,8 @@ public class CountryEntity {
     private Long id;
 
     private String name;
+
+    @OneToMany(mappedBy = "country")
+    private List<LocationEntity> locations;
 
 }
