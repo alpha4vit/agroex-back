@@ -68,9 +68,9 @@ public class FilterService {
                 case "countries" -> Arrays.stream(value.split(","))
                         .map(country -> Long.parseLong(country.trim()))
                         .forEach(country -> countryBuilder.with("country", EQUALS, country));
-                case "adminStatus" -> Arrays.stream(value.split(","))
+                case "innerStatus" -> Arrays.stream(value.split(","))
                         .map(String::trim)
-                        .forEach(status -> adminStatusBuilder.with("adminStatus", EQUALS, status));
+                        .forEach(status -> adminStatusBuilder.with("innerStatus", EQUALS, status));
                 case "status" -> Arrays.stream(value.split(","))
                         .map(String::trim)
                         .forEach(status -> statusBuilder.with("status", EQUALS, status));

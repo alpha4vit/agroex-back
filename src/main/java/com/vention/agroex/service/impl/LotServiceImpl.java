@@ -7,7 +7,9 @@ import com.vention.agroex.entity.ProductCategoryEntity;
 import com.vention.agroex.exception.ImageException;
 import com.vention.agroex.exception.ImageLotException;
 import com.vention.agroex.exception.InvalidArgumentException;
+import com.vention.agroex.exception.LotEditException;
 import com.vention.agroex.filter.FilterService;
+import com.vention.agroex.model.LotRejectRequest;
 import com.vention.agroex.model.LotStatusResponse;
 import com.vention.agroex.repository.LotRepository;
 import com.vention.agroex.service.*;
@@ -22,6 +24,7 @@ import org.springframework.data.domain.PageRequest;
 import org.springframework.stereotype.Service;
 import org.springframework.web.multipart.MultipartFile;
 
+import java.time.Instant;
 import java.util.ArrayList;
 import java.util.Arrays;
 import java.util.List;
@@ -68,7 +71,7 @@ public class LotServiceImpl implements LotService {
                 .toList());
 
         if (lotEntity.getLotType().equals(LotTypeConstants.AUCTION_SELL)) {
-            lotEntity.setAdminStatus(StatusConstants.NEW);
+            lotEntity.setInnerStatus(StatusConstants.NEW);
             lotEntity.setStatus(StatusConstants.INACTIVE);
         }
 
@@ -85,20 +88,10 @@ public class LotServiceImpl implements LotService {
         return updatePrice(saved, currency);
     }
 
+
     private void validateFields(LotEntity lotEntity, MultipartFile[] files) {
         if (files == null || files.length < 1 || files.length > 6)
             throw new InvalidArgumentException(Map.of("images", "Incorrect quantity of images must be from 1 to 6!"), "Invalid arguments!");
-        if (lotEntity.getLotType().equals(LotTypeConstants.AUCTION_SELL)) {
-            if (lotEntity.getDuration() == null) {
-                throw new InvalidArgumentException("Duration of auction lot should not be null");
-            }
-            if (lotEntity.getDuration() < 36000000L) {
-                throw new InvalidArgumentException("Duration must be more than 10 minutes");
-            }
-            if (lotEntity.getMinPrice() >= lotEntity.getPrice()) {
-                throw new InvalidArgumentException("Min price can`t be less than lot price");
-            }
-        }
     }
 
     @Override
@@ -135,9 +128,16 @@ public class LotServiceImpl implements LotService {
     @Override
     @Transactional(rollbackOn = ImageLotException.class)
     public LotEntity update(Long id, LotEntity entity, MultipartFile[] files) {
+        var lot = getById(id);
+        if (lot.getInnerStatus().equals(StatusConstants.ON_MODERATION)) {
+            throw new LotEditException("You can`t edit this lot while moderation");
+        }
+        if (lot.getInnerStatus().equals(StatusConstants.FINISHED)) {
+            throw new LotEditException("This auction has already ended");
+        }
         clearImagesForLot(id);
-
-        var result = lotMapper.update(getById(id), entity);
+        validateFields(entity, files);
+        var result = lotMapper.update(lot, entity);
 
         var userEntity = userService.getById(result.getUser().getId());
         var countryEntity = countryService.getById(result.getLocation().getCountry().getId());
@@ -216,7 +216,7 @@ public class LotServiceImpl implements LotService {
     }
 
     @Override
-    public void clearImagesForLot(Long lotId){
+    public void clearImagesForLot(Long lotId) {
         var lotEntity = getById(lotId);
         lotEntity.getImages().forEach(image -> {
             imageService.delete(image);
@@ -249,7 +249,7 @@ public class LotServiceImpl implements LotService {
         if (!lot.getLotType().equals(LotTypeConstants.AUCTION_SELL)) {
             throw new InvalidArgumentException("This lot is not an auction lot");
         }
-        lot.setAdminStatus(StatusConstants.ON_MODERATION);
+        lot.setInnerStatus(StatusConstants.ON_MODERATION);
         return update(id, lot);
     }
 
@@ -265,7 +265,9 @@ public class LotServiceImpl implements LotService {
         if (!lot.getLotType().equals(LotTypeConstants.AUCTION_SELL)) {
             throw new InvalidArgumentException("This lot is not an auction lot");
         }
-        lot.setAdminStatus(StatusConstants.APPROVED);
+        lot.setExpirationDate(Instant.now().plusMillis(lot.getDuration()));
+        lot.setInnerStatus(StatusConstants.APPROVED);
+        lot.setStatus(StatusConstants.ACTIVE);
         return update(id, lot);
     }
 
@@ -273,6 +275,23 @@ public class LotServiceImpl implements LotService {
     public LotEntity approve(Long lotId, String currency) {
         var lot = approve(lotId);
         return updatePrice(lot, currency);
+    }
+
+    @Override
+    public LotEntity reject(LotRejectRequest rejectRequest) {
+        var lot = getById(rejectRequest.lotId());
+        lot.setInnerStatus(StatusConstants.REJECTED_BY_ADMIN);
+        lot.setStatus(StatusConstants.INACTIVE);
+        lot.setAdminComment(rejectRequest.adminComment() == null ? "" : rejectRequest.adminComment());
+        return update(rejectRequest.lotId(), lot);
+    }
+
+    @Override
+    public LotEntity changeUserStatus(Long id, boolean status) {
+        var lot = getById(id);
+        lot.setUserStatus(status ? StatusConstants.ACTIVE : StatusConstants.INACTIVE);
+
+        return update(id, lot);
     }
 
     @Override
@@ -287,7 +306,7 @@ public class LotServiceImpl implements LotService {
         return lots.stream().map(lot -> updatePrice(lot, currency)).toList();
     }
 
-    private LotEntity updatePrice(LotEntity lotEntity, String currency){
+    private LotEntity updatePrice(LotEntity lotEntity, String currency) {
         if (!lotEntity.getOriginalCurrency().equals(currency)) {
             var currencyRate = currencyRateService.getByCurrencies(lotEntity.getOriginalCurrency(), currency);
             lotEntity.updatePrice(currencyRate);

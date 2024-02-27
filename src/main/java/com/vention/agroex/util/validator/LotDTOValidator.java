@@ -34,6 +34,16 @@ public class LotDTOValidator implements Validator {
                 .collect(toMap(ErrorField::field, ErrorField::message));
 
         var lot = (Lot) target;
+        if (lot.getLotType().equals("auctionSell")) {
+            if (lot.getDuration() == null) {
+                map.put("duration", "Duration of auction lot should not be null!");
+            } else if (lot.getDuration() < 600000L) {
+                map.put("duration", "Duration must be more than 10 minutes");
+            }
+            if (lot.getMinPrice() >= lot.getPrice()) {
+                map.put("minPrice", "Min price can`t be bigger than lot price");
+            }
+        }
         var currencies = currencyRateService.getDistinctCurrencies();
         if (!currencies.contains(lot.getOriginalCurrency()))
             map.put("originalCurrency", "Unsupported currency presented!");

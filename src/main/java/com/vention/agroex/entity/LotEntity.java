@@ -52,8 +52,8 @@ public class LotEntity {
     @Column(name = "original_currency")
     private String originalCurrency;
 
-    @Column(name = "admin_status")
-    private String adminStatus;
+    @Column(name = "inner_status")
+    private String innerStatus;
 
     @Column(name = "user_status")
     private String userStatus;
@@ -122,4 +122,7 @@ public class LotEntity {
             this.setPrice(this.getOriginalPrice());
         this.setCurrency(currencyRate.getTargetCurrency());
     }
+
+    @Column(name = "admin_comment")
+    private String adminComment;
 }

@@ -1,6 +1,7 @@
 package com.vention.agroex.controller;
 
 import com.vention.agroex.dto.Lot;
+import com.vention.agroex.model.LotRejectRequest;
 import com.vention.agroex.model.LotStatusResponse;
 import com.vention.agroex.service.LotService;
 import com.vention.agroex.util.mapper.LotMapper;
@@ -84,6 +85,12 @@ public class LotController {
         return ResponseEntity.ok(lotService.getLotStatus(id));
     }
 
+    @PostMapping("/{id}/userStatus")
+    public ResponseEntity<Lot> putOnModeration(@PathVariable("id") Long lotId, @RequestParam boolean status) {
+        var moderated = lotService.changeUserStatus(lotId, status);
+        return ResponseEntity.ok(lotMapper.toDTO(moderated));
+    }
+
     @PostMapping("/{id}/moderate")
     public ResponseEntity<Lot> putOnModeration(@PathVariable("id") Long lotId,
                                                @RequestHeader("currency") String currency) {
@@ -96,5 +103,11 @@ public class LotController {
                                        @RequestHeader("currency") String currency) {
         var approved = lotService.approve(lotId, currency);
         return ResponseEntity.ok(lotMapper.toDTO(approved));
+    }
+
+    @PostMapping("/{id}/reject")
+    public ResponseEntity<Lot> reject(@RequestBody LotRejectRequest rejectRequest) {
+        var rejected = lotService.reject(rejectRequest);
+        return ResponseEntity.ok(lotMapper.toDTO(rejected));
     }
 }

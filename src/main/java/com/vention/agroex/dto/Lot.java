@@ -43,7 +43,7 @@ public class Lot {
     private float minPrice;
 
     @JsonProperty(access = JsonProperty.Access.READ_ONLY)
-    private String adminStatus;
+    private String innerStatus;
 
     @JsonProperty(access = JsonProperty.Access.READ_ONLY)
     private String userStatus;
@@ -82,6 +82,8 @@ public class Lot {
 
     @JsonProperty(access = JsonProperty.Access.READ_ONLY)
     private List<ImageResponse> images;
+
+    private String adminComment;
 
     private String currency;
 

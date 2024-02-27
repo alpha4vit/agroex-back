@@ -2,10 +2,7 @@ package com.vention.agroex.entity;
 
 import com.fasterxml.jackson.annotation.JsonIgnore;
 import jakarta.persistence.*;
-import lombok.AllArgsConstructor;
-import lombok.Builder;
-import lombok.Data;
-import lombok.NoArgsConstructor;
+import lombok.*;
 
 
 @Data
@@ -25,6 +22,7 @@ public class ImageEntity {
 
     @ManyToOne
     @JsonIgnore
+    @ToString.Exclude
     @JoinColumn(name = "lot_id")
     private LotEntity lot;
 }
