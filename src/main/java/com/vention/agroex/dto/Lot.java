@@ -40,6 +40,8 @@ public class Lot {
 
     private Long duration;
 
+    private float originalMinPrice;
+
     private float minPrice;
 
     @JsonProperty(access = JsonProperty.Access.READ_ONLY)
