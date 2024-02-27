@@ -11,7 +11,7 @@ public class BetRequest {
 
     private Long userId;
 
-    private Long amount;
+    private Float amount;
 
     private Instant betTime;
 }

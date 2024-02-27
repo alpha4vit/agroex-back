@@ -4,6 +4,7 @@ import jakarta.persistence.*;
 import lombok.AllArgsConstructor;
 import lombok.Data;
 import lombok.NoArgsConstructor;
+import lombok.ToString;
 import org.hibernate.annotations.CreationTimestamp;
 
 import java.time.Instant;
@@ -20,9 +21,10 @@ public class BetEntity {
     private Long id;
 
     @ManyToOne
+    @ToString.Exclude
     private LotEntity lot;
 
-    private Long amount;
+    private Float amount;
 
     @ManyToOne
     private UserEntity user;

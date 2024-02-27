@@ -20,6 +20,7 @@ public interface LotService {
     void deleteById(Long id);
 
     List<LotEntity> getAll();
+
     List<LotEntity> getAll(String currency);
 
     void delete(LotEntity entity);
@@ -48,6 +49,8 @@ public interface LotService {
     LotEntity reject(LotRejectRequest rejectRequest);
 
     LotEntity changeUserStatus(Long id, boolean status);
+
+    void finishAuction(LotEntity lot);
 
     LotEntity approve(Long lotId, String currency);
 }

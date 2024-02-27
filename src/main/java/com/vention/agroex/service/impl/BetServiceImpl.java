@@ -7,6 +7,7 @@ import com.vention.agroex.repository.BetRepository;
 import com.vention.agroex.service.BetService;
 import com.vention.agroex.service.LotService;
 import com.vention.agroex.util.constant.LotTypeConstants;
+import com.vention.agroex.util.constant.StatusConstants;
 import lombok.RequiredArgsConstructor;
 import lombok.extern.slf4j.Slf4j;
 import org.springframework.stereotype.Service;
@@ -25,15 +26,23 @@ public class BetServiceImpl implements BetService {
     @Override
     public BetEntity makeBet(Long lotId, BetEntity betEntity) {
         var lot = lotService.getById(lotId);
-        if (!lot.getLotType().equals(LotTypeConstants.AUCTION_SELL)) {
+        if (!lot.getLotType().equals(StatusConstants.AUCTION_SELL)) {
             throw new InvalidBetException("This lot is not an auction lot");
+        }
+        if (!lot.getStatus().equals(StatusConstants.FINISHED)) {
+            throw new InvalidBetException("This auction is already finished");
         }
         if (lot.getMinPrice() > betEntity.getAmount()) {
             throw new InvalidBetException(
                     String.format("Your bet must be higher than the minimal price: %f", lot.getMinPrice()));
         }
         saveBet(lot, betEntity);
-
+        if (betEntity.getAmount() >= lot.getPrice()) {
+            log.info(String.format("User with id %d made a maxPrice bet. Auction ended",
+                    betEntity.getUser().getId()));
+            betEntity.setAmount(lot.getPrice());
+            lotService.finishAuction(lot);
+        }
         return betEntity;
     }
 

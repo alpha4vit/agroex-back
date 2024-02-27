@@ -272,6 +272,12 @@ public class LotServiceImpl implements LotService {
     }
 
     @Override
+    public void finishAuction(LotEntity lot) {
+        lot.setStatus(StatusConstants.FINISHED);
+        update(lot.getId(), lot);
+    }
+
+    @Override
     public LotEntity approve(Long lotId, String currency) {
         var lot = approve(lotId);
         return updatePrice(lot, currency);

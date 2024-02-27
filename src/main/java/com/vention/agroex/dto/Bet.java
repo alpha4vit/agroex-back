@@ -15,7 +15,7 @@ public class Bet {
 
     private Long lotId;
 
-    private Long amount;
+    private Float amount;
 
     private Long userId;
 }

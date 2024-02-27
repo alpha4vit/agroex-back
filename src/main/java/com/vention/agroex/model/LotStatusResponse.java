@@ -5,5 +5,5 @@ import lombok.Builder;
 import java.time.Instant;
 
 @Builder
-public record LotStatusResponse(Long lotId, Long userid, Long betAmount, Instant betTime, String status) {
+public record LotStatusResponse(Long lotId, Long userid, Float betAmount, Instant betTime, String status) {
 }
