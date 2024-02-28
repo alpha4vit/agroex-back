@@ -2,7 +2,6 @@ package com.vention.agroex.dto;
 
 import com.fasterxml.jackson.annotation.JsonProperty;
 import com.vention.agroex.entity.TagEntity;
-import com.vention.agroex.model.ProductCategoryModel;
 import jakarta.validation.constraints.*;
 import lombok.*;
 
@@ -71,7 +70,7 @@ public class Lot {
     @FutureOrPresent(message = "The field should be valid date greater or equal to current date ")
     private Instant expirationDate;
 
-    private ProductCategoryModel productCategory;
+    private ProductCategory productCategory;
 
     @Pattern(regexp = "\\b(?:buy|sell|auctionSell)\\b", message = "Lot type can be only buy/sell/auctionSell")
     private String lotType;

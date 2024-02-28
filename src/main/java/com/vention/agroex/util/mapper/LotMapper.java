@@ -8,7 +8,7 @@ import org.mapstruct.MappingConstants;
 
 import java.util.List;
 
-@Mapper(componentModel = MappingConstants.ComponentModel.SPRING, uses = LocationMapper.class)
+@Mapper(componentModel = "spring", uses = {LocationMapper.class, ProductCategoryMapper.class})
 public interface LotMapper {
 
     @Mapping(target = "creationDate", ignore = true)
@@ -19,7 +19,7 @@ public interface LotMapper {
     LotEntity toEntity(Lot lot);
 
     @Mapping(target = "userId", source = "user.id")
-    @Mapping(target = "productCategory.id", source = "productCategory.id")
+    @Mapping(target = "productCategory", qualifiedByName = "toDTO")
     Lot toDTO(LotEntity lotEntity);
 
     List<LotEntity> toEntities(List<Lot> lots);

@@ -21,10 +21,10 @@ public class ProductCategoryEntity {
     @Column(name = "title")
     private String title;
 
-    @Column(name = "parent_id")
-    private Long parentId;
+    @ManyToOne
+    @JoinColumn(name = "parent_id", referencedColumnName = "id")
+    private ProductCategoryEntity parent;
 
-    @JsonIgnore
     @ToString.Exclude
     @OneToMany(mappedBy = "productCategory", cascade = CascadeType.REMOVE)
     private List<LotEntity> lots;
