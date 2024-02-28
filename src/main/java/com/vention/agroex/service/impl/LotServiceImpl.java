@@ -1,5 +1,6 @@
 package com.vention.agroex.service.impl;
 
+import com.vention.agroex.entity.CurrencyRateEntity;
 import com.vention.agroex.entity.LotEntity;
 import com.vention.agroex.entity.ProductCategoryEntity;
 import com.vention.agroex.exception.ImageLotException;
@@ -275,6 +276,8 @@ public class LotServiceImpl implements LotService {
             var currencyRate = currencyRateService.getByCurrencies(lotEntity.getOriginalCurrency(), currency);
             lotEntity.updatePrice(currencyRate);
         }
+        else
+            lotEntity.updatePrice(new CurrencyRateEntity(lotEntity.getOriginalCurrency()));
         return lotEntity;
     }
 }
