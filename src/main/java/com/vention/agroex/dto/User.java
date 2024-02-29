@@ -38,4 +38,6 @@ public class User {
 
     private ZoneId timeZone;
 
+    private Boolean enabled;
+
 }

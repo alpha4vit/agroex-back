@@ -19,9 +19,11 @@ public class SecurityConfig {
                 .csrf(AbstractHttpConfigurer::disable)
                 .authorizeHttpRequests(request ->
                         request
+                                .requestMatchers("/users/updatedb").authenticated()
+                                .requestMatchers("/swagger-ui/**").permitAll()
+                                .requestMatchers("/v3/api-docs/**").permitAll()
                                 .requestMatchers("/auth/**").permitAll()
                                 .requestMatchers(HttpMethod.GET, "/lots/**").permitAll()
-                                .requestMatchers("/users/updatedb").authenticated()
                                 .requestMatchers(HttpMethod.GET, "/users/**").permitAll()
                                 .requestMatchers(HttpMethod.GET, "/countries/**").permitAll()
                                 .requestMatchers(HttpMethod.GET, "/categories/**").permitAll()

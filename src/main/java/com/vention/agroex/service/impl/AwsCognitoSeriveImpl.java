@@ -28,15 +28,6 @@ public class AwsCognitoSeriveImpl implements AwsCognitoService {
     private final AWSCognitoIdentityProvider identityProvider;
 
     @Override
-    public List<User> getAll() {
-        var request = new ListUsersRequest();
-        request.withUserPoolId(awsProperties.getUserPoolId());
-        request.withAttributesToGet("nickname", "sub", "email", "phone_number", "custom:creation_date");
-        var result = identityProvider.listUsers(request);
-        return new ArrayList<>(result.getUsers().stream().map(cognitoUserMapper::convertCognitoUserToUser).toList());
-    }
-
-    @Override
     public UserEntity getById(UUID id) {
         var request = new AdminGetUserRequest();
         request.withUserPoolId(awsProperties.getUserPoolId());
@@ -46,10 +37,10 @@ public class AwsCognitoSeriveImpl implements AwsCognitoService {
     }
 
     @Override
-    public User setEnabled(String username, boolean value) {
+    public void setEnabled(UUID id, boolean value) {
         if (value){
             var request = new AdminEnableUserRequest();
-            request.withUsername(username);
+            request.withUsername(id.toString());
             request.withUserPoolId(awsProperties.getUserPoolId());
             var response = identityProvider.adminEnableUser(request);
             log.info(response.toString());
@@ -57,11 +48,10 @@ public class AwsCognitoSeriveImpl implements AwsCognitoService {
         else {
             var request = new AdminDisableUserRequest();
             request.withUserPoolId(awsProperties.getUserPoolId());
-            request.withUsername(username);
+            request.withUsername(id.toString());
             var response = identityProvider.adminDisableUser(request);
             log.info(response.toString());
         }
-        return null;
     }
 
     @Override

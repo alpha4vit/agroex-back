@@ -77,6 +77,8 @@ public class Lot {
     @Pattern(regexp = "\\b(?:buy|sell|auctionSell)\\b", message = "Lot type can be only buy/sell/auctionSell")
     private String lotType;
 
+
+    @JsonProperty(access = JsonProperty.Access.READ_ONLY)
     private UUID userId;
 
     private Location location;

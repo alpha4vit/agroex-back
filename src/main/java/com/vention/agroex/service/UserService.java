@@ -25,4 +25,10 @@ public interface UserService {
 
     void updateTable();
 
+    UserEntity getAuthenticatedUser();
+
+    void disable(UUID id);
+
+    void enable(UUID id);
+
 }

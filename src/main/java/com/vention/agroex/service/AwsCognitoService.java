@@ -9,11 +9,9 @@ import java.util.UUID;
 
 public interface AwsCognitoService {
 
-    List<User> getAll();
-
     UserEntity getById(UUID id);
 
-    User setEnabled(String username, boolean value);
+    void setEnabled(UUID id, boolean value);
 
     List<UserEntity> updateDb();
 }

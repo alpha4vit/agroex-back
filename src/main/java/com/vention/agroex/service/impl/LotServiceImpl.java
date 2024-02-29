@@ -49,7 +49,6 @@ public class LotServiceImpl implements LotService {
     public LotEntity save(LotEntity lotEntity, MultipartFile[] files) {
         validateFields(lotEntity, files);
 
-        var userEntity = userService.getById(lotEntity.getUser().getId());
         var countryEntity = countryService.getById(lotEntity.getLocation().getCountry().getId());
 
         var productCategoryEntity = switch (lotEntity.getProductCategory()) {
@@ -61,7 +60,7 @@ public class LotServiceImpl implements LotService {
                     throw new InvalidArgumentException("Provide productCategory.id or productCategory.title");
         };
 
-        lotEntity.setUser(userEntity);
+        lotEntity.setUser(userService.getAuthenticatedUser());
         lotEntity.getLocation().setCountry(countryEntity);
         lotEntity.setProductCategory(productCategoryEntity);
         lotEntity.setTags(lotEntity.getTags()
@@ -76,7 +75,7 @@ public class LotServiceImpl implements LotService {
         if (lotEntity.getExpirationDate() != null) {
             lotEntity.setExpirationDate(
                     lotEntity.getExpirationDate()
-                            .withZoneSameLocal(userEntity.getTimeZone())
+                            .withZoneSameLocal(lotEntity.getUser().getTimeZone())
             );
         }
 
@@ -145,7 +144,6 @@ public class LotServiceImpl implements LotService {
         var updatedLot = lotMapper.update(lotToUpdate, entity);
         imageService.updateImagesForLot(lotToUpdate, updatedLot, files);
 
-        var userEntity = userService.getById(updatedLot.getUser().getId());
         var countryEntity = countryService.getById(updatedLot.getLocation().getCountry().getId());
 
         var productCategoryEntity = switch (entity.getProductCategory()) {
@@ -157,7 +155,7 @@ public class LotServiceImpl implements LotService {
                     throw new InvalidArgumentException("Provide productCategory.id or productCategory.title");
         };
 
-        updatedLot.setUser(userEntity);
+        updatedLot.setUser(userService.getAuthenticatedUser());
         updatedLot.getLocation().setCountry(countryEntity);
         updatedLot.setProductCategory(productCategoryEntity);
         updatedLot.setTags(updatedLot.getTags()
@@ -217,6 +215,8 @@ public class LotServiceImpl implements LotService {
     @Override
     public LotEntity putOnModeration(Long id) {
         var lot = getById(id);
+        if (!lot.getUser().getEnabled())
+            throw new InvalidArgumentException("Lot owner is disabled!");
         if (!lot.getLotType().equals(LotTypeConstants.AUCTION_SELL)) {
             throw new InvalidArgumentException("This lot is not an auction lot");
         }
@@ -233,6 +233,8 @@ public class LotServiceImpl implements LotService {
     @Override
     public LotEntity approve(Long id) {
         var lot = getById(id);
+        if (!lot.getUser().getEnabled())
+            throw new InvalidArgumentException("Lot owner is disabled!");
         if (!lot.getLotType().equals(LotTypeConstants.AUCTION_SELL)) {
             throw new InvalidArgumentException("This lot is not an auction lot");
         }
