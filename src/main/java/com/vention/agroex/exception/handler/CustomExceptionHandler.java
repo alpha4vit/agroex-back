@@ -16,6 +16,7 @@ import org.springframework.http.HttpStatus;
 import org.springframework.http.HttpStatusCode;
 import org.springframework.http.ResponseEntity;
 import org.springframework.http.converter.HttpMessageNotReadableException;
+import org.springframework.security.access.AccessDeniedException;
 import org.springframework.web.bind.MethodArgumentNotValidException;
 import org.springframework.web.bind.annotation.ControllerAdvice;
 import org.springframework.web.bind.annotation.ExceptionHandler;
@@ -64,6 +65,7 @@ public class CustomExceptionHandler extends ResponseEntityExceptionHandler {
             case InvalidBetException e -> createResponse(e, HttpStatus.BAD_REQUEST, new HashMap<>());
             case ImageLotException e -> createResponse(e, HttpStatus.BAD_REQUEST, e.getErrors());
             case ImageException e -> createResponse(e, HttpStatus.BAD_REQUEST, new HashMap<>());
+            case AccessDeniedException e -> createResponse(e, HttpStatus.FORBIDDEN, new HashMap<>());
             default -> createResponse(exception, HttpStatus.INTERNAL_SERVER_ERROR, new HashMap<>());
         };
     }

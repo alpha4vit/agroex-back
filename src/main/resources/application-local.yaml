@@ -21,6 +21,18 @@ spring:
   flyway:
     enabled: true
     locations: classpath:db/migration
+  security:
+    oauth2:
+      resourceserver:
+        jwt:
+          issuer-uri: ${AWS_COGNITO_ISSUER}
+aws:
+  accessKey: ${AWS_ACCESS_KEY}
+  secretKey: ${AWS_SECRET_KEY}
+  region: ${AWS_REGION}
+  userPoolId: ${AWS_USER_POOL_ID}
+  clientId: ${AWS_COGNITO_CLIENT_ID}
+  clientSecret: ${AWS_COGNITO_CLIENT_SECRET}
 minio:
   bucket: ${MINIO_BUCKET}
   url: ${MINIO_URL}

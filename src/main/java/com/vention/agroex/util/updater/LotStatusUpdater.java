@@ -27,7 +27,7 @@ public class LotStatusUpdater {
 
     private void checkStatus(LotEntity lot) {
         if (!lot.getStatus().equals(StatusConstants.EXPIRED)) {
-            var now = Instant.now();
+            var now = Instant.now().atZone(lot.getUser().getTimeZone());
             var lotExpirationDate = lot.getExpirationDate();
             if (lotExpirationDate.isBefore(now)) {
                 if (lot.getLotType().equals(StatusConstants.AUCTION_SELL)) {

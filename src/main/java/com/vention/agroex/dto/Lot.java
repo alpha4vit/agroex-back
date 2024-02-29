@@ -5,8 +5,9 @@ import com.vention.agroex.entity.TagEntity;
 import jakarta.validation.constraints.*;
 import lombok.*;
 
-import java.time.Instant;
+import java.time.ZonedDateTime;
 import java.util.List;
+import java.util.UUID;
 
 @Data
 @Builder
@@ -65,17 +66,17 @@ public class Lot {
     private String originalCurrency;
 
     @JsonProperty(access = JsonProperty.Access.READ_ONLY)
-    private Instant creationDate;
+    private ZonedDateTime creationDate;
 
     @FutureOrPresent(message = "The field should be valid date greater or equal to current date ")
-    private Instant expirationDate;
+    private ZonedDateTime expirationDate;
 
     private ProductCategory productCategory;
 
     @Pattern(regexp = "\\b(?:buy|sell|auctionSell)\\b", message = "Lot type can be only buy/sell/auctionSell")
     private String lotType;
 
-    private Long userId;
+    private UUID userId;
 
     private Location location;
 

@@ -70,6 +70,14 @@ public class LotServiceImpl implements LotService {
             lotEntity.setStatus(StatusConstants.INACTIVE);
         }
 
+        if (lotEntity.getExpirationDate() != null) {
+            lotEntity.setExpirationDate(
+                    lotEntity.getExpirationDate()
+                            .withZoneSameLocal(userEntity.getTimeZone())
+            );
+        }
+
+
         var saved = lotRepository.save(lotEntity);
         saved.setImages(imageService.uploadImages(saved, files));
 
@@ -124,6 +132,7 @@ public class LotServiceImpl implements LotService {
     public LotEntity update(Long id, LotEntity entity, MultipartFile[] files) {
         var lotToUpdate = getById(id);
 
+        imageService.updateImagesForLot(lotToUpdate, lotToUpdate, files);
         if (lotToUpdate.getInnerStatus().equals(StatusConstants.ON_MODERATION)) {
             throw new LotEditException("You can`t edit this lot while moderation");
         }
@@ -224,7 +233,7 @@ public class LotServiceImpl implements LotService {
         if (!lot.getLotType().equals(LotTypeConstants.AUCTION_SELL)) {
             throw new InvalidArgumentException("This lot is not an auction lot");
         }
-        lot.setExpirationDate(Instant.now().plusMillis(lot.getDuration()));
+        lot.setExpirationDate(Instant.now().plusMillis(lot.getDuration()).atZone(lot.getUser().getTimeZone()));
         lot.setInnerStatus(StatusConstants.APPROVED);
         lot.setStatus(StatusConstants.ACTIVE);
         return update(id, lot);

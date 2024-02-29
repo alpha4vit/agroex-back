@@ -6,11 +6,12 @@ import org.springframework.stereotype.Repository;
 
 import java.util.List;
 import java.util.Optional;
+import java.util.UUID;
 
 @Repository
-public interface UserRepository extends JpaRepository<UserEntity, Long> {
+public interface UserRepository extends JpaRepository<UserEntity, UUID> {
     Optional<UserEntity> findByUsername(String username);
     Optional<UserEntity> findByEmail(String email);
-    Optional<UserEntity> findByPhoneNumber(String phoneNumber);
-    List<UserEntity> findByUsernameOrEmailOrPhoneNumber(String username, String email, String phoneNumber);
+    List<UserEntity> findByUsernameOrEmail(String username, String email);
+    Boolean existsByEmail(String email);
 }

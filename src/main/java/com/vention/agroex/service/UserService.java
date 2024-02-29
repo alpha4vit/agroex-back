@@ -4,19 +4,25 @@ import com.vention.agroex.dto.Image;
 import com.vention.agroex.entity.UserEntity;
 
 import java.util.List;
+import java.util.Optional;
+import java.util.UUID;
 
 public interface UserService {
 
     List<UserEntity> getAll();
 
-    UserEntity getById(Long id);
+    UserEntity getById(UUID id);
 
     UserEntity save(UserEntity userEntity);
 
-    void deleteById(Long id);
+    Optional<UserEntity> saveWithCheck(UUID userId);
 
-    UserEntity update(Long id, UserEntity source);
+    void deleteById(UUID id);
 
-    UserEntity uploadAvatar(Long id, Image avatar);
+    UserEntity update(UUID id, UserEntity source);
+
+    UserEntity uploadAvatar(UUID id, Image avatar);
+
+    void updateTable();
 
 }

@@ -56,6 +56,10 @@ dependencies {
     implementation 'org.flywaydb:flyway-maven-plugin:10.7.0'
     implementation 'org.springframework.boot:spring-boot-configuration-processor:3.2.2'
     implementation 'io.minio:minio:8.5.7'
+    implementation 'org.springframework.boot:spring-boot-starter-oauth2-client'
+    implementation 'org.springframework.boot:spring-boot-starter-oauth2-resource-server'
+    implementation 'org.springframework.boot:spring-boot-starter-security'
+    implementation 'com.amazonaws:aws-java-sdk-cognitoidp:1.12.657'
 }
 
 tasks.named('test') {

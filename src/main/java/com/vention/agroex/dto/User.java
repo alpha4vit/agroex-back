@@ -9,7 +9,9 @@ import lombok.Builder;
 import lombok.Data;
 import lombok.NoArgsConstructor;
 
-import java.time.Instant;
+import java.time.ZoneId;
+import java.time.ZonedDateTime;
+import java.util.UUID;
 
 @Data
 @Builder
@@ -17,7 +19,7 @@ import java.time.Instant;
 @AllArgsConstructor
 public class User {
 
-    private Long id;
+    private UUID id;
 
     @NotBlank(message = "Username cant be blank")
     @Size(min = 3, max = 64, message = "Username must be between 3 and 64 characters")
@@ -27,19 +29,13 @@ public class User {
     @NotBlank(message = "Email cant be blank")
     private String email;
 
-    @NotBlank(message = "Password can`t be blank")
-    @JsonProperty(access = JsonProperty.Access.WRITE_ONLY)
-    @Size(min = 8, max = 64, message = "Password must contain between 8 and 64 characters")
-    private String password;
-
-    @NotBlank(message = "Phone number can`t be blank")
-    private String phoneNumber;
+    private String avatar;
 
     @JsonProperty(access = JsonProperty.Access.READ_ONLY)
-    private Instant creationDate;
+    private ZonedDateTime creationDate;
 
     private Boolean emailVerified;
 
-    private String avatar;
+    private ZoneId timeZone;
 
 }

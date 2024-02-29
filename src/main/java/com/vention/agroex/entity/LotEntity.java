@@ -8,7 +8,7 @@ import lombok.NoArgsConstructor;
 import org.hibernate.annotations.CreationTimestamp;
 import org.hibernate.annotations.Formula;
 
-import java.time.Instant;
+import java.time.ZonedDateTime;
 import java.util.List;
 
 @Data
@@ -65,11 +65,11 @@ public class LotEntity {
     private Long duration;
 
     @CreationTimestamp
-    @Column(name = "creation_date")
-    private Instant creationDate;
+    @Column(name = "creation_date", columnDefinition = "timestamp with time zone")
+    private ZonedDateTime creationDate;
 
-    @Column(name = "expiration_date")
-    private Instant expirationDate;
+    @Column(name = "expiration_date", columnDefinition = "timestamp with time zone")
+    private ZonedDateTime expirationDate;
 
     @ManyToOne
     @JoinColumn(name = "product_category_id", referencedColumnName = "id")

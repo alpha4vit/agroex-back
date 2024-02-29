@@ -3,7 +3,7 @@ package com.vention.agroex.controller;
 import com.vention.agroex.dto.Country;
 import com.vention.agroex.service.CountryService;
 import com.vention.agroex.util.mapper.CountryMapper;
-import com.vention.agroex.util.validator.CountryDTOValidator;
+import com.vention.agroex.util.validator.CountryValidator;
 import io.swagger.v3.oas.annotations.tags.Tag;
 import jakarta.validation.Valid;
 import lombok.RequiredArgsConstructor;
@@ -22,7 +22,7 @@ public class CountryController {
     
     private final CountryService countryService;
     private final CountryMapper countryMapper;
-    private final CountryDTOValidator countryDTOValidator;
+    private final CountryValidator countryValidator;
 
     @GetMapping
     public ResponseEntity<List<Country>> getAll(@RequestParam(value = "lot_existed", required = false) Boolean lotExisted){
@@ -39,7 +39,7 @@ public class CountryController {
     @PostMapping
     public ResponseEntity<Country> createCountry(@RequestBody @Valid Country country,
                                               BindingResult bindingResult){
-        countryDTOValidator.validate(country, bindingResult);
+        countryValidator.validate(country, bindingResult);
         var saved = countryService.save(countryMapper.toEntity(country));
         return ResponseEntity.ok(countryMapper.toDTO(saved));
     }
@@ -54,7 +54,7 @@ public class CountryController {
     public ResponseEntity<Country> updateCountry(@PathVariable("id") Long id,
                                               @RequestBody @Valid Country country,
                                               BindingResult bindingResult){
-        countryDTOValidator.validate(country, bindingResult);
+        countryValidator.validate(country, bindingResult);
         var saved = countryService.update(id, countryMapper.toEntity(country));
         return ResponseEntity.ok(countryMapper.toDTO(saved));
     }
