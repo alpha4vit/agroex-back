@@ -26,6 +26,11 @@ spring:
       resourceserver:
         jwt:
           issuer-uri: ${AWS_COGNITO_ISSUER}
+minio:
+  bucket: ${MINIO_BUCKET}
+  url: ${MINIO_URL}
+  accessKey: ${MINIO_ACCESS_KEY}
+  secretKey: ${MINIO_SECRET_KEY}
 aws:
   accessKey: ${AWS_ACCESS_KEY}
   secretKey: ${AWS_SECRET_KEY}
@@ -33,12 +38,6 @@ aws:
   userPoolId: ${AWS_USER_POOL_ID}
   clientId: ${AWS_COGNITO_CLIENT_ID}
   clientSecret: ${AWS_COGNITO_CLIENT_SECRET}
-minio:
-  bucket: ${MINIO_BUCKET}
-  url: ${MINIO_URL}
-  accessKey: ${MINIO_ACCESS_KEY}
-  secretKey: ${MINIO_SECRET_KEY}
-#  supported-extensions-path:
 currency-api:
   key: ${CURRENCY_API_KEY}
   url: ${CURRENCY_URL}

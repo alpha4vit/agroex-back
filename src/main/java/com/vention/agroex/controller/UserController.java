@@ -76,12 +76,6 @@ public class UserController {
         userService.updateTable();
     }
 
-    @PostMapping("/{id}/disable")
-    @ResponseStatus(HttpStatus.OK)
-    public void disableUser(@PathVariable("id") UUID id){
-        userService.disable(id);
-    }
-
     @PostMapping("/{id}/enable")
     @ResponseStatus(HttpStatus.OK)
     public void enableUser(@PathVariable("id") UUID id){
