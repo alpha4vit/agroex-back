@@ -1,6 +1,7 @@
 package com.vention.agroex.entity;
 
 import jakarta.persistence.*;
+import jakarta.validation.constraints.Size;
 import lombok.AllArgsConstructor;
 import lombok.Builder;
 import lombok.Data;
@@ -19,6 +20,7 @@ public class TagEntity {
     private Long id;
 
     @Column(name = "title")
+    @Size(min = 1, max = 10, message = "Tag title must be between 1 and 10 characters")
     private String title;
 
     @ManyToOne(fetch = FetchType.EAGER)
