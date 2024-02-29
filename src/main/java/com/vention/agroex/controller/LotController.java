@@ -18,6 +18,7 @@ import org.springframework.web.multipart.MultipartFile;
 
 import java.util.List;
 import java.util.Map;
+import java.util.UUID;
 
 @Slf4j
 @RestController
@@ -104,5 +105,12 @@ public class LotController {
     public ResponseEntity<Lot> reject(@RequestBody LotRejectRequest rejectRequest) {
         var rejected = lotService.reject(rejectRequest);
         return ResponseEntity.ok(lotMapper.toDTO(rejected));
+    }
+
+    @PostMapping("/{id}/buy")
+    public ResponseEntity<Lot> makeDeal(@PathVariable("id") Long lotId,
+                                        @RequestParam("userId") UUID userId) {
+        var lot = lotService.makeDeal(lotId, userId);
+        return ResponseEntity.ok(lotMapper.toDTO(lot));
     }
 }

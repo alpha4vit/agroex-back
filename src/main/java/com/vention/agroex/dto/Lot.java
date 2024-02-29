@@ -42,6 +42,7 @@ public class Lot {
 
     private float originalMinPrice;
 
+    @JsonProperty(access = JsonProperty.Access.READ_ONLY)
     private float minPrice;
 
     @JsonProperty(access = JsonProperty.Access.READ_ONLY)
@@ -89,4 +90,6 @@ public class Lot {
     private String currency;
 
     private float price;
+
+    private List<Bet> bets;
 }

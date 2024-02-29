@@ -1,10 +1,7 @@
 package com.vention.agroex.entity;
 
 import jakarta.persistence.*;
-import lombok.AllArgsConstructor;
-import lombok.Builder;
-import lombok.Data;
-import lombok.NoArgsConstructor;
+import lombok.*;
 
 
 @Data
@@ -20,6 +17,7 @@ public class LocationEntity {
     private Long id;
 
     @ManyToOne
+    @ToString.Exclude
     @JoinColumn(name = "country_id", referencedColumnName = "id")
     private CountryEntity country;
 

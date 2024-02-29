@@ -12,8 +12,9 @@ import java.util.List;
 @Mapper(componentModel = MappingConstants.ComponentModel.SPRING)
 public interface BetMapper {
 
+    BetEntity requestToEntity(BetRequest betRequest);
 
-    BetEntity toEntity(BetRequest betRequest);
+    BetEntity DTOToEntity(Bet bet);
 
     @Mapping(target = "userId", source = "user.id")
     @Mapping(target = "lotId", source = "lot.id")

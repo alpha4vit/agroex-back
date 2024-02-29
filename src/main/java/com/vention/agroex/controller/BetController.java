@@ -29,8 +29,8 @@ public class BetController {
     @PostMapping("/{id}")
     public ResponseEntity<Bet> makeBet(@PathVariable("id") Long lotId,
                                        @RequestBody BetRequest betRequest) {
-        var bet = betMapper.toEntity(betRequest);
-        var user = userService.getById(betRequest.getUserId());
+        var bet = betMapper.requestToEntity(betRequest);
+        var user = userService.getById(betRequest.userId());
         var lot = lotService.getById(lotId);
 
         bet.setUser(user);

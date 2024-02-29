@@ -1,18 +1,9 @@
 package com.vention.agroex.model;
 
-import lombok.Data;
+import lombok.Builder;
 
 import java.time.Instant;
 import java.util.UUID;
 
-@Data
-public class BetRequest {
-
-    private Long id;
-
-    private UUID userId;
-
-    private Float amount;
-
-    private Instant betTime;
-}
+@Builder
+public record BetRequest(UUID userId, Float amount, Instant betTime) {}

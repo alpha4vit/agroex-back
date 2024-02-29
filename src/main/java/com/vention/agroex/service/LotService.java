@@ -7,6 +7,7 @@ import org.springframework.web.multipart.MultipartFile;
 
 import java.util.List;
 import java.util.Map;
+import java.util.UUID;
 
 public interface LotService {
     LotEntity save(LotEntity lotEntity,  MultipartFile[] files);
@@ -48,4 +49,6 @@ public interface LotService {
     void finishAuction(LotEntity lot);
 
     LotEntity approve(Long lotId, String currency);
+
+    LotEntity makeDeal(Long lotId, UUID userId);
 }

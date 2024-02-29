@@ -2,13 +2,14 @@ package com.vention.agroex.util.mapper;
 
 import com.vention.agroex.dto.Lot;
 import com.vention.agroex.entity.*;
+import com.vention.agroex.util.constant.StatusConstants;
 import org.mapstruct.Mapper;
 import org.mapstruct.Mapping;
 import org.mapstruct.MappingConstants;
 
 import java.util.List;
 
-@Mapper(componentModel = "spring", uses = {LocationMapper.class, ProductCategoryMapper.class})
+@Mapper(componentModel = "spring", uses = {LocationMapper.class, ProductCategoryMapper.class,  BetMapper.class})
 public interface LotMapper {
 
     @Mapping(target = "creationDate", ignore = true)
@@ -16,6 +17,9 @@ public interface LotMapper {
     @Mapping(target = "productCategory.id", source = "productCategory.id")
     @Mapping(target = "enabledByAdmin", defaultValue = "true")
     @Mapping(target = "adminComment", defaultValue = "")
+    @Mapping(target = "userStatus", defaultValue = StatusConstants.ACTIVE)
+    @Mapping(target = "status", defaultValue = StatusConstants.ACTIVE)
+    @Mapping(target = "innerStatus", defaultValue = StatusConstants.APPROVED)
     LotEntity toEntity(Lot lot);
 
     @Mapping(target = "userId", source = "user.id")
@@ -25,6 +29,7 @@ public interface LotMapper {
     List<LotEntity> toEntities(List<Lot> lots);
 
     List<Lot> toDTOs(List<LotEntity> lotEntities);
+
 
     default LotEntity update(LotEntity before, LotEntity received) {
         LotEntity result = LotEntity.builder()
@@ -37,6 +42,7 @@ public interface LotMapper {
                 .creationDate(before.getCreationDate())
                 .expirationDate(received.getExpirationDate() != null ? received.getExpirationDate() : before.getExpirationDate())
                 .originalPrice(received.getOriginalPrice() != 0.0 ? received.getOriginalPrice() : before.getOriginalPrice())
+                .originalMinPrice(received.getOriginalMinPrice() != 0.0 ? received.getOriginalMinPrice() : before.getOriginalMinPrice())
                 .size(received.getSize() != null ? received.getSize() : before.getSize())
                 .quantity(received.getQuantity() != 0 ? received.getQuantity() : before.getQuantity())
                 .packaging(received.getPackaging() != null ? received.getPackaging() : before.getPackaging())
@@ -49,6 +55,7 @@ public interface LotMapper {
                 .userStatus((before.getUserStatus()))
                 .innerStatus((before.getInnerStatus()))
                 .duration(received.getDuration())
+                .minPrice(received.getMinPrice())
                 .adminComment(received.getAdminComment())
                 .build();
 

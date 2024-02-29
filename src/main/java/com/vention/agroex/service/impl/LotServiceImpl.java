@@ -1,10 +1,12 @@
 package com.vention.agroex.service.impl;
 
+import com.vention.agroex.entity.BetEntity;
 import com.vention.agroex.entity.CurrencyRateEntity;
 import com.vention.agroex.entity.LotEntity;
 import com.vention.agroex.entity.ProductCategoryEntity;
 import com.vention.agroex.exception.ImageLotException;
 import com.vention.agroex.exception.InvalidArgumentException;
+import com.vention.agroex.exception.InvalidBetException;
 import com.vention.agroex.exception.LotEditException;
 import com.vention.agroex.filter.FilterService;
 import com.vention.agroex.model.LotRejectRequest;
@@ -25,21 +27,22 @@ import org.springframework.web.multipart.MultipartFile;
 import java.time.Instant;
 import java.util.List;
 import java.util.Map;
+import java.util.UUID;
 
 @Slf4j
 @Service
 @RequiredArgsConstructor
 public class LotServiceImpl implements LotService {
 
-    private final LotRepository lotRepository;
-    private final ImageService imageService;
-    private final FilterService filterService;
-    private final ProductCategoryService productCategoryService;
-    private final CountryService countryService;
-    private final UserService userService;
     private final LotMapper lotMapper;
     private final TagService tagService;
+    private final UserService userService;
+    private final ImageService imageService;
+    private final FilterService filterService;
+    private final LotRepository lotRepository;
+    private final CountryService countryService;
     private final CurrencyRateService currencyRateService;
+    private final ProductCategoryService productCategoryService;
 
     @Override
     @Transactional(rollbackOn = Exception.class)
@@ -252,6 +255,33 @@ public class LotServiceImpl implements LotService {
     }
 
     @Override
+    public LotEntity makeDeal(Long lotId, UUID userId) {
+        var lot = getById(lotId);
+        validateDeal(lot);
+        var bets = lot.getBets();
+        var newBetEntity = BetEntity.builder()
+                .amount(lot.getOriginalPrice())
+                .betTime(Instant.now())
+                .user(userService.getById(userId))
+                .lot(getById(lotId))
+                .build();
+
+        bets.add(newBetEntity);
+        lot.setBets(bets);
+
+        return update(lot.getId(), lot);
+    }
+
+    private void validateDeal(LotEntity lot) {
+        if (lot.getLotType().equals(StatusConstants.AUCTION_SELL)) {
+            throw new InvalidBetException("This lot is an auction lot, you can`t buy it");
+        }
+        if (!lot.getStatus().equals(StatusConstants.ACTIVE)) {
+            throw new InvalidBetException("This lot is not active");
+        }
+    }
+
+    @Override
     public LotEntity reject(LotRejectRequest rejectRequest) {
         var lot = getById(rejectRequest.lotId());
         lot.setInnerStatus(StatusConstants.REJECTED_BY_ADMIN);
@@ -263,9 +293,26 @@ public class LotServiceImpl implements LotService {
     @Override
     public LotEntity changeUserStatus(Long id, boolean status) {
         var lot = getById(id);
-        lot.setUserStatus(status ? StatusConstants.ACTIVE : StatusConstants.INACTIVE);
-
+        validateUserStatusChangeRequest(lot);
+        var userStatus = status ? StatusConstants.ACTIVE : StatusConstants.INACTIVE;
+        var lotStatus = status ? StatusConstants.ACTIVE : StatusConstants.INACTIVE;
+        if (lot.getLotType().equals(StatusConstants.AUCTION_SELL)) {
+            lot.setInnerStatus(StatusConstants.NEW);
+            lotStatus = StatusConstants.INACTIVE;
+        }
+        lot.setUserStatus(userStatus);
+        lot.setStatus(lotStatus);
         return update(id, lot);
+    }
+
+    private void validateUserStatusChangeRequest(LotEntity lot) {
+        if (lot.getLotType().equals(StatusConstants.AUCTION_SELL) &&
+                !lot.getInnerStatus().equals(StatusConstants.NEW)) {
+            throw new LotEditException("It`s not possible to change lot userStatus already");
+        }
+        if (!lot.getBets().isEmpty()) {
+            throw new LotEditException("It`s not possible to change lot userStatus. It already has customers");
+        }
     }
 
     @Override
@@ -284,8 +331,7 @@ public class LotServiceImpl implements LotService {
         if (!lotEntity.getOriginalCurrency().equals(currency)) {
             var currencyRate = currencyRateService.getByCurrencies(lotEntity.getOriginalCurrency(), currency);
             lotEntity.updatePrice(currencyRate);
-        }
-        else
+        } else
             lotEntity.updatePrice(new CurrencyRateEntity(lotEntity.getOriginalCurrency()));
         return lotEntity;
     }
