@@ -1,13 +1,10 @@
 package com.vention.agroex.exception.handler;
 
 import com.fasterxml.jackson.databind.exc.InvalidFormatException;
-import com.vention.agroex.exception.ImageException;
-import com.vention.agroex.exception.ImageLotException;
-import com.vention.agroex.exception.InvalidArgumentException;
-import com.vention.agroex.exception.JsonIOException;
-import com.vention.agroex.exception.InvalidBetException;
+import com.vention.agroex.exception.*;
 import com.vention.agroex.model.ExceptionResponse;
 import jakarta.persistence.EntityNotFoundException;
+import jakarta.validation.ConstraintViolationException;
 import lombok.extern.slf4j.Slf4j;
 import org.springframework.core.Ordered;
 import org.springframework.core.annotation.Order;
@@ -25,6 +22,7 @@ import org.springframework.web.servlet.mvc.method.annotation.ResponseEntityExcep
 
 import java.util.HashMap;
 import java.util.Map;
+import java.util.stream.Collectors;
 
 import static java.util.stream.Collectors.toMap;
 
@@ -66,11 +64,22 @@ public class CustomExceptionHandler extends ResponseEntityExceptionHandler {
             case ImageLotException e -> createResponse(e, HttpStatus.BAD_REQUEST, e.getErrors());
             case ImageException e -> createResponse(e, HttpStatus.BAD_REQUEST, new HashMap<>());
             case AccessDeniedException e -> createResponse(e, HttpStatus.FORBIDDEN, new HashMap<>());
+            case ConstraintViolationException e -> handleConstraintViolationException(e);
             default -> createResponse(exception, HttpStatus.INTERNAL_SERVER_ERROR, new HashMap<>());
         };
     }
 
     private ResponseEntity<Object> createResponse(Exception e, HttpStatus status, Map<String, String> errors) {
         return ResponseEntity.status(status).body(new ExceptionResponse(errors, e.getMessage(), status));
+    }
+
+    private ResponseEntity<Object> handleConstraintViolationException(ConstraintViolationException e){
+        record ErrorField(String field, String message) {}
+        var errors = e.getConstraintViolations().stream()
+                .map(violation ->
+                        new ErrorField(
+                                violation.getPropertyPath().toString(), violation.getMessageTemplate()))
+                .collect(Collectors.toMap(ErrorField::field, ErrorField::message));
+        return ResponseEntity.status(HttpStatus.BAD_REQUEST).body(new ExceptionResponse(errors, e.getMessage(), HttpStatus.BAD_REQUEST));
     }
 }
