@@ -89,22 +89,17 @@ public class UserServiceImpl implements UserService {
 
     @Override
     @Transactional(rollbackOn = Exception.class)
-    public void disable(UUID id) {
-        var user = getById(id);
-        user.setEnabled(false);
-        for (var lot : user.getLots()){
-            lot.setStatus(StatusConstants.REJECTED_BY_ADMIN);
-            lot.setAdminComment(String.format("%s. Rejected due to user deactivation", lot.getAdminComment()));
-        }
-        awsCognitoService.setEnabled(id, false);
-    }
-
-    @Override
     public void enable(UUID id) {
         var user = getById(id);
-        user.setEnabled(true);
-        awsCognitoService.setEnabled(id, true);
-        userRepository.save(user);
+        var beforeState = user.getEnabled();
+        user.setEnabled(!beforeState);
+        awsCognitoService.setEnabled(id, !beforeState);
+        if (beforeState) {
+            for (var lot : user.getLots()) {
+                lot.setStatus(StatusConstants.REJECTED_BY_ADMIN);
+                lot.setAdminComment(String.format("%s. Rejected due to user deactivation", lot.getAdminComment()));
+            }
+        }
     }
 
 }
