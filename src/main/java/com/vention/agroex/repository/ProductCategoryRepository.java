@@ -1,6 +1,7 @@
 package com.vention.agroex.repository;
 
 import com.vention.agroex.entity.ProductCategoryEntity;
+import org.jetbrains.annotations.NotNull;
 import org.springframework.data.jpa.repository.JpaRepository;
 import org.springframework.data.jpa.repository.JpaSpecificationExecutor;
 import org.springframework.data.jpa.repository.Query;
@@ -14,6 +15,10 @@ public interface ProductCategoryRepository extends JpaRepository<ProductCategory
 
     @Query(nativeQuery = true, value = "SELECT * from product_category where id=0")
     ProductCategoryEntity getRootCategory();
+
+    @NotNull
+    @Query(nativeQuery = true, value = "SELECT * from product_category where id!=0")
+    List<ProductCategoryEntity> findAll();
 
     Optional<List<ProductCategoryEntity>> findProductCategoryListByParentId(Long parentId);
 

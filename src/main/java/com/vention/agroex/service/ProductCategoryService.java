@@ -19,5 +19,4 @@ public interface ProductCategoryService {
 
     ProductCategoryEntity update(Long id, ProductCategoryEntity productCategoryEntity);
 
-    List<ProductCategoryEntity> getWithFilters(String filters);
 }
