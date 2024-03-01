@@ -89,7 +89,7 @@ public class UserServiceImpl implements UserService {
 
     @Override
     @Transactional(rollbackOn = Exception.class)
-    public void enable(UUID id) {
+    public UserEntity enable(UUID id) {
         var user = getById(id);
         var beforeState = user.getEnabled();
         user.setEnabled(!beforeState);
@@ -100,6 +100,7 @@ public class UserServiceImpl implements UserService {
                 lot.setAdminComment(String.format("%s. Rejected due to user deactivation", lot.getAdminComment()));
             }
         }
+        return userRepository.save(user);
     }
 
 }

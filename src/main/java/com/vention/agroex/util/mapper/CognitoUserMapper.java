@@ -3,12 +3,10 @@ package com.vention.agroex.util.mapper;
 import com.amazonaws.services.cognitoidp.model.AdminGetUserResult;
 import com.amazonaws.services.cognitoidp.model.AttributeType;
 import com.amazonaws.services.cognitoidp.model.UserType;
-import com.vention.agroex.dto.User;
 import com.vention.agroex.entity.UserEntity;
 import org.springframework.stereotype.Component;
 
 import java.time.ZoneId;
-import java.time.ZonedDateTime;
 import java.util.List;
 import java.util.UUID;
 
@@ -40,7 +38,7 @@ public class CognitoUserMapper {
                 case "name" -> builder.username(userAttribute.getValue());
                 case "email" -> builder.email(userAttribute.getValue());
                 case "custom:avatar" -> builder.avatar(userAttribute.getValue());
-                case "zoneinfo" -> builder.timeZone(ZoneId.of(userAttribute.getValue()));
+                case "zoneinfo" -> builder.zoneinfo(ZoneId.of(userAttribute.getValue()));
                 case "email_verified" -> builder.emailVerified(Boolean.valueOf(userAttribute.getValue()));
             }
         }

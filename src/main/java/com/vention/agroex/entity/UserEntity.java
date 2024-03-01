@@ -42,8 +42,8 @@ public class UserEntity {
     @OneToMany(mappedBy = "user", cascade = CascadeType.REMOVE)
     private List<LotEntity> lots;
 
-    @Column(name = "time_zone")
-    private ZoneId timeZone;
+    @Column(name = "zone_info")
+    private ZoneId zoneinfo;
 
     @Column(name = "enabled")
     private Boolean enabled;

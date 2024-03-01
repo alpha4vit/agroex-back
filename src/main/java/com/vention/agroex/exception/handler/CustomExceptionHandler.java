@@ -22,7 +22,6 @@ import org.springframework.web.servlet.mvc.method.annotation.ResponseEntityExcep
 
 import java.util.HashMap;
 import java.util.Map;
-import java.util.stream.Collectors;
 
 import static java.util.stream.Collectors.toMap;
 
@@ -49,8 +48,12 @@ public class CustomExceptionHandler extends ResponseEntityExceptionHandler {
 
     @Override
     protected ResponseEntity<Object> handleMethodArgumentNotValid(MethodArgumentNotValidException ex, HttpHeaders headers, HttpStatusCode status, WebRequest request) {
-        log.info(ex.getMessage());
-        return createResponse(ex, HttpStatus.BAD_REQUEST, new HashMap<>());
+        record ErrorField(String field, String message) {}
+        var errors = ex.getBindingResult().getFieldErrors().stream()
+                .map(fieldError -> new ErrorField(
+                        fieldError.getField(), fieldError.getDefaultMessage()))
+                .collect(toMap(ErrorField::field, ErrorField::message));
+        return createResponse(ex, HttpStatus.BAD_REQUEST, errors);
     }
 
     @ExceptionHandler
@@ -79,7 +82,7 @@ public class CustomExceptionHandler extends ResponseEntityExceptionHandler {
                 .map(violation ->
                         new ErrorField(
                                 violation.getPropertyPath().toString(), violation.getMessageTemplate()))
-                .collect(Collectors.toMap(ErrorField::field, ErrorField::message));
+                .collect(toMap(ErrorField::field, ErrorField::message));
         return ResponseEntity.status(HttpStatus.BAD_REQUEST).body(new ExceptionResponse(errors, e.getMessage(), HttpStatus.BAD_REQUEST));
     }
 }

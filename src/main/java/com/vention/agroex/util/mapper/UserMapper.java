@@ -15,7 +15,7 @@ public interface UserMapper {
     @Mapping(target = "creationDate", ignore = true)
     UserEntity toEntity(User user);
 
-    @Mapping(target = "creationDate", expression = "java(userEntity.getCreationDate().atZone(userEntity.getTimeZone()))")
+    @Mapping(target = "creationDate", expression = "java(userEntity.getCreationDate().atZone(userEntity.getZoneinfo()))")
     User toDTO(UserEntity userEntity);
 
     List<UserEntity> toEntities(List<User> dtos);
@@ -23,7 +23,9 @@ public interface UserMapper {
     List<User> toDtos(List<UserEntity> userEntities);
 
     @Mapping(target = "id", ignore = true)
+    @Mapping(target = "enabled", ignore = true)
     @Mapping(target = "creationDate", ignore = true)
+    @Mapping(target = "emailVerified", ignore = true)
     UserEntity update(@MappingTarget UserEntity target, UserEntity source);
 
 }

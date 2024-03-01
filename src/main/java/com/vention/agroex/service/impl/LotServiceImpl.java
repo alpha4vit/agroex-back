@@ -75,7 +75,7 @@ public class LotServiceImpl implements LotService {
         if (lotEntity.getExpirationDate() != null) {
             lotEntity.setExpirationDate(
                     lotEntity.getExpirationDate()
-                            .withZoneSameLocal(lotEntity.getUser().getTimeZone())
+                            .withZoneSameLocal(lotEntity.getUser().getZoneinfo())
             );
         }
 
@@ -238,7 +238,7 @@ public class LotServiceImpl implements LotService {
         if (!lot.getLotType().equals(LotTypeConstants.AUCTION_SELL)) {
             throw new InvalidArgumentException("This lot is not an auction lot");
         }
-        lot.setExpirationDate(Instant.now().plusMillis(lot.getDuration()).atZone(lot.getUser().getTimeZone()));
+        lot.setExpirationDate(Instant.now().plusMillis(lot.getDuration()).atZone(lot.getUser().getZoneinfo()));
         lot.setInnerStatus(StatusConstants.APPROVED);
         lot.setStatus(StatusConstants.ACTIVE);
         return update(id, lot);
