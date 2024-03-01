@@ -12,14 +12,17 @@ import java.util.List;
 @Mapper(componentModel = "spring")
 public interface ProductCategoryMapper {
 
+    @Named("toProductCategoryEntity")
+    @Mapping(target = "parent.id", source = "parentId")
     ProductCategoryEntity toEntity(ProductCategory category);
 
-    @Named("toDTO")
+    @Named("toProductCategoryDTO")
     @Mapping(target = "parentId", source = "entity.parent.id")
     ProductCategory toDTO(ProductCategoryEntity entity);
 
-    @IterableMapping(qualifiedByName = "toDTO")
+    @IterableMapping(qualifiedByName = "toProductCategoryDTO")
     List<ProductCategory> toDTOs(List<ProductCategoryEntity> entities);
 
+    @IterableMapping(qualifiedByName = "toProductCategoryEntity")
     List<ProductCategoryEntity> toEntities(List<ProductCategory> categories);
 }

@@ -46,10 +46,6 @@ public class ProductCategoryController {
         return ResponseEntity.ok(productCategoryMapper.toDTOs(fetchedProductCategories));
     }
 
-    public ResponseEntity<List<ProductCategory>> findWithFilters(@RequestParam(value = "filters", required = false) String filters) {
-        return ResponseEntity.ok(productCategoryMapper.toDTOs(productCategoryService.getWithFilters(filters)));
-    }
-
     @GetMapping("/{id}")
     public ResponseEntity<List<ProductCategory>> findAllSubcategories(@PathVariable Long id,
                                                                       @RequestParam(value = "lot_existed", required = false, defaultValue = "true") Boolean lotExisted) {

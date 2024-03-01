@@ -5,7 +5,6 @@ import com.vention.agroex.entity.*;
 import com.vention.agroex.util.constant.StatusConstants;
 import org.mapstruct.Mapper;
 import org.mapstruct.Mapping;
-import org.mapstruct.MappingConstants;
 
 import java.util.List;
 
@@ -14,8 +13,8 @@ public interface LotMapper {
 
     @Mapping(target = "creationDate", ignore = true)
     @Mapping(target = "user.id", source = "userId")
-    @Mapping(target = "productCategory.id", source = "productCategory.id")
     @Mapping(target = "enabledByAdmin", defaultValue = "true")
+    @Mapping(target = "productCategory", qualifiedByName = "toProductCategoryEntity")
     @Mapping(target = "adminComment", defaultValue = "")
     @Mapping(target = "userStatus", defaultValue = StatusConstants.ACTIVE)
     @Mapping(target = "status", defaultValue = StatusConstants.ACTIVE)
@@ -23,7 +22,7 @@ public interface LotMapper {
     LotEntity toEntity(Lot lot);
 
     @Mapping(target = "userId", source = "user.id")
-    @Mapping(target = "productCategory", qualifiedByName = "toDTO")
+    @Mapping(target = "productCategory", qualifiedByName = "toProductCategoryDTO")
     Lot toDTO(LotEntity lotEntity);
 
     List<LotEntity> toEntities(List<Lot> lots);
