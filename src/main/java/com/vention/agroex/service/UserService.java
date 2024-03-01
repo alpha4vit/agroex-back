@@ -27,6 +27,6 @@ public interface UserService {
 
     UserEntity getAuthenticatedUser();
 
-    void enable(UUID id);
+    UserEntity enable(UUID id);
 
 }

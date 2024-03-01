@@ -2,6 +2,7 @@ package com.vention.agroex.controller;
 
 import com.vention.agroex.dto.Image;
 import com.vention.agroex.dto.User;
+import com.vention.agroex.entity.UserEntity;
 import com.vention.agroex.service.UserService;
 import com.vention.agroex.util.mapper.UserMapper;
 import com.vention.agroex.util.validator.UserCreateValidator;
@@ -57,7 +58,7 @@ public class UserController {
 
     @PutMapping("/{id}")
     public ResponseEntity<User> updateUser(@PathVariable("id") UUID id,
-                                           @RequestBody User user) {
+                                           @RequestBody @Valid User user) {
         var saved = userService.update(id, userMapper.toEntity(user));
         return ResponseEntity.ok(userMapper.toDTO(saved));
     }
@@ -77,9 +78,8 @@ public class UserController {
     }
 
     @PostMapping("/{id}/enable")
-    @ResponseStatus(HttpStatus.OK)
-    public void enableUser(@PathVariable("id") UUID id){
-        userService.enable(id);
+    public ResponseEntity<User> enableUser(@PathVariable("id") UUID id){
+        return ResponseEntity.ok(userMapper.toDTO(userService.enable(id)));
     }
 
 }

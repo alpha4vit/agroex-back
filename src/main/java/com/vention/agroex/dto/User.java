@@ -3,7 +3,7 @@ package com.vention.agroex.dto;
 import com.fasterxml.jackson.annotation.JsonProperty;
 import jakarta.validation.constraints.Email;
 import jakarta.validation.constraints.NotBlank;
-import jakarta.validation.constraints.Size;
+import jakarta.validation.constraints.NotNull;
 import lombok.AllArgsConstructor;
 import lombok.Builder;
 import lombok.Data;
@@ -22,12 +22,14 @@ public class User {
     private UUID id;
 
     @NotBlank(message = "Username cant be blank")
-    @Size(min = 3, max = 64, message = "Username must be between 3 and 64 characters")
     private String username;
 
     @Email
     @NotBlank(message = "Email cant be blank")
     private String email;
+
+    @NotNull(message = "Time zone cant be null!")
+    private ZoneId zoneinfo;
 
     private String avatar;
 
@@ -35,8 +37,6 @@ public class User {
     private ZonedDateTime creationDate;
 
     private Boolean emailVerified;
-
-    private ZoneId timeZone;
 
     private Boolean enabled;
 
