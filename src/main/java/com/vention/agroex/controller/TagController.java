@@ -7,6 +7,7 @@ import com.vention.agroex.util.validator.TagValidator;
 import jakarta.validation.Valid;
 import lombok.RequiredArgsConstructor;
 import org.springframework.http.ResponseEntity;
+import org.springframework.security.access.prepost.PreAuthorize;
 import org.springframework.validation.BindingResult;
 import org.springframework.web.bind.annotation.*;
 
@@ -33,6 +34,7 @@ public class TagController {
         return ResponseEntity.ok(tagMapper.toDto(tag));
     }
 
+    @PreAuthorize("@customSecurityExpression.isAdmin()")
     @PostMapping
     public ResponseEntity<Tag> save(@RequestBody Tag tag,
                                     BindingResult bindingResult) {
@@ -41,6 +43,7 @@ public class TagController {
         return ResponseEntity.ok(tagMapper.toDto(saved));
     }
 
+    @PreAuthorize("@customSecurityExpression.isAdmin()")
     @PutMapping("/{id}")
     public ResponseEntity<Tag> update(@PathVariable("id") Long id,
                                       @RequestBody @Valid Tag tag,

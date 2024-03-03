@@ -4,10 +4,12 @@ import com.amazonaws.services.cognitoidp.model.AdminGetUserResult;
 import com.amazonaws.services.cognitoidp.model.AttributeType;
 import com.amazonaws.services.cognitoidp.model.UserType;
 import com.vention.agroex.entity.UserEntity;
+import com.vention.agroex.util.constant.Role;
 import org.springframework.stereotype.Component;
 
 import java.time.ZoneId;
 import java.util.List;
+import java.util.Set;
 import java.util.UUID;
 
 @Component
@@ -40,6 +42,7 @@ public class CognitoUserMapper {
                 case "custom:avatar" -> builder.avatar(userAttribute.getValue());
                 case "zoneinfo" -> builder.zoneinfo(ZoneId.of(userAttribute.getValue()));
                 case "email_verified" -> builder.emailVerified(Boolean.valueOf(userAttribute.getValue()));
+                case "custom:role" -> builder.roles(Set.of(Role.valueOf(userAttribute.getValue().toUpperCase())));
             }
         }
     }

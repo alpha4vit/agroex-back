@@ -1,7 +1,9 @@
 package com.vention.agroex.service.impl;
 
 import com.vention.agroex.dto.Image;
+import com.vention.agroex.entity.LotEntity;
 import com.vention.agroex.entity.UserEntity;
+import com.vention.agroex.repository.LotRepository;
 import com.vention.agroex.repository.UserRepository;
 import com.vention.agroex.service.AwsCognitoService;
 import com.vention.agroex.service.ImageServiceStorage;
@@ -27,7 +29,7 @@ public class UserServiceImpl implements UserService {
     private final ImageServiceStorage imageServiceStorage;
     private final UserMapper userMapper;
     private final AwsCognitoService awsCognitoService;
-
+    private final LotRepository lotRepository;
 
     @Override
     public List<UserEntity> getAll() {
@@ -78,7 +80,11 @@ public class UserServiceImpl implements UserService {
     @Transactional(rollbackOn = Exception.class)
     public void updateTable() {
         var userEntities = awsCognitoService.updateDb();
-        userRepository.saveAll(userEntities);
+        List<UserEntity> saved = userRepository.saveAll(userEntities);
+        saved.forEach(user -> {
+            if (!user.getEnabled())
+                rejectLotsDueToUserDeactivation(lotRepository.findByUser(user));
+        });
     }
 
     @Override
@@ -95,14 +101,21 @@ public class UserServiceImpl implements UserService {
         var beforeState = user.getEnabled();
         user.setEnabled(!beforeState);
         awsCognitoService.setEnabled(id, !beforeState);
-        if (beforeState) {
-            for (var lot : user.getLots()) {
-                lot.setInnerStatus(StatusConstants.REJECTED_BY_ADMIN);
-                lot.setStatus(StatusConstants.INACTIVE);
-                lot.setAdminComment(String.format("%s. Rejected due to user deactivation", lot.getAdminComment()));
-            }
-        }
+        if (beforeState)
+            rejectLotsDueToUserDeactivation(user.getLots());
         return userRepository.save(user);
     }
 
+    protected void rejectLotsDueToUserDeactivation(List<LotEntity> lotEntities) {
+        lotEntities.stream()
+                .filter(lot -> !lot.getStatus().equals(StatusConstants.REJECTED_BY_ADMIN))
+                .forEach(lot -> {
+                    lot.setInnerStatus(StatusConstants.REJECTED_BY_ADMIN);
+                    lot.setStatus(StatusConstants.INACTIVE);
+                    lot.setAdminComment(!lot.getAdminComment().isEmpty() ?
+                            String.format("%s. Rejected due to user deactivation", lot.getAdminComment()) :
+                            "Rejected due to user deactivation");
+                });
+
+    }
 }

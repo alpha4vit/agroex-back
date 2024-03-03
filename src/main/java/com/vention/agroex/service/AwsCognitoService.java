@@ -1,7 +1,5 @@
 package com.vention.agroex.service;
 
-import com.amazonaws.services.cognitoidp.model.AuthenticationResultType;
-import com.vention.agroex.dto.User;
 import com.vention.agroex.entity.UserEntity;
 
 import java.util.List;

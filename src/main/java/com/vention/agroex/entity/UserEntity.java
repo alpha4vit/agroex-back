@@ -1,5 +1,6 @@
 package com.vention.agroex.entity;
 
+import com.vention.agroex.util.constant.Role;
 import jakarta.persistence.*;
 import lombok.*;
 import org.hibernate.annotations.CreationTimestamp;
@@ -7,6 +8,7 @@ import org.hibernate.annotations.CreationTimestamp;
 import java.time.Instant;
 import java.time.ZoneId;
 import java.util.List;
+import java.util.Set;
 import java.util.UUID;
 
 @Entity
@@ -47,5 +49,10 @@ public class UserEntity {
 
     @Column(name = "enabled")
     private Boolean enabled;
+
+    @ElementCollection(targetClass = Role.class)
+    @CollectionTable(name = "user_role", joinColumns = @JoinColumn(name = "user_id"))
+    @Enumerated(EnumType.STRING)
+    private Set<Role> roles;
 
 }
