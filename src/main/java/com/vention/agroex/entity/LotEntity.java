@@ -1,6 +1,5 @@
 package com.vention.agroex.entity;
 
-import com.vention.agroex.util.constant.LotTypeConstants;
 import jakarta.persistence.*;
 import lombok.AllArgsConstructor;
 import lombok.Builder;

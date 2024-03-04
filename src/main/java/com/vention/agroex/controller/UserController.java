@@ -15,7 +15,6 @@ import org.springframework.validation.BindingResult;
 import org.springframework.web.bind.annotation.*;
 import org.springframework.web.multipart.MultipartFile;
 
-import java.util.List;
 import java.util.UUID;
 
 @RestController
@@ -30,9 +29,9 @@ public class UserController {
 
 
     @GetMapping
-    public ResponseEntity<List<User>> getAll() {
+    public ResponseEntity<Object> getAll() {
         var users = userService.getAll();
-        return ResponseEntity.ok(userMapper.toDtos(users));
+        return ResponseEntity.ok(users);
     }
 
     @GetMapping("/{id}")
