@@ -1,7 +1,6 @@
 package com.vention.agroex.controller;
 
 import com.vention.agroex.dto.Lot;
-import com.vention.agroex.model.LotRejectRequest;
 import com.vention.agroex.model.LotStatusResponse;
 import com.vention.agroex.service.LotService;
 import com.vention.agroex.util.mapper.LotMapper;
@@ -90,21 +89,24 @@ public class LotController {
 
     @PostMapping("/{id}/moderate")
     public ResponseEntity<Lot> putOnModeration(@PathVariable("id") Long lotId,
-                                               @RequestHeader("currency") String currency) {
-        var moderated = lotService.putOnModeration(lotId, currency);
+                                               @RequestHeader("currency") String currency,
+                                               @RequestParam(value = "adminComment", required = false) String adminComment) {
+        var moderated = lotService.putOnModeration(lotId, currency, adminComment);
         return ResponseEntity.ok(lotMapper.toDTO(moderated));
     }
 
     @PostMapping("/{id}/approve")
     public ResponseEntity<Lot> approve(@PathVariable("id") Long lotId,
-                                       @RequestHeader("currency") String currency) {
-        var approved = lotService.approve(lotId, currency);
+                                       @RequestHeader("currency") String currency,
+                                       @RequestParam(value = "adminComment", required = false) String adminComment) {
+        var approved = lotService.approve(lotId, currency, adminComment);
         return ResponseEntity.ok(lotMapper.toDTO(approved));
     }
 
     @PostMapping("/{id}/reject")
-    public ResponseEntity<Lot> reject(@RequestBody LotRejectRequest rejectRequest) {
-        var rejected = lotService.reject(rejectRequest);
+    public ResponseEntity<Lot> reject(@PathVariable("id") Long lotId,
+                                      @RequestParam(value = "adminComment") String adminComment) {
+        var rejected = lotService.reject(lotId, adminComment);
         return ResponseEntity.ok(lotMapper.toDTO(rejected));
     }
 

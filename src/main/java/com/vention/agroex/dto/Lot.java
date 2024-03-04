@@ -62,6 +62,8 @@ public class Lot {
     @DecimalMin(value = "1.0", message = "The field should contain only numbers from 1 to 9999 (integer or fractional)")
     private float originalPrice;
 
+    private Float calculatedPrice;
+
     @NotBlank(message = "Lot currency cant be blank")
     @Size(max = 10, message = "Lot currency must be less than 10 characters")
     private String originalCurrency;

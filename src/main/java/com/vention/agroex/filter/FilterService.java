@@ -7,6 +7,7 @@ import jakarta.persistence.criteria.Expression;
 import jakarta.persistence.criteria.Predicate;
 import jakarta.persistence.criteria.Root;
 import lombok.RequiredArgsConstructor;
+import org.jetbrains.annotations.NotNull;
 import org.springframework.data.jpa.domain.Specification;
 import org.springframework.stereotype.Service;
 
@@ -49,32 +50,27 @@ public class FilterService {
                 case "title" -> mainFieldsBuilder.with("title", EQUALS, value);
                 case "minQuantity" -> mainFieldsBuilder.with("quantity", GREATER, Float.parseFloat(value));
                 case "maxQuantity" -> mainFieldsBuilder.with("quantity", LOWER, Float.parseFloat(value));
-                case "minPrice" -> mainFieldsBuilder.with("price", GREATER, Float.parseFloat(value));
-                case "maxPrice" -> mainFieldsBuilder.with("price", LOWER, Float.parseFloat(value));
                 case "enabledByAdmin" -> mainFieldsBuilder.with("enabledByAdmin", EQUALS, Boolean.parseBoolean(value));
 
-                case "categories" -> Arrays.stream(value.split(","))
-                        .map(category -> Long.parseLong(category.trim()))
+                case "categories" -> getStringStream(value)
+                        .map(Long::parseLong)
                         .forEach(category -> productCategoryBuilder.with("productCategory", EQUALS, category));
-                case "users" -> Arrays.stream(value.split(","))
-                        .map(user -> UUID.fromString(user.trim()))
+                case "users" -> getStringStream(value)
+                        .map(UUID::fromString)
                         .forEach(user -> userBuilder.with("user", EQUALS, user));
-                case "lotType" -> Arrays.stream(value.split(","))
-                        .map(String::trim)
+                case "lotType" -> getStringStream(value)
                         .forEach(type -> typeBuilder.with("lotType", EQUALS, type));
-                case "countries" -> Arrays.stream(value.split(","))
-                        .map(country -> Long.parseLong(country.trim()))
+                case "countries" -> getStringStream(value)
+                        .map(Long::parseLong)
                         .forEach(country -> countryBuilder.with("country", EQUALS, country));
-                case "innerStatus" -> Arrays.stream(value.split(","))
-                        .map(String::trim)
+                case "innerStatus" -> getStringStream(value)
                         .forEach(status -> adminStatusBuilder.with("innerStatus", EQUALS, status));
-                case "status" -> Arrays.stream(value.split(","))
-                        .map(String::trim)
+                case "status" -> getStringStream(value)
                         .forEach(status -> statusBuilder.with("status", EQUALS, status));
-                case "userStatus" -> Arrays.stream(value.split(","))
-                        .map(String::trim)
+                case "userStatus" -> getStringStream(value)
                         .forEach(status -> userStatusBuilder.with("userStatus", EQUALS, status));
                 case "keyword" -> keyword = value;
+                case "minPrice", "maxPrice" -> {}
                 default -> throw new InvalidArgumentException(
                         String.format("There are no parameters with name %s", field));
             }
@@ -96,6 +92,12 @@ public class FilterService {
                 .filter(Objects::nonNull)
                 .reduce(Specification::and)
                 .orElse((root, query, criteriaBuilder) -> criteriaBuilder.conjunction());
+    }
+
+    @NotNull
+    private static Stream<String> getStringStream(String value) {
+        return Arrays.stream(value.split(","))
+                .map(String::trim);
     }
 
     private void clearNonSearchFields(Map<String, String> filters) {

@@ -9,7 +9,6 @@ import com.vention.agroex.exception.InvalidArgumentException;
 import com.vention.agroex.exception.InvalidBetException;
 import com.vention.agroex.exception.LotEditException;
 import com.vention.agroex.filter.FilterService;
-import com.vention.agroex.model.LotRejectRequest;
 import com.vention.agroex.model.LotStatusResponse;
 import com.vention.agroex.repository.LotRepository;
 import com.vention.agroex.service.*;
@@ -25,9 +24,11 @@ import org.springframework.stereotype.Service;
 import org.springframework.web.multipart.MultipartFile;
 
 import java.time.Instant;
+import java.util.ArrayList;
 import java.util.List;
 import java.util.Map;
 import java.util.UUID;
+import java.util.stream.Collectors;
 
 @Slf4j
 @Service
@@ -111,6 +112,13 @@ public class LotServiceImpl implements LotService {
 
     @Override
     public void deleteById(Long id) {
+        var lotToDelete = getById(id);
+        if (lotToDelete.getBets() != null) {
+            throw new LotEditException("You can`t delete this lot, it already has customers");
+        }
+        if (lotToDelete.getStatus().equals(StatusConstants.ACTIVE)) {
+            throw new LotEditException("You can`t delete this lot, deactivate it firstly");
+        }
         lotRepository.deleteById(id);
     }
 
@@ -131,7 +139,7 @@ public class LotServiceImpl implements LotService {
 
     @Override
     @Transactional(rollbackOn = ImageLotException.class)
-    public LotEntity update(Long id, LotEntity entity, MultipartFile[] files) {
+    public LotEntity update(Long id, LotEntity entity, MultipartFile[] files, String currency) {
         var lotToUpdate = getById(id);
 
         imageService.updateImagesForLot(lotToUpdate, lotToUpdate, files);
@@ -155,6 +163,9 @@ public class LotServiceImpl implements LotService {
                     throw new InvalidArgumentException("Provide productCategory.id or productCategory.title");
         };
 
+        if (!lotToUpdate.getInnerStatus().equals(StatusConstants.APPROVED)) {
+            lotToUpdate.setInnerStatus(StatusConstants.NEW);
+        }
         updatedLot.setUser(userService.getAuthenticatedUser());
         updatedLot.getLocation().setCountry(countryEntity);
         updatedLot.setProductCategory(productCategoryEntity);
@@ -162,14 +173,7 @@ public class LotServiceImpl implements LotService {
                 .stream().map(tagService::save)
                 .toList());
 
-        return lotRepository.save(updatedLot);
-    }
-
-    @Override
-    @Transactional(rollbackOn = ImageLotException.class)
-    public LotEntity update(Long id, LotEntity entity, MultipartFile[] files, String currency) {
-        var updated = update(id, entity, files);
-        return updatePrice(updated, currency);
+        return updatePrice(lotRepository.save(updatedLot), currency);
     }
 
     @Override
@@ -212,26 +216,25 @@ public class LotServiceImpl implements LotService {
         return statusBuilder.build();
     }
 
-    @Override
-    public LotEntity putOnModeration(Long id) {
+    private LotEntity moderateLot(Long id, String adminComment) {
         var lot = getById(id);
         if (!lot.getUser().getEnabled())
             throw new InvalidArgumentException("Lot owner is disabled!");
-        if (!lot.getLotType().equals(LotTypeConstants.AUCTION_SELL)) {
-            throw new InvalidArgumentException("This lot is not an auction lot");
+        if (adminComment != null) {
+            lot.setAdminComment(adminComment);
         }
         lot.setInnerStatus(StatusConstants.ON_MODERATION);
         return update(id, lot);
     }
 
     @Override
-    public LotEntity putOnModeration(Long lotId, String currency) {
-        var lot = putOnModeration(lotId);
+    public LotEntity putOnModeration(Long lotId, String currency, String adminComment) {
+        var lot = moderateLot(lotId, adminComment);
         return updatePrice(lot, currency);
     }
 
-    @Override
-    public LotEntity approve(Long id) {
+
+    private LotEntity approveLot(Long id, String adminComment) {
         var lot = getById(id);
         if (!lot.getUser().getEnabled())
             throw new InvalidArgumentException("Lot owner is disabled!");
@@ -240,20 +243,23 @@ public class LotServiceImpl implements LotService {
         }
         lot.setExpirationDate(Instant.now().plusMillis(lot.getDuration()).atZone(lot.getUser().getZoneinfo()));
         lot.setInnerStatus(StatusConstants.APPROVED);
+        if (adminComment != null) {
+            lot.setAdminComment(adminComment);
+        }
         lot.setStatus(StatusConstants.ACTIVE);
         return update(id, lot);
+    }
+
+    @Override
+    public LotEntity approve(Long lotId, String currency, String adminComment) {
+        var lot = approveLot(lotId, adminComment);
+        return updatePrice(lot, currency);
     }
 
     @Override
     public void finishAuction(LotEntity lot) {
         lot.setStatus(StatusConstants.FINISHED);
         update(lot.getId(), lot);
-    }
-
-    @Override
-    public LotEntity approve(Long lotId, String currency) {
-        var lot = approve(lotId);
-        return updatePrice(lot, currency);
     }
 
     @Override
@@ -284,12 +290,15 @@ public class LotServiceImpl implements LotService {
     }
 
     @Override
-    public LotEntity reject(LotRejectRequest rejectRequest) {
-        var lot = getById(rejectRequest.lotId());
+    public LotEntity reject(Long lotId, String adminComment) {
+        if (adminComment.isEmpty()) {
+            throw new LotEditException("You need to give comment about rejection");
+        }
+        var lot = getById(lotId);
         lot.setInnerStatus(StatusConstants.REJECTED_BY_ADMIN);
         lot.setStatus(StatusConstants.INACTIVE);
-        lot.setAdminComment(rejectRequest.adminComment() == null ? "" : rejectRequest.adminComment());
-        return update(rejectRequest.lotId(), lot);
+        lot.setAdminComment(adminComment);
+        return update(lotId, lot);
     }
 
     @Override
@@ -318,15 +327,25 @@ public class LotServiceImpl implements LotService {
     }
 
     @Override
-    public List<LotEntity> getWithCriteria(Map<String, String> filters, int pageNumber, int pageSize) {
-        var searchCriteria = filterService.getCriteria(filters);
-        return lotRepository.findAll(searchCriteria, PageRequest.of(pageNumber, pageSize)).toList();
-    }
-
-    @Override
     public List<LotEntity> getWithCriteria(Map<String, String> filters, int pageNumber, int pageSize, String currency) {
-        var lots = getWithCriteria(filters, pageNumber, pageSize);
-        return lots.stream().map(lot -> updatePrice(lot, currency)).toList();
+        var searchCriteria = filterService.getCriteria(filters);
+
+        var lots = lotRepository.findAll(searchCriteria, PageRequest.of(pageNumber, pageSize)).toList();
+        var lotsWithUpdatedPrice = new ArrayList<>(lots.stream().map(lot -> updatePrice(lot, currency)).toList());
+        var nonNullFilters = filters.entrySet().stream()
+                .filter(entry -> entry.getValue() != null && !entry.getValue().isEmpty())
+                .collect(Collectors.toMap(Map.Entry::getKey, Map.Entry::getValue));
+
+        nonNullFilters.forEach((field, value) -> {
+            switch (field) {
+                case "minPrice" ->
+                        lotsWithUpdatedPrice.removeIf(lotEntity -> lotEntity.getPrice() <= Float.parseFloat(value));
+                case "maxPrice" ->
+                        lotsWithUpdatedPrice.removeIf(lotEntity -> lotEntity.getPrice() >= Float.parseFloat(value));
+            }
+        });
+
+        return lotsWithUpdatedPrice;
     }
 
     private LotEntity updatePrice(LotEntity lotEntity, String currency) {

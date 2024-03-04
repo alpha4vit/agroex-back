@@ -26,6 +26,7 @@ public class LotSpecification implements Specification<LotEntity> {
             case ("productCategory") -> builder.equal(root.join("productCategory").get("id"), value);
             case ("location") -> builder.equal(root.join("location").get("id"), value);
             case ("user") -> builder.equal(root.join("user").get("id"), value);
+            case ("price") -> getPredicateFromOperation(criteria.getOperation(), root, "calculatedPrice", value, builder);
             case ("country") -> builder.equal(root.join("location").join("country").get("id"), value);
             default -> getPredicateFromOperation(criteria.getOperation(), root, key, value, builder);
         };

@@ -105,14 +105,21 @@ public class LotEntity {
     @Transient
     private String currency;
 
+    @Formula("(SELECT l.original_price * cr.rate FROM lot l LEFT JOIN currency_rates cr ON" +
+            " cr.source_currency = l.original_currency AND cr.target_currency = 'USD' WHERE l.id = id)")
+    private Float calculatedPrice;
+
     @Transient
     private float price;
 
     @Transient
     private float minPrice;
 
+    @Column(name = "admin_comment")
+    private String adminComment;
+
     @PostLoad
-    private void init(){
+    private void init() {
         this.currency = this.getOriginalCurrency();
         this.price = this.getOriginalPrice();
     }
@@ -128,7 +135,4 @@ public class LotEntity {
         }
         this.setCurrency(currencyRate.getTargetCurrency());
     }
-
-    @Column(name = "admin_comment")
-    private String adminComment;
 }
