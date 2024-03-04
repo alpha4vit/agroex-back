@@ -74,6 +74,9 @@ public class Lot {
     @FutureOrPresent(message = "The field should be valid date greater or equal to current date ")
     private ZonedDateTime expirationDate;
 
+    @JsonProperty(access = JsonProperty.Access.READ_ONLY)
+    private ZonedDateTime actualStartDate;
+
     private ProductCategory productCategory;
 
     @Pattern(regexp = "\\b(?:buy|sell|auctionSell)\\b", message = "Lot type can be only buy/sell/auctionSell")

@@ -96,7 +96,8 @@ public class UserServiceImpl implements UserService {
         awsCognitoService.setEnabled(id, !beforeState);
         if (beforeState) {
             for (var lot : user.getLots()) {
-                lot.setStatus(StatusConstants.REJECTED_BY_ADMIN);
+                lot.setInnerStatus(StatusConstants.REJECTED_BY_ADMIN);
+                lot.setStatus(StatusConstants.INACTIVE);
                 lot.setAdminComment(String.format("%s. Rejected due to user deactivation", lot.getAdminComment()));
             }
         }
