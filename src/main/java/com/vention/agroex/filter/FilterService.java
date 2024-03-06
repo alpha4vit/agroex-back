@@ -2,6 +2,7 @@ package com.vention.agroex.filter;
 
 import com.vention.agroex.entity.LotEntity;
 import com.vention.agroex.exception.InvalidArgumentException;
+import com.vention.agroex.util.constant.StatusConstants;
 import jakarta.persistence.criteria.CriteriaBuilder;
 import jakarta.persistence.criteria.Expression;
 import jakarta.persistence.criteria.Predicate;
@@ -45,6 +46,10 @@ public class FilterService {
             mainFieldsBuilder.with("enabledByAdmin", EQUALS, true);
         }
 
+        if (!nonNullFilters.containsKey("status")){
+            statusBuilder.with("status", EQUALS, StatusConstants.ACTIVE);
+        }
+
         nonNullFilters.forEach((field, value) -> {
             switch (field) {
                 case "title" -> mainFieldsBuilder.with("title", EQUALS, value);
@@ -66,6 +71,7 @@ public class FilterService {
                 case "innerStatus" -> getStringStream(value)
                         .forEach(status -> adminStatusBuilder.with("innerStatus", EQUALS, status));
                 case "status" -> getStringStream(value)
+                        .filter(status -> !status.equals("all"))
                         .forEach(status -> statusBuilder.with("status", EQUALS, status));
                 case "userStatus" -> getStringStream(value)
                         .forEach(status -> userStatusBuilder.with("userStatus", EQUALS, status));

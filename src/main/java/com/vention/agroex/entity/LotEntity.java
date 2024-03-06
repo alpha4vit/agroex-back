@@ -71,6 +71,9 @@ public class LotEntity {
     @Column(name = "expiration_date", columnDefinition = "timestamp with time zone")
     private ZonedDateTime expirationDate;
 
+    @Column(name = "actual_start_date", columnDefinition = "timestamp with time zone")
+    private ZonedDateTime actualStartDate;
+
     @ManyToOne
     @JoinColumn(name = "product_category_id", referencedColumnName = "id")
     private ProductCategoryEntity productCategory;

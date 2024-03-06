@@ -42,7 +42,7 @@ public class LotSpecification implements Specification<LotEntity> {
                     root.get(key), value.toString());
             case ":" -> {
                 if (root.get(key).getJavaType() == String.class) {
-                    yield builder.like(builder.lower(root.get(key)), "%" + value.toString().toLowerCase() + "%");
+                    yield builder.equal(builder.lower(root.get(key)), value.toString().toLowerCase());
                 } else {
                     yield builder.equal(root.get(key), value);
                 }

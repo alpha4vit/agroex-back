@@ -25,6 +25,7 @@ import org.springframework.web.multipart.MultipartFile;
 
 import java.time.Instant;
 import java.util.ArrayList;
+import java.time.ZonedDateTime;
 import java.util.List;
 import java.util.Map;
 import java.util.UUID;
@@ -242,6 +243,7 @@ public class LotServiceImpl implements LotService {
             throw new InvalidArgumentException("This lot is not an auction lot");
         }
         lot.setExpirationDate(Instant.now().plusMillis(lot.getDuration()).atZone(lot.getUser().getZoneinfo()));
+        lot.setActualStartDate(ZonedDateTime.now(lot.getUser().getZoneinfo()));
         lot.setInnerStatus(StatusConstants.APPROVED);
         if (adminComment != null) {
             lot.setAdminComment(adminComment);
