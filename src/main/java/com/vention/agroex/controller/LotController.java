@@ -117,4 +117,13 @@ public class LotController {
         var lot = lotService.makeDeal(lotId, userId, currency);
         return ResponseEntity.ok(lotMapper.toDTO(lot));
     }
+
+    @GetMapping("/activity")
+    public ResponseEntity<List<Lot>> getUserActivityById(
+            @RequestParam(value = "userId") UUID id,
+            @RequestHeader("currency") String currency) {
+
+        var lots = lotService.getUserActivityById(id, currency);
+        return ResponseEntity.ok(lotMapper.toDTOs(lots));
+    }
 }

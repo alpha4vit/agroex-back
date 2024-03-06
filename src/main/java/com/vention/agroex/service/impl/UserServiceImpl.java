@@ -28,6 +28,7 @@ public class UserServiceImpl implements UserService {
     private final UserMapper userMapper;
     private final AwsCognitoService awsCognitoService;
 
+
     @Override
     public List<UserEntity> getAll() {
         return userRepository.findAll();

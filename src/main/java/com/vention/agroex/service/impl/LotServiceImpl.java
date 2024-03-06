@@ -50,7 +50,7 @@ public class LotServiceImpl implements LotService {
     @Override
     @Transactional(rollbackOn = Exception.class)
     public LotEntity save(LotEntity lotEntity, MultipartFile[] files) {
-        validateFields(lotEntity, files);
+        validateFiles(files);
 
         var countryEntity = countryService.getById(lotEntity.getLocation().getCountry().getId());
 
@@ -96,7 +96,7 @@ public class LotServiceImpl implements LotService {
         return updatePrice(saved, currency);
     }
 
-    private void validateFields(LotEntity lotEntity, MultipartFile[] files) {
+    private void validateFiles(MultipartFile[] files) {
         if (files == null || files.length < 1 || files.length > 6)
             throw new InvalidArgumentException(Map.of("images", "Incorrect quantity of images must be from 1 to 6!"), "Invalid arguments!");
     }
@@ -191,12 +191,6 @@ public class LotServiceImpl implements LotService {
         result.setProductCategory(productCategoryEntity);
 
         return lotRepository.save(result);
-    }
-
-    @Override
-    public void deleteImage(String fileName) {
-        var imageEntity = imageService.getByName(fileName);
-        imageService.delete(imageEntity);
     }
 
     @Override
@@ -361,5 +355,13 @@ public class LotServiceImpl implements LotService {
         } else
             lotEntity.updatePrice(new CurrencyRateEntity(lotEntity.getOriginalCurrency()));
         return lotEntity;
+    }
+
+    @Override
+    public List<LotEntity> getUserActivityById(UUID id, String currency) {
+        var user = userService.getById(id);
+        return lotRepository.findByBetsUserId(user.getId()).stream()
+                .map(lot -> updatePrice(lot, currency))
+                .toList();
     }
 }

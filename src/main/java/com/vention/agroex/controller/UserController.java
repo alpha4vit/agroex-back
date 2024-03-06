@@ -2,7 +2,6 @@ package com.vention.agroex.controller;
 
 import com.vention.agroex.dto.Image;
 import com.vention.agroex.dto.User;
-import com.vention.agroex.entity.UserEntity;
 import com.vention.agroex.service.UserService;
 import com.vention.agroex.util.mapper.UserMapper;
 import com.vention.agroex.util.validator.UserCreateValidator;
@@ -24,8 +23,8 @@ import java.util.UUID;
 @Tag(name = "User controller")
 public class UserController {
 
-    private final UserService userService;
     private final UserMapper userMapper;
+    private final UserService userService;
     private final UserCreateValidator userCreateValidator;
 
 
@@ -65,7 +64,7 @@ public class UserController {
 
     @PostMapping("/{id}/avatar")
     public ResponseEntity<User> uploadAvatar(@PathVariable("id") UUID id,
-                                                @RequestParam("file") MultipartFile file){
+                                             @RequestParam("file") MultipartFile file) {
         var avatar = new Image(file);
         var user = userService.uploadAvatar(id, avatar);
         return ResponseEntity.ok(userMapper.toDTO(user));
@@ -73,12 +72,12 @@ public class UserController {
 
     @GetMapping("/updatedb")
     @ResponseStatus(HttpStatus.OK)
-    public void udpateDatabase(){
+    public void updateDatabase() {
         userService.updateTable();
     }
 
     @PostMapping("/{id}/enable")
-    public ResponseEntity<User> enableUser(@PathVariable("id") UUID id){
+    public ResponseEntity<User> enableUser(@PathVariable("id") UUID id) {
         return ResponseEntity.ok(userMapper.toDTO(userService.enable(id)));
     }
 

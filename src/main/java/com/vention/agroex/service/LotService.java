@@ -24,12 +24,9 @@ public interface LotService {
 
     void delete(LotEntity entity);
 
-
     LotEntity update(Long id, LotEntity entity, MultipartFile[] files, String currency);
 
     LotEntity update(Long id, LotEntity entity);
-
-    void deleteImage(String fileName);
 
     List<LotEntity> getWithCriteria(Map<String, String> filters, int pageNumber, int pageSize, String currency);
 
@@ -44,6 +41,10 @@ public interface LotService {
     LotEntity changeUserStatus(Long id, boolean status);
 
     void finishAuction(LotEntity lot);
+
+    LotEntity makeDeal(Long lotId, UUID userId);
+
+    List<LotEntity> getUserActivityById(UUID id, String currency);
 
     LotEntity makeDeal(Long lotId, UUID userId, String currency);
 }
