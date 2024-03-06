@@ -268,7 +268,7 @@ public class LotServiceImpl implements LotService {
     @Override
     public LotEntity makeDeal(Long lotId, UUID userId, String currency) {
         var lot = getById(lotId);
-        validateDeal(lot);
+        validateDeal(lot, userId);
         var bets = lot.getBets();
         var newBetEntity = BetEntity.builder()
                 .amount(lot.getOriginalPrice())
@@ -283,9 +283,12 @@ public class LotServiceImpl implements LotService {
         return updatePrice(updated, currency);
     }
 
-    private void validateDeal(LotEntity lot) {
+    private void validateDeal(LotEntity lot, UUID userId) {
         if (lot.getLotType().equals(StatusConstants.AUCTION_SELL)) {
             throw new InvalidBetException("This lot is an auction lot, you can`t buy it");
+        }
+        if (lot.getUser().getId() == userId) {
+            throw new InvalidBetException("You can't buy/sell your own lot");
         }
         if (!lot.getStatus().equals(StatusConstants.ACTIVE)) {
             throw new InvalidBetException("This lot is not active");
