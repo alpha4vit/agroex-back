@@ -11,6 +11,7 @@ import org.springframework.stereotype.Service;
 import org.springframework.web.client.RestTemplate;
 import org.springframework.web.util.UriComponentsBuilder;
 
+import java.math.BigDecimal;
 import java.util.Map;
 
 @Slf4j
@@ -36,7 +37,7 @@ public class CurrencyUpdater {
             var targets = currencyRateService.getTargetsByCurrency(currencyName);
             var updatedRates = getAllCurrenciesByBase(currencyName);
             targets.forEach(targetEntity -> targetEntity.setRate(
-                    Float.valueOf(updatedRates.get(
+                    new BigDecimal(updatedRates.get(
                             currencyName + targetEntity.getTargetCurrency())
                     )));
         });

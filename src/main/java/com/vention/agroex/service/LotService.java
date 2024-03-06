@@ -45,5 +45,5 @@ public interface LotService {
 
     void finishAuction(LotEntity lot);
 
-    LotEntity makeDeal(Long lotId, UUID userId);
+    LotEntity makeDeal(Long lotId, UUID userId, String currency);
 }

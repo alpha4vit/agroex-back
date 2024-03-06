@@ -5,6 +5,7 @@ import lombok.Builder;
 import lombok.Data;
 import lombok.NoArgsConstructor;
 
+import java.math.BigDecimal;
 import java.util.UUID;
 
 @Data
@@ -17,7 +18,7 @@ public class Bet {
 
     private Long lotId;
 
-    private Float amount;
+    private BigDecimal amount;
 
     private UUID userId;
 }

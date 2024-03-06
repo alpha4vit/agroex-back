@@ -5,6 +5,7 @@ import com.vention.agroex.entity.TagEntity;
 import jakarta.validation.constraints.*;
 import lombok.*;
 
+import java.math.BigDecimal;
 import java.time.ZonedDateTime;
 import java.util.List;
 import java.util.UUID;
@@ -40,10 +41,10 @@ public class Lot {
 
     private Long duration;
 
-    private float originalMinPrice;
+    private BigDecimal originalMinPrice;
 
     @JsonProperty(access = JsonProperty.Access.READ_ONLY)
-    private float minPrice;
+    private BigDecimal minPrice;
 
     @JsonProperty(access = JsonProperty.Access.READ_ONLY)
     private String innerStatus;
@@ -60,9 +61,9 @@ public class Lot {
 
     @NotNull
     @DecimalMin(value = "1.0", message = "The field should contain only numbers from 1 to 9999 (integer or fractional)")
-    private float originalPrice;
+    private BigDecimal originalPrice;
 
-    private Float calculatedPrice;
+    private BigDecimal calculatedPrice;
 
     @NotBlank(message = "Lot currency cant be blank")
     @Size(max = 10, message = "Lot currency must be less than 10 characters")
@@ -82,7 +83,6 @@ public class Lot {
     @Pattern(regexp = "\\b(?:buy|sell|auctionSell)\\b", message = "Lot type can be only buy/sell/auctionSell")
     private String lotType;
 
-
     @JsonProperty(access = JsonProperty.Access.READ_ONLY)
     private UUID userId;
 
@@ -96,7 +96,7 @@ public class Lot {
 
     private String currency;
 
-    private float price;
+    private BigDecimal price;
 
     private List<Bet> bets;
 }

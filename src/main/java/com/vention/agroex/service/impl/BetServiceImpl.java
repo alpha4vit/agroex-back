@@ -26,7 +26,7 @@ public class BetServiceImpl implements BetService {
     public BetEntity makeBet(Long lotId, BetEntity betEntity) {
         var lot = lotService.getById(lotId);
         validateBet(betEntity, lot);
-        if (betEntity.getAmount() >= lot.getPrice()) {
+        if (betEntity.getAmount().compareTo(lot.getPrice()) >= 0) {
             log.info(String.format("User with id %s made a maxPrice bet. Auction ended",
                     betEntity.getUser().getId()));
             betEntity.setAmount(lot.getPrice());
@@ -43,7 +43,7 @@ public class BetServiceImpl implements BetService {
         if (lot.getStatus().equals(StatusConstants.FINISHED)) {
             throw new InvalidBetException("This auction is already finished");
         }
-        if (lot.getMinPrice() > betEntity.getAmount()) {
+        if (lot.getMinPrice().compareTo(betEntity.getAmount()) >= 0) {
             throw new InvalidBetException(
                     String.format("Your bet must be higher than the minimal price: %f", lot.getMinPrice()));
         }
@@ -54,9 +54,9 @@ public class BetServiceImpl implements BetService {
 
         bets.stream().max(Comparator.comparing(BetEntity::getBetTime))
                 .ifPresent(lastBet -> {
-                    if (lastBet.getAmount() >= betEntity.getAmount()) {
+                    if (lastBet.getAmount().compareTo(betEntity.getAmount()) >= 0) {
                         throw new InvalidBetException(
-                                String.format("Your bet amount must be higher than the last one: %d", lastBet.getAmount()));
+                                String.format("Your bet amount must be higher than the last one: %f", lastBet.getAmount()));
                     }
                 });
 

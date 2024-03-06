@@ -40,7 +40,7 @@ public class LotValidator implements Validator {
             } else if (lot.getDuration() < 600000L) {
                 map.put("duration", "Duration must be more than 10 minutes");
             }
-            if (lot.getMinPrice() >= lot.getOriginalPrice()) {
+            if (lot.getMinPrice().compareTo(lot.getOriginalPrice()) > 0) {
                 map.put("minPrice", "Min price can`t be bigger than lot price");
             }
         }

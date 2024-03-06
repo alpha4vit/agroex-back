@@ -6,6 +6,7 @@ import com.vention.agroex.util.constant.StatusConstants;
 import org.mapstruct.Mapper;
 import org.mapstruct.Mapping;
 
+import java.math.BigDecimal;
 import java.util.List;
 
 @Mapper(componentModel = "spring", uses = {LocationMapper.class, ProductCategoryMapper.class,  BetMapper.class})
@@ -40,8 +41,8 @@ public interface LotMapper {
                 .enabledByAdmin(before.getEnabledByAdmin())
                 .creationDate(before.getCreationDate())
                 .expirationDate(received.getExpirationDate() != null ? received.getExpirationDate() : before.getExpirationDate())
-                .originalPrice(received.getOriginalPrice() != 0.0 ? received.getOriginalPrice() : before.getOriginalPrice())
-                .originalMinPrice(received.getOriginalMinPrice() != 0.0 ? received.getOriginalMinPrice() : before.getOriginalMinPrice())
+                .originalPrice(received.getOriginalPrice().compareTo(BigDecimal.valueOf(0.0)) != 0 ? received.getOriginalPrice() : before.getOriginalPrice())
+                .originalMinPrice(received.getOriginalMinPrice().compareTo(BigDecimal.valueOf(0.0)) != 0 ? received.getOriginalMinPrice() : before.getOriginalMinPrice())
                 .size(received.getSize() != null ? received.getSize() : before.getSize())
                 .quantity(received.getQuantity() != 0 ? received.getQuantity() : before.getQuantity())
                 .packaging(received.getPackaging() != null ? received.getPackaging() : before.getPackaging())

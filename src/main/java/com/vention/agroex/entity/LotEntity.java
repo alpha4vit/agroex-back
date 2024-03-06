@@ -8,6 +8,8 @@ import lombok.NoArgsConstructor;
 import org.hibernate.annotations.CreationTimestamp;
 import org.hibernate.annotations.Formula;
 
+import java.math.BigDecimal;
+import java.math.RoundingMode;
 import java.time.ZonedDateTime;
 import java.util.List;
 
@@ -44,10 +46,10 @@ public class LotEntity {
     private float quantity;
 
     @Column(name = "original_min_price")
-    private float originalMinPrice;
+    private BigDecimal originalMinPrice;
 
     @Column(name = "original_price")
-    private float originalPrice;
+    private BigDecimal originalPrice;
 
     @Column(name = "original_currency")
     private String originalCurrency;
@@ -110,13 +112,13 @@ public class LotEntity {
 
     @Formula("(SELECT l.original_price * cr.rate FROM lot l LEFT JOIN currency_rates cr ON" +
             " cr.source_currency = l.original_currency AND cr.target_currency = 'USD' WHERE l.id = id)")
-    private Float calculatedPrice;
+    private BigDecimal calculatedPrice;
 
     @Transient
-    private float price;
+    private BigDecimal price;
 
     @Transient
-    private float minPrice;
+    private BigDecimal minPrice;
 
     @Column(name = "admin_comment")
     private String adminComment;
@@ -130,8 +132,8 @@ public class LotEntity {
     public void updatePrice(CurrencyRateEntity currencyRate) {
         var sourceCurrency = this.getOriginalCurrency();
         if (!sourceCurrency.equals(currencyRate.getTargetCurrency())) {
-            this.setPrice(this.getOriginalPrice() * currencyRate.getRate());
-            this.setMinPrice(this.getOriginalMinPrice() * currencyRate.getRate());
+            this.setPrice(this.getOriginalPrice().multiply(currencyRate.getRate()).setScale(4, RoundingMode.HALF_UP));
+            this.setMinPrice(this.getOriginalMinPrice().multiply(currencyRate.getRate()).setScale(4, RoundingMode.HALF_UP));
         } else {
             this.setPrice(this.getOriginalPrice());
             this.setMinPrice(this.getOriginalMinPrice());

@@ -23,6 +23,7 @@ import org.springframework.data.domain.PageRequest;
 import org.springframework.stereotype.Service;
 import org.springframework.web.multipart.MultipartFile;
 
+import java.math.BigDecimal;
 import java.time.Instant;
 import java.util.ArrayList;
 import java.time.ZonedDateTime;
@@ -265,7 +266,7 @@ public class LotServiceImpl implements LotService {
     }
 
     @Override
-    public LotEntity makeDeal(Long lotId, UUID userId) {
+    public LotEntity makeDeal(Long lotId, UUID userId, String currency) {
         var lot = getById(lotId);
         validateDeal(lot);
         var bets = lot.getBets();
@@ -278,8 +279,8 @@ public class LotServiceImpl implements LotService {
 
         bets.add(newBetEntity);
         lot.setBets(bets);
-
-        return update(lot.getId(), lot);
+        var updated = update(lot.getId(), lot);
+        return updatePrice(updated, currency);
     }
 
     private void validateDeal(LotEntity lot) {
@@ -341,9 +342,9 @@ public class LotServiceImpl implements LotService {
         nonNullFilters.forEach((field, value) -> {
             switch (field) {
                 case "minPrice" ->
-                        lotsWithUpdatedPrice.removeIf(lotEntity -> lotEntity.getPrice() <= Float.parseFloat(value));
+                        lotsWithUpdatedPrice.removeIf(lotEntity -> lotEntity.getPrice().compareTo(new BigDecimal(value)) < 0);
                 case "maxPrice" ->
-                        lotsWithUpdatedPrice.removeIf(lotEntity -> lotEntity.getPrice() >= Float.parseFloat(value));
+                        lotsWithUpdatedPrice.removeIf(lotEntity -> lotEntity.getPrice().compareTo(new BigDecimal(value)) > 0);
             }
         });
 

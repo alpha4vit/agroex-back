@@ -4,6 +4,7 @@ import jakarta.persistence.*;
 import lombok.*;
 import org.hibernate.annotations.CreationTimestamp;
 
+import java.math.BigDecimal;
 import java.time.Instant;
 
 @Data
@@ -22,7 +23,7 @@ public class BetEntity {
     @ToString.Exclude
     private LotEntity lot;
 
-    private Float amount;
+    private BigDecimal amount;
 
     @ManyToOne
     @ToString.Exclude

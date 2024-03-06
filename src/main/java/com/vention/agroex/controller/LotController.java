@@ -112,8 +112,9 @@ public class LotController {
 
     @PostMapping("/{id}/buy")
     public ResponseEntity<Lot> makeDeal(@PathVariable("id") Long lotId,
+                                        @RequestHeader("currency") String currency,
                                         @RequestParam("userId") UUID userId) {
-        var lot = lotService.makeDeal(lotId, userId);
+        var lot = lotService.makeDeal(lotId, userId, currency);
         return ResponseEntity.ok(lotMapper.toDTO(lot));
     }
 }

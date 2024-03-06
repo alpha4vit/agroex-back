@@ -7,6 +7,7 @@ import lombok.Data;
 import lombok.NoArgsConstructor;
 import org.hibernate.annotations.UpdateTimestamp;
 
+import java.math.BigDecimal;
 import java.time.Instant;
 
 @Data
@@ -28,7 +29,7 @@ public class CurrencyRateEntity {
     private String targetCurrency;
 
     @Column(name = "rate")
-    private Float rate;
+    private BigDecimal rate;
 
     @UpdateTimestamp
     @Column(name = "updated_at")
