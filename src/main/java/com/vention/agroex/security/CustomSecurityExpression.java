@@ -5,6 +5,7 @@ import com.vention.agroex.service.UserService;
 import com.vention.agroex.util.constant.Role;
 import lombok.RequiredArgsConstructor;
 import lombok.extern.slf4j.Slf4j;
+import org.springframework.cache.annotation.Cacheable;
 import org.springframework.stereotype.Component;
 
 import java.util.UUID;
@@ -17,6 +18,7 @@ public class CustomSecurityExpression {
     private final LotService lotService;
     private final UserService userService;
 
+    @Cacheable(value = "lotEntity", key = "#lotId")
     public boolean isLotOwner(Long lotId) {
         var authUser = userService.getAuthenticatedUser();
         var lotEntity = lotService.getById(lotId);
