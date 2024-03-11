@@ -87,6 +87,7 @@ public class LotController {
         return ResponseEntity.ok(lotMapper.toDTO(moderated));
     }
 
+    @PreAuthorize("@customSecurityExpression.isAdmin()")
     @PostMapping("/{id}/moderate")
     public ResponseEntity<Lot> putOnModeration(@PathVariable("id") Long lotId,
                                                @RequestHeader("currency") String currency,
@@ -95,6 +96,7 @@ public class LotController {
         return ResponseEntity.ok(lotMapper.toDTO(moderated));
     }
 
+    @PreAuthorize("@customSecurityExpression.isAdmin()")
     @PostMapping("/{id}/approve")
     public ResponseEntity<Lot> approve(@PathVariable("id") Long lotId,
                                        @RequestHeader("currency") String currency,
@@ -103,6 +105,7 @@ public class LotController {
         return ResponseEntity.ok(lotMapper.toDTO(approved));
     }
 
+    @PreAuthorize("@customSecurityExpression.isAdmin()")
     @PostMapping("/{id}/reject")
     public ResponseEntity<Lot> reject(@PathVariable("id") Long lotId,
                                       @RequestParam(value = "adminComment") String adminComment) {

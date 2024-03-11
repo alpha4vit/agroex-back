@@ -9,6 +9,7 @@ import jakarta.validation.Valid;
 import lombok.RequiredArgsConstructor;
 import org.springframework.http.HttpStatus;
 import org.springframework.http.ResponseEntity;
+import org.springframework.security.access.prepost.PreAuthorize;
 import org.springframework.validation.BindingResult;
 import org.springframework.web.bind.annotation.*;
 
@@ -36,6 +37,7 @@ public class CountryController {
         return ResponseEntity.ok(countryMapper.toDTO(countryEntity));
     }
 
+    @PreAuthorize("@customSecurityExpression.isAdmin()")
     @PostMapping
     public ResponseEntity<Country> createCountry(@RequestBody @Valid Country country,
                                               BindingResult bindingResult){
@@ -44,6 +46,7 @@ public class CountryController {
         return ResponseEntity.ok(countryMapper.toDTO(saved));
     }
 
+    @PreAuthorize("@customSecurityExpression.isAdmin()")
     @DeleteMapping("/{id}")
     @ResponseStatus(HttpStatus.OK)
     public void deleteCountryById(@PathVariable("id") Long id){

@@ -1,4 +1,4 @@
-package com.vention.agroex.util.currency;
+package com.vention.agroex.util.updater;
 
 import com.vention.agroex.model.CurrencyExchange;
 import com.vention.agroex.service.CurrencyRateService;

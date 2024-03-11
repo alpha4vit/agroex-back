@@ -10,6 +10,7 @@ import jakarta.validation.Valid;
 import lombok.RequiredArgsConstructor;
 import org.springframework.http.HttpStatus;
 import org.springframework.http.ResponseEntity;
+import org.springframework.security.access.prepost.PreAuthorize;
 import org.springframework.validation.BindingResult;
 import org.springframework.web.bind.annotation.*;
 import org.springframework.web.multipart.MultipartFile;
@@ -40,6 +41,7 @@ public class UserController {
         return ResponseEntity.ok(userMapper.toDTO(userEntity));
     }
 
+    @PreAuthorize("@customSecurityExpression.isAdmin()")
     @PostMapping
     public ResponseEntity<User> createUser(@RequestBody @Valid User user,
                                            BindingResult bindingResult) {
@@ -48,6 +50,7 @@ public class UserController {
         return ResponseEntity.ok(userMapper.toDTO(saved));
     }
 
+    @PreAuthorize("@customSecurityExpression.isAdmin()")
     @DeleteMapping("/{id}")
     @ResponseStatus(HttpStatus.OK)
     public ResponseEntity<UUID> deleteUserById(@PathVariable("id") UUID id) {
@@ -55,6 +58,7 @@ public class UserController {
         return ResponseEntity.ok(id);
     }
 
+    @PreAuthorize("@customSecurityExpression.isAuthenticatedUser(#id)")
     @PutMapping("/{id}")
     public ResponseEntity<User> updateUser(@PathVariable("id") UUID id,
                                            @RequestBody @Valid User user) {
@@ -62,6 +66,7 @@ public class UserController {
         return ResponseEntity.ok(userMapper.toDTO(saved));
     }
 
+    @PreAuthorize("@customSecurityExpression.isAuthenticatedUser(#id)")
     @PostMapping("/{id}/avatar")
     public ResponseEntity<User> uploadAvatar(@PathVariable("id") UUID id,
                                              @RequestParam("file") MultipartFile file) {
@@ -70,12 +75,14 @@ public class UserController {
         return ResponseEntity.ok(userMapper.toDTO(user));
     }
 
+    @PreAuthorize("@customSecurityExpression.isAdmin()")
     @GetMapping("/updatedb")
     @ResponseStatus(HttpStatus.OK)
     public void updateDatabase() {
         userService.updateTable();
     }
 
+    @PreAuthorize("@customSecurityExpression.isAdmin()")
     @PostMapping("/{id}/enable")
     public ResponseEntity<User> enableUser(@PathVariable("id") UUID id) {
         return ResponseEntity.ok(userMapper.toDTO(userService.enable(id)));

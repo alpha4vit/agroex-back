@@ -8,6 +8,7 @@ import com.vention.agroex.util.validator.ProductCategoryValidator;
 import io.swagger.v3.oas.annotations.tags.Tag;
 import lombok.RequiredArgsConstructor;
 import org.springframework.http.ResponseEntity;
+import org.springframework.security.access.prepost.PreAuthorize;
 import org.springframework.validation.BindingResult;
 import org.springframework.web.bind.annotation.*;
 
@@ -23,6 +24,7 @@ public class ProductCategoryController {
     private final ProductCategoryValidator productCategoryValidator;
     private final ProductCategoryMapper productCategoryMapper;
 
+    @PreAuthorize("@customSecurityExpression.isAdmin()")
     @PostMapping()
     public ResponseEntity<ProductCategory> save(@RequestBody ProductCategoryEntity productCategoryEntity,
                                                 BindingResult bindingResult) {
@@ -31,6 +33,7 @@ public class ProductCategoryController {
         return ResponseEntity.ok(productCategoryMapper.toDTO(savedProductCategory));
     }
 
+    @PreAuthorize("@customSecurityExpression.isAdmin()")
     @PutMapping("/{id}")
     public ResponseEntity<ProductCategory> update(@PathVariable Long id,
                                                         @RequestBody ProductCategoryEntity productCategoryEntity,
@@ -59,6 +62,7 @@ public class ProductCategoryController {
         return ResponseEntity.ok(productCategoryMapper.toDTOs(fetchedProductCategories));
     }
 
+    @PreAuthorize("@customSecurityExpression.isAdmin()")
     @DeleteMapping("/{id}")
     public ResponseEntity<Long> deleteById(@PathVariable Long id) {
         productCategoryService.deleteById(id);
