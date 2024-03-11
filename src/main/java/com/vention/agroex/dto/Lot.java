@@ -2,6 +2,7 @@ package com.vention.agroex.dto;
 
 import com.fasterxml.jackson.annotation.JsonProperty;
 import com.vention.agroex.entity.TagEntity;
+import jakarta.validation.Valid;
 import jakarta.validation.constraints.*;
 import lombok.*;
 
@@ -19,21 +20,23 @@ public class Lot {
 
     private Long id;
 
-    @NotBlank(message = "Lot title cant be blank")
+    @NotNull(message = "Please fill in the field")
     @Size(min = 1, max = 30, message = "The field should be from 1 to 30 characters long")
     private String title;
 
-    @NotBlank(message = "Lot description cant be blank")
+    @NotNull(message = "Please fill in the field")
     @Size(min = 20, max = 1000, message = "The field should be from 20 to 1000 characters long")
     private String description;
 
-    @NotBlank(message = "Lot variety cant be blank")
+    @NotNull(message = "Please fill in the field")
     @Size(max = 64, message = "The field should be less than 64 characters long")
     private String variety;
 
-    @Size(max = 64, message = "The field should be less than 64 characters long")
+    @NotNull(message = "Please fill in the field")
+    @Size(min = 1, max = 10, message = "The field should be from 1 to 10 characters long")
     private String size;
 
+    @NotNull(message = "Please fill in the field")
     @Size(min = 1, max = 10, message = "The field should be from 1 to 10 characters long")
     private String packaging;
 
@@ -55,37 +58,41 @@ public class Lot {
     @JsonProperty(access = JsonProperty.Access.READ_ONLY)
     private String status;
 
-    @NotNull
-    @DecimalMin(value = "0.01", message = "Minimum quantity is 0.01")
+    @NotNull(message = "Please fill in the field")
+    @DecimalMin(value = "1.00", message = "The field should contain only numbers from 1 to 999 (integer or fractional)")
     private float quantity;
 
-    @NotNull
+    @NotNull(message = "Please fill in the field")
     @DecimalMin(value = "1.0", message = "The field should contain only numbers from 1 to 9999 (integer or fractional)")
     private BigDecimal originalPrice;
 
     private BigDecimal calculatedPrice;
 
-    @NotBlank(message = "Lot currency cant be blank")
+    @NotNull(message = "Please fill in the field")
     @Size(max = 10, message = "Lot currency must be less than 10 characters")
     private String originalCurrency;
 
     @JsonProperty(access = JsonProperty.Access.READ_ONLY)
     private ZonedDateTime creationDate;
 
+    @NotNull(message = "Please fill in the field")
     @FutureOrPresent(message = "The field should be valid date greater or equal to current date ")
     private ZonedDateTime expirationDate;
 
     @JsonProperty(access = JsonProperty.Access.READ_ONLY)
     private ZonedDateTime actualStartDate;
 
+    @Valid
     private ProductCategory productCategory;
 
+    @NotNull(message = "Please fill in the field")
     @Pattern(regexp = "\\b(?:buy|sell|auctionSell)\\b", message = "Lot type can be only buy/sell/auctionSell")
     private String lotType;
 
     @JsonProperty(access = JsonProperty.Access.READ_ONLY)
     private UUID userId;
 
+    @Valid
     private Location location;
 
     private List<TagEntity> tags;

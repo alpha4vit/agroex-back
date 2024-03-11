@@ -1,3 +1,17 @@
 package com.vention.agroex.dto;
 
-public record ProductCategory(Long id, String title, Long parentId) {}
+import jakarta.validation.constraints.AssertTrue;
+
+public record ProductCategory(
+        Long id,
+
+        String title,
+
+        Long parentId) {
+
+    @AssertTrue(message = "Provide product category id or title")
+    private boolean isIdOrTitlePresented(){
+        return id != null || parentId != null;
+    }
+
+}
