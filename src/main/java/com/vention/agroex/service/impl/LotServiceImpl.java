@@ -25,6 +25,7 @@ import org.springframework.web.multipart.MultipartFile;
 
 import java.math.BigDecimal;
 import java.time.Instant;
+import java.time.ZoneId;
 import java.util.ArrayList;
 import java.time.ZonedDateTime;
 import java.util.List;
@@ -78,7 +79,7 @@ public class LotServiceImpl implements LotService {
         if (lotEntity.getExpirationDate() != null) {
             lotEntity.setExpirationDate(
                     lotEntity.getExpirationDate()
-                            .withZoneSameLocal(lotEntity.getUser().getZoneinfo())
+                            .withZoneSameLocal(lotEntity.getUser().getZoneinfo() != null ? lotEntity.getUser().getZoneinfo() : ZoneId.systemDefault())
             );
         }
 
@@ -144,7 +145,6 @@ public class LotServiceImpl implements LotService {
     public LotEntity update(Long id, LotEntity entity, MultipartFile[] files, String currency) {
         var lotToUpdate = getById(id);
 
-        imageService.updateImagesForLot(lotToUpdate, lotToUpdate, files);
         if (lotToUpdate.getInnerStatus().equals(StatusConstants.ON_MODERATION)) {
             throw new LotEditException("You can`t edit this lot while moderation");
         }
@@ -153,6 +153,19 @@ public class LotServiceImpl implements LotService {
         }
         var updatedLot = lotMapper.update(lotToUpdate, entity);
         imageService.updateImagesForLot(lotToUpdate, updatedLot, files);
+
+        if (!entity.getLotType().equals(lotToUpdate.getLotType())) {
+            if (entity.getLotType().equals(LotTypeConstants.AUCTION_SELL)) {
+                updatedLot.setLotType(LotTypeConstants.AUCTION_SELL);
+                updatedLot.setInnerStatus(StatusConstants.NEW);
+            } else {
+                if (updatedLot.getLotType().equals(LotTypeConstants.AUCTION_SELL) && !updatedLot.getInnerStatus().equals(StatusConstants.NEW))
+                    throw new InvalidArgumentException(Map.of("lotType", "Lot type cant be changed to auction sell on this active lot"), "Invalid operation");
+                updatedLot.setLotType(entity.getLotType());
+                updatedLot.setInnerStatus(StatusConstants.ACTIVE);
+                updatedLot.setStatus(StatusConstants.ACTIVE);
+            }
+        }
 
         var countryEntity = countryService.getById(updatedLot.getLocation().getCountry().getId());
 
@@ -237,8 +250,8 @@ public class LotServiceImpl implements LotService {
         if (!lot.getLotType().equals(LotTypeConstants.AUCTION_SELL)) {
             throw new InvalidArgumentException("This lot is not an auction lot");
         }
-        lot.setExpirationDate(Instant.now().plusMillis(lot.getDuration()).atZone(lot.getUser().getZoneinfo()));
-        lot.setActualStartDate(ZonedDateTime.now(lot.getUser().getZoneinfo()));
+        lot.setExpirationDate(Instant.now().plusMillis(lot.getDuration()).atZone(lot.getUser().getZoneinfo() != null ? lot.getUser().getZoneinfo() : ZoneId.systemDefault()));
+        lot.setActualStartDate(ZonedDateTime.now(lot.getUser().getZoneinfo() != null ? lot.getUser().getZoneinfo() : ZoneId.systemDefault()));
         lot.setInnerStatus(StatusConstants.APPROVED);
         if (adminComment != null) {
             lot.setAdminComment(adminComment);
