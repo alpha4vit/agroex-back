@@ -25,16 +25,20 @@ public class LotValidator implements Validator {
 
     @Override
     public void validate(Object target, Errors errors) {
-        record ErrorField(String field, String message){}
+        record ErrorField(String field, String message) {}
 
         Map<String, String> map = errors.getFieldErrors().stream()
-                .map(fieldError -> new ErrorField(
-                        fieldError.getField(), fieldError.getDefaultMessage())
+                .map(fieldError -> {
+                            String field = fieldError.getField();
+                            if (field.startsWith("productCategory"))
+                                field = "productCategory";
+                            return new ErrorField(field, fieldError.getDefaultMessage());
+                        }
                 )
                 .collect(toMap(ErrorField::field, ErrorField::message));
 
         var lot = (Lot) target;
-        if (lot.getLotType().equals("auctionSell")) {
+        if (lot.getLotType() != null && lot.getLotType().equals("auctionSell")) {
             if (lot.getDuration() == null) {
                 map.put("duration", "Duration of auction lot should not be null!");
             } else if (lot.getDuration() < 600000L) {
