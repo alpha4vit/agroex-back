@@ -158,8 +158,12 @@ public class LotServiceImpl implements LotService {
             if (entity.getLotType().equals(LotTypeConstants.AUCTION_SELL)) {
                 updatedLot.setLotType(LotTypeConstants.AUCTION_SELL);
                 updatedLot.setInnerStatus(StatusConstants.NEW);
+                updatedLot.setStatus(StatusConstants.INACTIVE);
+                updatedLot.setExpirationDate(null);
             } else {
-                if (updatedLot.getLotType().equals(LotTypeConstants.AUCTION_SELL) && !updatedLot.getInnerStatus().equals(StatusConstants.NEW))
+                if (lotToUpdate.getLotType().equals(LotTypeConstants.AUCTION_SELL)
+                        && !lotToUpdate.getInnerStatus().equals(StatusConstants.NEW)
+                        && !lotToUpdate.getStatus().equals(StatusConstants.INACTIVE))
                     throw new InvalidArgumentException(Map.of("lotType", "Lot type cant be changed to auction sell on this active lot"), "Invalid operation");
                 updatedLot.setLotType(entity.getLotType());
                 updatedLot.setInnerStatus(StatusConstants.ACTIVE);
