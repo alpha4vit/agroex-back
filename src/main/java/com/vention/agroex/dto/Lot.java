@@ -75,8 +75,7 @@ public class Lot {
     @JsonProperty(access = JsonProperty.Access.READ_ONLY)
     private ZonedDateTime creationDate;
 
-    @NotNull(message = "Please fill in the field")
-    @FutureOrPresent(message = "The field should be valid date greater or equal to current date ")
+    @FutureOrPresent(message = "The field should be valid date greater or equal to current date")
     private ZonedDateTime expirationDate;
 
     @JsonProperty(access = JsonProperty.Access.READ_ONLY)

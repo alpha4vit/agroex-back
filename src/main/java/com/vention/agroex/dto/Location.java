@@ -20,7 +20,7 @@ public class Location {
 
     private String countryName;
 
-    @NotNull(message = "Region cant be blank")
+    @NotNull(message = "Please fill in the field")
     @Size(max = 64, message = "Region must be less than 64 characters")
     private String region;
 

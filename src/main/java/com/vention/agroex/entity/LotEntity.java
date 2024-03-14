@@ -1,5 +1,6 @@
 package com.vention.agroex.entity;
 
+import com.vention.agroex.util.constant.LotTypeConstants;
 import jakarta.persistence.*;
 import lombok.AllArgsConstructor;
 import lombok.Builder;
@@ -132,8 +133,10 @@ public class LotEntity {
     public void updatePrice(CurrencyRateEntity currencyRate) {
         var sourceCurrency = this.getOriginalCurrency();
         if (!sourceCurrency.equals(currencyRate.getTargetCurrency())) {
-            this.setPrice(this.getOriginalPrice().multiply(currencyRate.getRate()).setScale(4, RoundingMode.HALF_UP));
-            this.setMinPrice(this.getOriginalMinPrice().multiply(currencyRate.getRate()).setScale(4, RoundingMode.HALF_UP));
+            if (this.getLotType().equals(LotTypeConstants.AUCTION_SELL))
+                this.setMinPrice(this.getOriginalMinPrice().multiply(currencyRate.getRate()).setScale(4, RoundingMode.HALF_UP));
+            else
+                this.setPrice(this.getOriginalPrice().multiply(currencyRate.getRate()).setScale(4, RoundingMode.HALF_UP));
         } else {
             this.setPrice(this.getOriginalPrice());
             this.setMinPrice(this.getOriginalMinPrice());
