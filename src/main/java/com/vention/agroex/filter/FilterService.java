@@ -36,6 +36,7 @@ public class FilterService {
         var userStatusBuilder = new LotSpecificationsBuilder();
         var adminStatusBuilder = new LotSpecificationsBuilder();
         var statusBuilder = new LotSpecificationsBuilder();
+        var regionBuilder = new LotSpecificationsBuilder();
         keyword = "";
 
         var nonNullFilters = filters.entrySet().stream()
@@ -68,6 +69,8 @@ public class FilterService {
                 case "countries" -> getStringStream(value)
                         .map(Long::parseLong)
                         .forEach(country -> countryBuilder.with("country", EQUALS, country));
+                case "regions" -> getStringStream(value)
+                        .forEach(region -> regionBuilder.with("region", EQUALS, region));
                 case "innerStatus" -> getStringStream(value)
                         .forEach(status -> adminStatusBuilder.with("innerStatus", EQUALS, status));
                 case "status" -> getStringStream(value)
@@ -87,13 +90,14 @@ public class FilterService {
         var userSpec = userBuilder.buildOr();
         var typeSpec = typeBuilder.buildOr();
         var countrySpec = countryBuilder.buildOr();
+        var regionSpec = regionBuilder.buildOr();
         var userStatusSpec = userStatusBuilder.buildOr();
         var statusSpec = statusBuilder.buildOr();
         var adminsStatusSpec = adminStatusBuilder.buildOr();
         var keywordPredicateSpec = (Specification<LotEntity>) (root, query, criteriaBuilder) ->
                 getKeywordPredicate(criteriaBuilder, root, keyword);
 
-        return Stream.of(mainSpec, categorySpec, userSpec, typeSpec, countrySpec, keywordPredicateSpec,
+        return Stream.of(mainSpec, categorySpec, userSpec, typeSpec, countrySpec, regionSpec, keywordPredicateSpec,
                         userStatusSpec, statusSpec, adminsStatusSpec)
                 .filter(Objects::nonNull)
                 .reduce(Specification::and)
