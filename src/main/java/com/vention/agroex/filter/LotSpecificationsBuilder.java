@@ -16,8 +16,8 @@ public class LotSpecificationsBuilder {
 
     private final List<SearchCriteria> params = new ArrayList<>();
 
-    public LotSpecificationsBuilder with(String key, String operation, Object value) {
-        params.add(new SearchCriteria(key, operation, value));
+    public LotSpecificationsBuilder with(String key, String operation, Object value, String currency) {
+        params.add(new SearchCriteria(key, operation, value, currency));
         return this;
     }
 

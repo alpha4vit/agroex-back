@@ -44,10 +44,11 @@ public class Lot {
 
     private Long duration;
 
-    private BigDecimal originalMinPrice;
+    @NotNull(message = "Please fill in the field")
+    @DecimalMin(value = "1.0", message = "The field should contain only numbers from 1 to 9999 (integer or fractional)")
+    private BigDecimal originalPrice;
 
-    @JsonProperty(access = JsonProperty.Access.READ_ONLY)
-    private BigDecimal minPrice;
+    private BigDecimal originalMinPrice;
 
     @JsonProperty(access = JsonProperty.Access.READ_ONLY)
     private String innerStatus;
@@ -61,12 +62,6 @@ public class Lot {
     @NotNull(message = "Please fill in the field")
     @DecimalMin(value = "1.00", message = "The field should contain only numbers from 1 to 999 (integer or fractional)")
     private float quantity;
-
-    @NotNull(message = "Please fill in the field")
-    @DecimalMin(value = "1.0", message = "The field should contain only numbers from 1 to 9999 (integer or fractional)")
-    private BigDecimal originalPrice;
-
-    private BigDecimal calculatedPrice;
 
     @NotNull(message = "Please fill in the field")
     @Size(max = 10, message = "Lot currency must be less than 10 characters")
@@ -102,7 +97,11 @@ public class Lot {
 
     private String currency;
 
+    @JsonProperty(access = JsonProperty.Access.READ_ONLY)
     private BigDecimal price;
+
+    @JsonProperty(access = JsonProperty.Access.READ_ONLY)
+    private BigDecimal minPrice;
 
     private List<Bet> bets;
 }

@@ -57,6 +57,8 @@ public interface LotMapper {
                 .duration(received.getDuration())
                 .minPrice(received.getMinPrice())
                 .adminComment(received.getAdminComment())
+                .currency(before.getCurrency())
+                .currencyRates(before.getCurrencyRates())
                 .build();
 
         LocationEntity locationEntity = LocationEntity.builder()

@@ -7,9 +7,11 @@ import jakarta.persistence.criteria.CriteriaQuery;
 import jakarta.persistence.criteria.Predicate;
 import jakarta.persistence.criteria.Root;
 import lombok.AllArgsConstructor;
+import lombok.extern.slf4j.Slf4j;
 import org.jetbrains.annotations.NotNull;
 import org.springframework.data.jpa.domain.Specification;
 
+@Slf4j
 @AllArgsConstructor
 public class LotSpecification implements Specification<LotEntity> {
 
@@ -26,13 +28,33 @@ public class LotSpecification implements Specification<LotEntity> {
             case ("productCategory") -> builder.equal(root.join("productCategory").get("id"), value);
             case ("location") -> builder.equal(root.join("location").get("id"), value);
             case ("user") -> builder.equal(root.join("user").get("id"), value);
-            case ("price") -> getPredicateFromOperation(criteria.getOperation(), root, "calculatedPrice", value, builder);
+            case ("price") -> getPricePredicate(root, builder, value);
             case ("country") -> builder.equal(root.join("location").join("country").get("id"), value);
             case ("region") -> builder.equal(root.join("location").get("region"), value);
+            case ("keyword") -> builder.equal(builder.literal("SEARCH_STRING"), builder.literal(modifySearchString(value.toString())));
             default -> getPredicateFromOperation(criteria.getOperation(), root, key, value, builder);
         };
     }
 
+    private Predicate getPricePredicate(@NotNull Root<LotEntity> root, @NotNull CriteriaBuilder builder, Object value) {
+        var isSameCurrency = builder.equal(root.get("originalCurrency"), criteria.getCurrency());
+        var calculatedPrice = builder.selectCase()
+                .when(isSameCurrency, root.get("originalPrice"))
+                .otherwise(builder.prod(root.join("currencyRates").get("rate"), root.get("originalPrice")))
+                .as(Float.class);
+        return switch (criteria.getOperation()) {
+            case ">" -> builder.greaterThanOrEqualTo(
+                    calculatedPrice, builder.literal(Float.parseFloat(value.toString())));
+            case "<" -> builder.lessThanOrEqualTo(
+                    calculatedPrice, builder.literal(Float.parseFloat(value.toString())));
+            case ":" -> builder.equal(calculatedPrice, value);
+            default -> throw new IllegalStateException("Unexpected value: " + criteria.getOperation());
+        };
+    }
+
+    private String modifySearchString(String keyword) {
+        return keyword.replace(" ", " & ");
+    }
 
     private Predicate getPredicateFromOperation(String operation, Root<LotEntity> root, String key, Object value,
                                                 CriteriaBuilder builder) {

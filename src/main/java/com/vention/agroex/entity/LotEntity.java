@@ -7,12 +7,11 @@ import lombok.Builder;
 import lombok.Data;
 import lombok.NoArgsConstructor;
 import org.hibernate.annotations.CreationTimestamp;
-import org.hibernate.annotations.Formula;
 
 import java.math.BigDecimal;
-import java.math.RoundingMode;
 import java.time.ZonedDateTime;
 import java.util.List;
+import java.util.NoSuchElementException;
 
 @Data
 @Builder
@@ -52,7 +51,7 @@ public class LotEntity {
     @Column(name = "original_price")
     private BigDecimal originalPrice;
 
-    @Column(name = "original_currency")
+    @Column(name = "currency")
     private String originalCurrency;
 
     @Column(name = "inner_status")
@@ -105,15 +104,12 @@ public class LotEntity {
     @OneToMany(mappedBy = "lot", cascade = CascadeType.ALL)
     private List<BetEntity> bets;
 
-    @Formula("(SELECT ls.search_string FROM lot_search_view ls WHERE ls.id = id)")
-    private String searchString;
+    @OneToMany(cascade = CascadeType.ALL)
+    @JoinColumn(name = "currency", referencedColumnName = "currency")
+    private List<CurrencyRateEntity> currencyRates;
 
     @Transient
     private String currency;
-
-    @Formula("(SELECT l.original_price * cr.rate FROM lot l LEFT JOIN currency_rates cr ON" +
-            " cr.source_currency = l.original_currency AND cr.target_currency = 'USD' WHERE l.id = id)")
-    private BigDecimal calculatedPrice;
 
     @Transient
     private BigDecimal price;
@@ -124,23 +120,36 @@ public class LotEntity {
     @Column(name = "admin_comment")
     private String adminComment;
 
+    public BigDecimal getMinPrice() {
+        if (currency.equals(originalCurrency)) {
+            minPrice = originalMinPrice;
+        } else {
+            minPrice = currencyRates.stream()
+                    .filter(rateEntity -> rateEntity.getTargetCurrency().equals(currency))
+                    .findFirst()
+                    .orElseThrow(() -> new NoSuchElementException(
+                            String.format("There is no currency with name: %s", currency)))
+                    .getRate().multiply(originalMinPrice);
+        }
+        return minPrice;
+    }
+
+    public BigDecimal getPrice() {
+        if (currency.equals(originalCurrency)) {
+            price = originalPrice;
+        } else {
+            price = currencyRates.stream()
+                    .filter(rateEntity -> rateEntity.getTargetCurrency().equals(currency))
+                    .findFirst()
+                    .orElseThrow(() -> new NoSuchElementException(
+                            String.format("There is no currency with name: %s", currency)))
+                    .getRate().multiply(originalPrice);
+        }
+        return price;
+    }
+
     @PostLoad
     private void init() {
         this.currency = this.getOriginalCurrency();
-        this.price = this.getOriginalPrice();
-    }
-
-    public void updatePrice(CurrencyRateEntity currencyRate) {
-        var sourceCurrency = this.getOriginalCurrency();
-        if (!sourceCurrency.equals(currencyRate.getTargetCurrency())) {
-            if (this.getLotType().equals(LotTypeConstants.AUCTION_SELL))
-                this.setMinPrice(this.getOriginalMinPrice().multiply(currencyRate.getRate()).setScale(4, RoundingMode.HALF_UP));
-            else
-                this.setPrice(this.getOriginalPrice().multiply(currencyRate.getRate()).setScale(4, RoundingMode.HALF_UP));
-        } else {
-            this.setPrice(this.getOriginalPrice());
-            this.setMinPrice(this.getOriginalMinPrice());
-        }
-        this.setCurrency(currencyRate.getTargetCurrency());
     }
 }

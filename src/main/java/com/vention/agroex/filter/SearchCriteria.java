@@ -12,4 +12,6 @@ public class SearchCriteria {
     private String operation;
 
     private Object value;
+
+    private String currency;
 }

@@ -1,7 +1,6 @@
 package com.vention.agroex.service.impl;
 
 import com.vention.agroex.entity.BetEntity;
-import com.vention.agroex.entity.CurrencyRateEntity;
 import com.vention.agroex.entity.LotEntity;
 import com.vention.agroex.entity.ProductCategoryEntity;
 import com.vention.agroex.exception.ImageLotException;
@@ -26,8 +25,8 @@ import org.springframework.web.multipart.MultipartFile;
 import java.math.BigDecimal;
 import java.time.Instant;
 import java.time.ZoneId;
-import java.util.ArrayList;
 import java.time.ZonedDateTime;
+import java.util.ArrayList;
 import java.util.List;
 import java.util.Map;
 import java.util.UUID;
@@ -45,7 +44,6 @@ public class LotServiceImpl implements LotService {
     private final FilterService filterService;
     private final LotRepository lotRepository;
     private final CountryService countryService;
-    private final CurrencyRateService currencyRateService;
     private final ProductCategoryService productCategoryService;
 
     @Override
@@ -94,7 +92,7 @@ public class LotServiceImpl implements LotService {
     @Transactional(rollbackOn = ImageLotException.class)
     public LotEntity save(LotEntity lotEntity, MultipartFile[] files, String currency) {
         var saved = save(lotEntity, files);
-        return updatePrice(saved, currency);
+        return updateCurrency(saved, currency);
     }
 
     private void validateFiles(MultipartFile[] files) {
@@ -110,7 +108,7 @@ public class LotServiceImpl implements LotService {
 
     @Override
     public LotEntity getById(Long id, String currency) {
-        return updatePrice(getById(id), currency);
+        return updateCurrency(getById(id), currency);
     }
 
     @Override
@@ -188,7 +186,7 @@ public class LotServiceImpl implements LotService {
                 .stream().map(tagService::save)
                 .toList());
 
-        return updatePrice(lotRepository.save(updatedLot), currency);
+        return updateCurrency(lotRepository.save(updatedLot), currency);
     }
 
     @Override
@@ -203,7 +201,8 @@ public class LotServiceImpl implements LotService {
         result.getLocation().setCountry(countryEntity);
         result.setProductCategory(productCategoryEntity);
 
-        return lotRepository.save(result);
+        var saved = lotRepository.save(result);
+        return saved;
     }
 
     @Override
@@ -239,7 +238,7 @@ public class LotServiceImpl implements LotService {
     @Override
     public LotEntity putOnModeration(Long lotId, String currency, String adminComment) {
         var lot = moderateLot(lotId, adminComment);
-        return updatePrice(lot, currency);
+        return updateCurrency(lot, currency);
     }
 
 
@@ -263,7 +262,7 @@ public class LotServiceImpl implements LotService {
     @Override
     public LotEntity approve(Long lotId, String currency, String adminComment) {
         var lot = approveLot(lotId, adminComment);
-        return updatePrice(lot, currency);
+        return updateCurrency(lot, currency);
     }
 
     @Override
@@ -287,7 +286,7 @@ public class LotServiceImpl implements LotService {
         bets.add(newBetEntity);
         lot.setBets(bets);
         var updated = update(lot.getId(), lot);
-        return updatePrice(updated, currency);
+        return updateCurrency(updated, currency);
     }
 
     private void validateDeal(LotEntity lot, UUID userId) {
@@ -341,10 +340,10 @@ public class LotServiceImpl implements LotService {
 
     @Override
     public List<LotEntity> getWithCriteria(Map<String, String> filters, int pageNumber, int pageSize, String currency) {
-        var searchCriteria = filterService.getCriteria(filters);
+        var searchCriteria = filterService.getCriteria(filters, currency);
 
         var lots = lotRepository.findAll(searchCriteria, PageRequest.of(pageNumber, pageSize)).toList();
-        var lotsWithUpdatedPrice = new ArrayList<>(lots.stream().map(lot -> updatePrice(lot, currency)).toList());
+        var lotsWithUpdatedPrice = new ArrayList<>(lots.stream().map(lot -> updateCurrency(lot, currency)).toList());
         var nonNullFilters = filters.entrySet().stream()
                 .filter(entry -> entry.getValue() != null && !entry.getValue().isEmpty())
                 .collect(Collectors.toMap(Map.Entry::getKey, Map.Entry::getValue));
@@ -361,12 +360,8 @@ public class LotServiceImpl implements LotService {
         return lotsWithUpdatedPrice;
     }
 
-    private LotEntity updatePrice(LotEntity lotEntity, String currency) {
-        if (!lotEntity.getOriginalCurrency().equals(currency)) {
-            var currencyRate = currencyRateService.getByCurrencies(lotEntity.getOriginalCurrency(), currency);
-            lotEntity.updatePrice(currencyRate);
-        } else
-            lotEntity.updatePrice(new CurrencyRateEntity(lotEntity.getOriginalCurrency()));
+    private LotEntity updateCurrency(LotEntity lotEntity, String currency) {
+        lotEntity.setCurrency(currency);
         return lotEntity;
     }
 
@@ -374,7 +369,7 @@ public class LotServiceImpl implements LotService {
     public List<LotEntity> getUserActivityById(UUID id, String currency) {
         var user = userService.getById(id);
         return lotRepository.findByBetsUserId(user.getId()).stream()
-                .map(lot -> updatePrice(lot, currency))
+                .map(lot -> updateCurrency(lot, currency))
                 .toList();
     }
 }
