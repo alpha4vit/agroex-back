@@ -3,6 +3,7 @@ package com.vention.agroex.controller;
 import com.vention.agroex.model.ReportRequest;
 import com.vention.agroex.service.ReportService;
 import lombok.RequiredArgsConstructor;
+import org.springframework.http.MediaType;
 import org.springframework.http.ResponseEntity;
 import org.springframework.web.bind.annotation.PostMapping;
 import org.springframework.web.bind.annotation.RequestBody;
@@ -11,68 +12,74 @@ import org.springframework.web.bind.annotation.RestController;
 
 @RestController
 @RequiredArgsConstructor
-@RequestMapping("/reports")
+@RequestMapping(value = "/reports", produces = MediaType.APPLICATION_OCTET_STREAM_VALUE)
 public class ReportController {
 
     private final ReportService reportService;
 
     @PostMapping("/baseLot")
-    public ResponseEntity<Object> filterLotsByDate(@RequestBody ReportRequest reportRequest){
+    public ResponseEntity<byte[]> filterLotsByDate(@RequestBody ReportRequest reportRequest){
         var bytes = reportService.baseLotReport(reportRequest);
         return ResponseEntity.ok(bytes);
     }
 
     @PostMapping("/lotByMaxPrice")
-    public ResponseEntity<Object> filterLotsByBaseAndMaxPrice(@RequestBody ReportRequest reportRequest){
+    public ResponseEntity<byte[]> filterLotsByBaseAndMaxPrice(@RequestBody ReportRequest reportRequest){
         var bytes = reportService.lotReportByMaxPrice(reportRequest);
         return ResponseEntity.ok(bytes);
     }
 
     @PostMapping("/userByLotCount")
-    public ResponseEntity<Object> filterUsersByLotsBaseAndMaxQuantity(@RequestBody ReportRequest reportRequest){
+    public ResponseEntity<byte[]> filterUsersByLotsBaseAndMaxQuantity(@RequestBody ReportRequest reportRequest){
         var bytes = reportService.userReportByLotCount(reportRequest);
         return ResponseEntity.ok(bytes);
     }
 
-    @PostMapping("/userByBetMoney")
-    public ResponseEntity<Object> filterUserByLotsBaseAndMaxAmountInBets(@RequestBody ReportRequest reportRequest){
-        var bytes = reportService.userReportByBetMoney(reportRequest);
+    @PostMapping("/ownersByBets")
+    public ResponseEntity<byte[]> filterUserByLotsBaseAndMaxAmountInBets(@RequestBody ReportRequest reportRequest){
+        var bytes = reportService.userReportOwnersByBets(reportRequest);
         return ResponseEntity.ok(bytes);
     }
 
-    @PostMapping("/userByLotMoney")
-    public ResponseEntity<Object> filterUserByLotsBaseAndMaxAmountMoneyInLots(@RequestBody ReportRequest reportRequest){
-        var bytes = reportService.userReportByLotMoney(reportRequest);
+    @PostMapping("/participantsByBets")
+    public ResponseEntity<byte[]> filterUserByLotsBaseAndMaxAmountMoneyInLots(@RequestBody ReportRequest reportRequest){
+        var bytes = reportService.userReportParticipantByBets(reportRequest);
         return ResponseEntity.ok(bytes);
     }
 
-    @PostMapping("/countryByBetMoney")
-    public ResponseEntity<Object> filterCountryByLotsBaseAndTotalBetAmount(@RequestBody ReportRequest reportRequest){
-        var bytes = reportService.countryReportByBetMoney(reportRequest);
+    @PostMapping("/countryByLotPrice")
+    public ResponseEntity<byte[]> filterCountryByLotsBaseAndTotalBetAmount(@RequestBody ReportRequest reportRequest){
+        var bytes = reportService.countryReportByLotPrice(reportRequest);
         return ResponseEntity.ok(bytes);
     }
 
     @PostMapping("/countryByLotCount")
-    public ResponseEntity<Object> filterCountryByLotsBaseAndTotalLotQuantity(@RequestBody ReportRequest reportRequest){
+    public ResponseEntity<byte[]> filterCountryByLotsBaseAndTotalLotQuantity(@RequestBody ReportRequest reportRequest){
         var bytes = reportService.countryReportByLotCount(reportRequest);
         return ResponseEntity.ok(bytes);
     }
 
     @PostMapping("/countryByOwnerCount")
-    public ResponseEntity<Object> filterCountryByLotsBaseAndLotOwnersQuantity(@RequestBody ReportRequest reportRequest){
+    public ResponseEntity<byte[]> filterCountryByLotsBaseAndLotOwnersQuantity(@RequestBody ReportRequest reportRequest){
         var bytes = reportService.countryReportByOwnerCount(reportRequest);
         return ResponseEntity.ok(bytes);
     }
 
-    @PostMapping("/countryByLotMoney")
-    public ResponseEntity<byte[]> filterCountryByLotsBaseAndLotsMoneyNested(@RequestBody ReportRequest reportRequest) {
-        var bytes = reportService.countryReportByLotMoney(reportRequest);
+    @PostMapping("/countryByOwnersLotsBets")
+    public ResponseEntity<byte[]> filterCountryByOwnersLotsBets(@RequestBody ReportRequest reportRequest) {
+        var bytes = reportService.countryReportByOwnersLotsBets(reportRequest);
         return ResponseEntity.ok(bytes);
     }
 
     @PostMapping("/countryByParticipantCount")
     public ResponseEntity<Object> filterCountryByLotsBaseAndLotParticipantsQuantity(@RequestBody ReportRequest reportRequest){
         var bytes = reportService.countryReportByParticipantCount(reportRequest);
+        return ResponseEntity.ok(bytes);
+    }
+
+    @PostMapping("/countryByParticipantBets")
+    public ResponseEntity<Object> filterCountryByLotsBaseAndLotParticipantBets(@RequestBody ReportRequest reportRequest){
+        var bytes = reportService.countryReportByParticipantBets(reportRequest);
         return ResponseEntity.ok(bytes);
     }
 

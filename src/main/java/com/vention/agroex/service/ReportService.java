@@ -10,18 +10,20 @@ public interface ReportService {
 
     byte[] userReportByLotCount(ReportRequest reportRequest);
 
-    byte[] userReportByBetMoney(ReportRequest reportRequest);
+    byte[] userReportOwnersByBets(ReportRequest reportRequest);
 
-    byte[] userReportByLotMoney(ReportRequest reportRequest);
+    byte[] userReportParticipantByBets(ReportRequest reportRequest);
 
-    byte[] countryReportByBetMoney(ReportRequest reportRequest);
+    byte[] countryReportByLotPrice(ReportRequest reportRequest);
 
     byte[] countryReportByLotCount(ReportRequest reportRequest);
 
     byte[] countryReportByOwnerCount(ReportRequest reportRequest);
 
-    byte[] countryReportByLotMoney(ReportRequest reportRequest);
+    byte[] countryReportByOwnersLotsBets(ReportRequest reportRequest);
 
     byte[] countryReportByParticipantCount(ReportRequest reportRequest);
+
+    byte[] countryReportByParticipantBets(ReportRequest reportRequest);
 
 }

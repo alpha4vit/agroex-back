@@ -1,4 +1,4 @@
-package com.vention.agroex.service.impl;
+package com.vention.agroex.service;
 
 import com.vention.agroex.model.CountryReportModel;
 import com.vention.agroex.model.LotReportModel;

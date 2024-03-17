@@ -109,10 +109,10 @@ BEGIN
         END) AS calculated_price
       FROM base_lot_filter(vActualStartDate, vExpirationDate, vLotType, vCountryId) l
       LEFT JOIN currency_rates cr
-        ON cr.source_currency = l.original_currency
+        ON  cr.source_currency = l.original_currency
         AND cr.target_currency = 'USD'
-      ORDER BY calculated_price DESC
-      LIMIT 10
+     ORDER BY calculated_price DESC
+     LIMIT 10
   );
 END
 $$ LANGUAGE PLPGSQL STABLE;
@@ -154,8 +154,8 @@ BEGIN
 END
 $$ LANGUAGE PLPGSQL STABLE;
 
-DROP FUNCTION IF EXISTS user_filter_by_bet_money(timestamptz, timestamptz, varchar, bigint);
-CREATE OR REPLACE FUNCTION user_filter_by_bet_money(
+DROP FUNCTION IF EXISTS owner_filter_by_bets(timestamptz, timestamptz, varchar, bigint);
+CREATE OR REPLACE FUNCTION owner_filter_by_bets(
   vActualStartDate timestamptz,
   vExpirationDate timestamptz,
   vLotType varchar default null,
@@ -172,15 +172,15 @@ BEGIN
     WITH
       bet_scope AS (
         SELECT DISTINCT ON (b.lot_id)
-            b.user_id,
+            lots.user_id,
             (CASE
-                 WHEN lots.original_currency <> 'USD' THEN b.amount * cr.rate
-                 ELSE b.amount
-                END) as amount
+              WHEN lots.original_currency <> 'USD' THEN b.amount * cr.rate
+              ELSE b.amount
+            END) as amount
           FROM bet b
           JOIN base_lot_filter(vActualStartDate, vExpirationDate, vLotType, vCountryId) lots ON lots.id = b.lot_id
           LEFT JOIN currency_rates cr
-            ON cr.source_currency = lots.original_currency
+            ON  cr.source_currency = lots.original_currency
             AND cr.target_currency = 'USD'
          ORDER BY b.lot_id, b.bet_time DESC
       ),
@@ -205,10 +205,8 @@ BEGIN
 END
 $$ LANGUAGE PLPGSQL STABLE;
 
--- ____________________________________________________________________________
-
-DROP FUNCTION IF EXISTS user_filter_by_lot_money(timestamptz, timestamptz, varchar, bigint);
-CREATE OR REPLACE FUNCTION user_filter_by_lot_money(
+DROP FUNCTION IF EXISTS participant_filter_by_bets(timestamptz, timestamptz, varchar, bigint);
+CREATE OR REPLACE FUNCTION participant_filter_by_bets(
   vActualStartDate timestamptz,
   vExpirationDate timestamptz,
   vLotType varchar default null,
@@ -223,36 +221,44 @@ CREATE OR REPLACE FUNCTION user_filter_by_lot_money(
 BEGIN
   RETURN QUERY (
     WITH
-      lot_scope AS (
-        SELECT
-            lots.user_id,
-            sum(CASE
-                  WHEN lots.original_currency <> 'USD' THEN COALESCE(lots.original_price, lots.original_min_price) * cr.rate
-                  ELSE COALESCE(lots.original_price, lots.original_min_price)
-                END) as price_sum
-          FROM base_lot_filter(vActualStartDate, vExpirationDate, vLotType, vCountryId) as lots
-          LEFT JOIN currency_rates cr
-            ON cr.source_currency = lots.original_currency
-            AND cr.target_currency = 'USD'
-         GROUP BY lots.user_id
-      )
+        bet_scope AS (
+            SELECT DISTINCT ON (b.lot_id)
+                b.user_id,
+                (CASE
+                  WHEN lots.original_currency <> 'USD' THEN b.amount * cr.rate
+                  ELSE b.amount
+                END) as amount
+              FROM bet b
+              JOIN base_lot_filter(vActualStartDate, vExpirationDate, vLotType, vCountryId) lots ON lots.id = b.lot_id
+              LEFT JOIN currency_rates cr
+                ON  cr.source_currency = lots.original_currency
+                AND cr.target_currency = 'USD'
+             ORDER BY b.lot_id, b.bet_time DESC
+        ),
+        user_scope AS (
+            SELECT
+                bs.user_id,
+                sum(bs.amount) AS amount
+              FROM bet_scope bs
+             GROUP BY user_id
+        )
     SELECT
         u.id,
         u.username,
         u.email,
-        ls.price_sum,
+        us.amount,
         u.creation_date
       FROM users u
-      JOIN lot_scope ls ON ls.user_id = u.id
-     ORDER BY ls.price_sum DESC
+      JOIN user_scope us ON us.user_id = u.id
+     ORDER BY us.amount DESC
      LIMIT 10
     );
 END
 $$ LANGUAGE PLPGSQL STABLE;
 
 
-DROP FUNCTION IF EXISTS country_filter_by_bet_money(timestamptz, timestamptz, varchar);
-CREATE OR REPLACE FUNCTION country_filter_by_bet_money(
+DROP FUNCTION IF EXISTS country_owner_filter_by_bets(timestamptz, timestamptz, varchar);
+CREATE OR REPLACE FUNCTION country_owner_filter_by_bets(
   vActualStartDate timestamptz,
   vExpirationDate timestamptz,
   vLotType varchar default null
@@ -264,9 +270,10 @@ CREATE OR REPLACE FUNCTION country_filter_by_bet_money(
 BEGIN
   RETURN QUERY (
     WITH
-      lot_scope AS (
+      bet_scope AS (
         SELECT DISTINCT ON (b.lot_id)
             lots.country_id,
+            lots.user_id,
             (CASE
               WHEN lots.original_currency <> 'USD' THEN b.amount * cr.rate
               ELSE b.amount
@@ -274,17 +281,25 @@ BEGIN
           FROM bet b
           JOIN base_lot_filter(vActualStartDate, vExpirationDate, vLotType) lots ON lots.id = b.lot_id
           LEFT JOIN currency_rates cr
-            ON cr.source_currency = lots.original_currency
-            AND cr.target_currency = 'USD'
+          ON cr.source_currency = lots.original_currency
+          AND cr.target_currency = 'USD'
          ORDER BY b.lot_id, b.bet_time DESC
         ),
+      user_scope AS (
+        SELECT
+            bs.user_id,
+            bs.country_id,
+            sum(bs.amount) AS amount
+          FROM bet_scope bs
+         GROUP BY bs.user_id, bs.country_id
+      ),
       country_scope AS (
         SELECT
             c.id,
             c.name,
-            SUM(ls.amount) AS total_bet_sum
+            SUM(us.amount) AS total_bet_sum
           FROM country c
-          JOIN lot_scope ls ON ls.country_id = c.id
+          JOIN user_scope us ON us.country_id = c.id
          GROUP BY c.id
          ORDER BY total_bet_sum DESC
       )
@@ -368,8 +383,8 @@ END
 $$ LANGUAGE PLPGSQL STABLE;
 
 
-DROP FUNCTION IF EXISTS country_filter_by_lot_money(timestamptz, timestamptz, varchar);
-CREATE OR REPLACE FUNCTION country_filter_by_lot_money(
+DROP FUNCTION IF EXISTS country_filter_by_lot_price(timestamptz, timestamptz, varchar);
+CREATE OR REPLACE FUNCTION country_filter_by_lot_price(
   vActualStartDate timestamptz,
   vExpirationDate timestamptz,
   vLotType varchar default null
@@ -392,9 +407,9 @@ BEGIN
             ) AS price_sum
           FROM base_lot_filter(vActualStartDate, vExpirationDate, vLotType) lots
           LEFT JOIN currency_rates cr
-            ON cr.source_currency = lots.original_currency
-            AND cr.target_currency = 'USD'
-          GROUP BY lots.id, lots.country_id
+          ON cr.source_currency = lots.original_currency
+          AND cr.target_currency = 'USD'
+         GROUP BY lots.id, lots.country_id
       )
     SELECT
         c.id,
@@ -428,7 +443,7 @@ BEGIN
             count(DISTINCT b.user_id) as user_count
           FROM bet b
           JOIN base_lot_filter(vActualStartDate, vExpirationDate, vLotType) lots ON lots.id = b.lot_id
-         GROUP BY lots.country_id
+          GROUP BY lots.country_id
       )
     SELECT
         c.id,
@@ -439,5 +454,46 @@ BEGIN
      ORDER BY ls.user_count
      LIMIT 10
     );
+END
+$$ LANGUAGE PLPGSQL STABLE;
+
+DROP FUNCTION IF EXISTS country_participant_filter_by_bets(timestamptz, timestamptz, varchar);
+CREATE OR REPLACE FUNCTION country_participant_filter_by_bets(
+  vActualStartDate timestamptz,
+  vExpirationDate timestamptz,
+  vLotType varchar default null
+) RETURNS TABLE (
+  id         bigint,
+  name       varchar,
+  bet_amount real
+) AS $$
+BEGIN
+  RETURN QUERY (
+    WITH
+      bet_scope AS (
+        SELECT DISTINCT ON (b.lot_id)
+            lots.country_id,
+            b.user_id,
+            (CASE
+              WHEN lots.original_currency <> 'USD' THEN b.amount * cr.rate
+              ELSE b.amount
+             END) as amount
+          FROM bet b
+          JOIN base_lot_filter(vActualStartDate, vExpirationDate, vLotType) lots ON lots.id = b.lot_id
+          LEFT JOIN currency_rates cr
+            ON  cr.source_currency = lots.original_currency
+            AND cr.target_currency = 'USD'
+         ORDER BY b.lot_id, b.bet_time DESC
+      )
+    SELECT
+        c.id,
+        c.name,
+        sum(bs.amount) as bet_amount
+      FROM country c
+      JOIN bet_scope bs ON bs.country_id = c.id
+     GROUP BY c.id
+     ORDER BY bet_amount DESC
+     LIMIT 10
+  );
 END
 $$ LANGUAGE PLPGSQL STABLE;

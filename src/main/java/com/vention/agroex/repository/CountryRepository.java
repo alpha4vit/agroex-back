@@ -17,10 +17,10 @@ public interface CountryRepository extends JpaRepository<CountryEntity, Long> {
     Optional<CountryEntity> findByName(String name);
     List<CountryEntity> findByLocationsIsNotEmpty();
 
-    @Query(value = "select * from country_filter_by_bet_money(:startDate, :expirationDate, :lotType)", nativeQuery = true)
-    List<CountryReportModel> filterByBetMoney(@Param("startDate") ZonedDateTime startDate,
-                                                        @Param("expirationDate") ZonedDateTime expirationDate,
-                                                        @Param("lotType") @Nullable String lotType);
+    @Query(value = "select * from country_filter_by_lot_price(:startDate, :expirationDate, :lotType)", nativeQuery = true)
+    List<CountryReportModel> filterByLotPrice(@Param("startDate") ZonedDateTime startDate,
+                                              @Param("expirationDate") ZonedDateTime expirationDate,
+                                              @Param("lotType") @Nullable String lotType);
 
     @Query(value = "select * from country_filter_by_lot_count(:startDate, :expirationDate, :lotType)", nativeQuery = true)
     List<CountryReportModel> filterByLotCount(@Param("startDate") ZonedDateTime startDate,
@@ -32,8 +32,8 @@ public interface CountryRepository extends JpaRepository<CountryEntity, Long> {
                                                      @Param("expirationDate") ZonedDateTime expirationDate,
                                                      @Param("lotType") @Nullable String lotType);
 
-    @Query(value = "select * from country_filter_by_lot_money(:startDate, :expirationDate, :lotType)", nativeQuery = true)
-    List<CountryReportModel> filterByLotMoney(@Param("startDate") ZonedDateTime startDate,
+    @Query(value = "select * from country_owner_filter_by_bets(:startDate, :expirationDate, :lotType)", nativeQuery = true)
+    List<CountryReportModel> filterByOwnersLotsBets(@Param("startDate") ZonedDateTime startDate,
                                                         @Param("expirationDate") ZonedDateTime expirationDate,
                                                         @Param("lotType") @Nullable String lotType);
 
@@ -41,4 +41,9 @@ public interface CountryRepository extends JpaRepository<CountryEntity, Long> {
     List<CountryReportModel> filterByParticipantCount(@Param("startDate") ZonedDateTime startDate,
                                                                 @Param("expirationDate") ZonedDateTime expirationDate,
                                                                 @Param("lotType") @Nullable String lotType);
+
+    @Query(value = "select * from country_participant_filter_by_bets(:startDate, :expirationDate, :lotType)", nativeQuery = true)
+    List<CountryReportModel> filterByParticipantBets(@Param("startDate") ZonedDateTime startDate,
+                                                      @Param("expirationDate") ZonedDateTime expirationDate,
+                                                      @Param("lotType") @Nullable String lotType);
 }

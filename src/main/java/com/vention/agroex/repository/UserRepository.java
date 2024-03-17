@@ -26,15 +26,16 @@ public interface UserRepository extends JpaRepository<UserEntity, UUID> {
                                            @Param("lotType") @Nullable String lotType,
                                            @Param("countryId") @Nullable Long countryId);
 
-    @Query(value = "select * from user_filter_by_bet_money(:startDate, :expirationDate, :lotType, :countryId)", nativeQuery = true)
-    List<UserReportModel> filterByBetMoney(@Param("startDate") ZonedDateTime startDate,
-                                           @Param("expirationDate") ZonedDateTime expirationDate,
-                                           @Param("lotType") @Nullable String lotType,
-                                           @Param("countryId") @Nullable Long countryId);
+    @Query(value = "select * from owner_filter_by_bets(:startDate, :expirationDate, :lotType, :countryId)", nativeQuery = true)
+    List<UserReportModel> filterOwnerByBetMoney(@Param("startDate") ZonedDateTime startDate,
+                                                @Param("expirationDate") ZonedDateTime expirationDate,
+                                                @Param("lotType") @Nullable String lotType,
+                                                @Param("countryId") @Nullable Long countryId);
 
-    @Query(value = "select * from user_filter_by_lot_money(:startDate, :expirationDate, :lotType, :countryId)", nativeQuery = true)
-    List<UserReportModel> filterByLotMoney(@Param("startDate") ZonedDateTime startDate,
-                                           @Param("expirationDate") ZonedDateTime expirationDate,
-                                           @Param("lotType") @Nullable String lotType,
-                                           @Param("countryId") @Nullable Long countryId);
+    @Query(value = "select * from participant_filter_by_bets(:startDate, :expirationDate, :lotType, :countryId)", nativeQuery = true)
+    List<UserReportModel> filterParticipantByBets(@Param("startDate") ZonedDateTime startDate,
+                                                  @Param("expirationDate") ZonedDateTime expirationDate,
+                                                  @Param("lotType") @Nullable String lotType,
+                                                  @Param("countryId") @Nullable Long countryId);
+
 }

@@ -7,6 +7,7 @@ import com.vention.agroex.model.UserReportModel;
 import com.vention.agroex.repository.CountryRepository;
 import com.vention.agroex.repository.LotRepository;
 import com.vention.agroex.repository.UserRepository;
+import com.vention.agroex.service.ExcelWriter;
 import com.vention.agroex.service.ReportService;
 import com.vention.agroex.util.constant.ReportType;
 import lombok.RequiredArgsConstructor;
@@ -75,8 +76,8 @@ public class ExcelReportServiceImpl implements ReportService {
     }
 
     @Override
-    public byte[] userReportByBetMoney(ReportRequest reportRequest) {
-        List<UserReportModel> userReportModels = userRepository.filterByBetMoney(
+    public byte[] userReportOwnersByBets(ReportRequest reportRequest) {
+        List<UserReportModel> userReportModels = userRepository.filterOwnerByBetMoney(
                 reportRequest.actualStartDate(),
                 reportRequest.expirationDate(),
                 reportRequest.lotType(),
@@ -91,8 +92,8 @@ public class ExcelReportServiceImpl implements ReportService {
     }
 
     @Override
-    public byte[] userReportByLotMoney(ReportRequest reportRequest) {
-        List<UserReportModel> userReportModels = userRepository.filterByLotMoney(
+    public byte[] userReportParticipantByBets(ReportRequest reportRequest) {
+        List<UserReportModel> userReportModels = userRepository.filterParticipantByBets(
                 reportRequest.actualStartDate(),
                 reportRequest.expirationDate(),
                 reportRequest.lotType(),
@@ -107,8 +108,8 @@ public class ExcelReportServiceImpl implements ReportService {
     }
 
     @Override
-    public byte[] countryReportByBetMoney(ReportRequest reportRequest) {
-        List<CountryReportModel> countryReportModels = countryRepository.filterByBetMoney(
+    public byte[] countryReportByLotPrice(ReportRequest reportRequest) {
+        List<CountryReportModel> countryReportModels = countryRepository.filterByLotPrice(
                 reportRequest.actualStartDate(),
                 reportRequest.expirationDate(),
                 reportRequest.lotType()
@@ -152,8 +153,8 @@ public class ExcelReportServiceImpl implements ReportService {
     }
 
     @Override
-    public byte[] countryReportByLotMoney(ReportRequest reportRequest) {
-        List<CountryReportModel> countryReportModels = countryRepository.filterByLotMoney(
+    public byte[] countryReportByOwnersLotsBets(ReportRequest reportRequest) {
+        List<CountryReportModel> countryReportModels = countryRepository.filterByOwnersLotsBets(
                 reportRequest.actualStartDate(),
                 reportRequest.expirationDate(),
                 reportRequest.lotType()
@@ -169,6 +170,21 @@ public class ExcelReportServiceImpl implements ReportService {
     @Override
     public byte[] countryReportByParticipantCount(ReportRequest reportRequest) {
         List<CountryReportModel> countryReportModels = countryRepository.filterByParticipantCount(
+                reportRequest.actualStartDate(),
+                reportRequest.expirationDate(),
+                reportRequest.lotType()
+        );
+        excelWriter.writeCountriesReport(countryReportModels, ReportType.COUNTRY_LOTS_TOTAL_MONEY_NESTED);
+        try (var is = getClass().getClassLoader().getResourceAsStream("reports/countryReport.xlsx")){
+            return IOUtils.toByteArray(is);
+        } catch (Exception e) {
+            throw new RuntimeException(e);
+        }
+    }
+
+    @Override
+    public byte[] countryReportByParticipantBets(ReportRequest reportRequest) {
+        List<CountryReportModel> countryReportModels = countryRepository.filterByParticipantBets(
                 reportRequest.actualStartDate(),
                 reportRequest.expirationDate(),
                 reportRequest.lotType()
