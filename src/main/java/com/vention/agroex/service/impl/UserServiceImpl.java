@@ -78,13 +78,14 @@ public class UserServiceImpl implements UserService {
 
     @Override
     @Transactional(rollbackOn = Exception.class)
-    public void updateTable() {
+    public List<UserEntity> updateTable() {
         var userEntities = awsCognitoService.updateDb();
         List<UserEntity> saved = userRepository.saveAll(userEntities);
         saved.forEach(user -> {
             if (!user.getEnabled())
                 rejectLotsDueToUserDeactivation(lotRepository.findByUser(user));
         });
+        return saved;
     }
 
     @Override

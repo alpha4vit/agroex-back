@@ -78,8 +78,8 @@ public class UserController {
     @PreAuthorize("@customSecurityExpression.isAdmin()")
     @GetMapping("/updatedb")
     @ResponseStatus(HttpStatus.OK)
-    public void updateDatabase() {
-        userService.updateTable();
+    public ResponseEntity<List<User>> updateDatabase() {
+        return ResponseEntity.ok(userMapper.toDtos(userService.updateTable()));
     }
 
     @PreAuthorize("@customSecurityExpression.isAdmin()")

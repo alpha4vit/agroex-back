@@ -23,7 +23,7 @@ public interface UserService {
 
     UserEntity uploadAvatar(UUID id, Image avatar);
 
-    void updateTable();
+    List<UserEntity> updateTable();
 
     UserEntity getAuthenticatedUser();
 
