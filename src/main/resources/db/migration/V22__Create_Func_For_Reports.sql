@@ -110,7 +110,7 @@ BEGIN
       FROM base_lot_filter(vActualStartDate, vExpirationDate, vLotType, vCountryId) l
       LEFT JOIN currency_rates cr
         ON  cr.source_currency = l.original_currency
-        AND cr.target_currency = 'USD'
+       AND cr.target_currency = 'USD'
      ORDER BY calculated_price DESC
      LIMIT 10
   );
@@ -181,7 +181,7 @@ BEGIN
           JOIN base_lot_filter(vActualStartDate, vExpirationDate, vLotType, vCountryId) lots ON lots.id = b.lot_id
           LEFT JOIN currency_rates cr
             ON  cr.source_currency = lots.original_currency
-            AND cr.target_currency = 'USD'
+           AND cr.target_currency = 'USD'
          ORDER BY b.lot_id, b.bet_time DESC
       ),
       user_scope AS (
@@ -221,27 +221,27 @@ CREATE OR REPLACE FUNCTION participant_filter_by_bets(
 BEGIN
   RETURN QUERY (
     WITH
-        bet_scope AS (
-            SELECT DISTINCT ON (b.lot_id)
-                b.user_id,
-                (CASE
-                  WHEN lots.original_currency <> 'USD' THEN b.amount * cr.rate
-                  ELSE b.amount
-                END) as amount
-              FROM bet b
-              JOIN base_lot_filter(vActualStartDate, vExpirationDate, vLotType, vCountryId) lots ON lots.id = b.lot_id
-              LEFT JOIN currency_rates cr
-                ON  cr.source_currency = lots.original_currency
-                AND cr.target_currency = 'USD'
-             ORDER BY b.lot_id, b.bet_time DESC
-        ),
-        user_scope AS (
-            SELECT
-                bs.user_id,
-                sum(bs.amount) AS amount
-              FROM bet_scope bs
-             GROUP BY user_id
-        )
+      bet_scope AS (
+        SELECT DISTINCT ON (b.lot_id)
+            b.user_id,
+            (CASE
+              WHEN lots.original_currency <> 'USD' THEN b.amount * cr.rate
+              ELSE b.amount
+            END) as amount
+          FROM bet b
+          JOIN base_lot_filter(vActualStartDate, vExpirationDate, vLotType, vCountryId) lots ON lots.id = b.lot_id
+          LEFT JOIN currency_rates cr
+            ON  cr.source_currency = lots.original_currency
+           AND cr.target_currency = 'USD'
+         ORDER BY b.lot_id, b.bet_time DESC
+      ),
+      user_scope AS (
+        SELECT
+            bs.user_id,
+            sum(bs.amount) AS amount
+          FROM bet_scope bs
+         GROUP BY user_id
+      )
     SELECT
         u.id,
         u.username,
@@ -281,10 +281,10 @@ BEGIN
           FROM bet b
           JOIN base_lot_filter(vActualStartDate, vExpirationDate, vLotType) lots ON lots.id = b.lot_id
           LEFT JOIN currency_rates cr
-          ON cr.source_currency = lots.original_currency
-          AND cr.target_currency = 'USD'
+            ON cr.source_currency = lots.original_currency
+           AND cr.target_currency = 'USD'
          ORDER BY b.lot_id, b.bet_time DESC
-        ),
+      ),
       user_scope AS (
         SELECT
             bs.user_id,
@@ -401,14 +401,13 @@ BEGIN
             lots.id,
             lots.country_id,
             SUM(CASE
-                  WHEN lots.original_currency <> 'USD' THEN COALESCE(lots.original_price, lots.original_min_price) * cr.rate
-                  ELSE COALESCE(lots.original_price, lots.original_min_price)
-                END
-            ) AS price_sum
+              WHEN lots.original_currency <> 'USD' THEN COALESCE(lots.original_price, lots.original_min_price) * cr.rate
+              ELSE COALESCE(lots.original_price, lots.original_min_price)
+            END) AS price_sum
           FROM base_lot_filter(vActualStartDate, vExpirationDate, vLotType) lots
           LEFT JOIN currency_rates cr
-          ON cr.source_currency = lots.original_currency
-          AND cr.target_currency = 'USD'
+            ON cr.source_currency = lots.original_currency
+           AND cr.target_currency = 'USD'
          GROUP BY lots.id, lots.country_id
       )
     SELECT
@@ -417,7 +416,7 @@ BEGIN
         SUM(ls.price_sum) as total_bets_amount
       FROM country c
       JOIN lot_scope ls ON ls.country_id = c.id
-      GROUP BY c.id, c.name
+     GROUP BY c.id, c.name
      ORDER BY total_bets_amount DESC
      LIMIT 10
     );
@@ -477,12 +476,12 @@ BEGIN
             (CASE
               WHEN lots.original_currency <> 'USD' THEN b.amount * cr.rate
               ELSE b.amount
-             END) as amount
+            END) as amount
           FROM bet b
           JOIN base_lot_filter(vActualStartDate, vExpirationDate, vLotType) lots ON lots.id = b.lot_id
           LEFT JOIN currency_rates cr
-            ON  cr.source_currency = lots.original_currency
-            AND cr.target_currency = 'USD'
+            ON cr.source_currency = lots.original_currency
+           AND cr.target_currency = 'USD'
          ORDER BY b.lot_id, b.bet_time DESC
       )
     SELECT
