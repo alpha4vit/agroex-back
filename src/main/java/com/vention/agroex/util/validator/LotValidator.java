@@ -25,7 +25,8 @@ public class LotValidator implements Validator {
 
     @Override
     public void validate(Object target, Errors errors) {
-        record ErrorField(String field, String message) {}
+        record ErrorField(String field, String message) {
+        }
 
         Map<String, String> map = errors.getFieldErrors().stream()
                 .map(fieldError -> {
@@ -36,7 +37,6 @@ public class LotValidator implements Validator {
                         }
                 )
                 .collect(toMap(ErrorField::field, ErrorField::message));
-
         var lot = (Lot) target;
         if (lot.getLotType() != null && lot.getLotType().equals("auctionSell")) {
             if (lot.getDuration() == null) {
@@ -44,7 +44,11 @@ public class LotValidator implements Validator {
             } else if (lot.getDuration() < 600000L) {
                 map.put("duration", "Duration must be more than 10 minutes");
             }
-            if (lot.getOriginalMinPrice().compareTo(lot.getOriginalPrice()) > 0) {
+            if (lot.getOriginalMinPrice() == null) {
+                map.put("minPrice", "MinPrice can`t be null");
+            }
+            if (lot.getOriginalMinPrice() != null &&
+                    lot.getOriginalMinPrice().compareTo(lot.getOriginalPrice()) > 0) {
                 map.put("minPrice", "Min price can`t be bigger than lot price");
             }
         }
@@ -55,5 +59,5 @@ public class LotValidator implements Validator {
         if (!map.isEmpty())
             throw new InvalidArgumentException(map, "Invalid arguments!");
     }
-    
+
 }

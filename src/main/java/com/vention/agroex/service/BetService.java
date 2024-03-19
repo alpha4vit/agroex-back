@@ -6,7 +6,7 @@ import java.util.List;
 
 public interface BetService {
 
-    BetEntity makeBet(Long lotId, BetEntity betEntity);
+    BetEntity makeBet(Long lotId, BetEntity betEntity, String currency);
 
     List<BetEntity> getLotBets(Long lotId);
 }

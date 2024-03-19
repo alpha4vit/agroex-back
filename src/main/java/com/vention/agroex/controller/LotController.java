@@ -82,7 +82,7 @@ public class LotController {
 
     @PreAuthorize("@customSecurityExpression.isUserEnabled() && @customSecurityExpression.isLotOwner(#lotId)")
     @PostMapping("/{id}/userStatus")
-    public ResponseEntity<Lot> putOnModeration(@PathVariable("id") Long lotId, @RequestParam boolean status) {
+    public ResponseEntity<Lot> changeUserStatus(@PathVariable("id") Long lotId, @RequestParam boolean status) {
         var moderated = lotService.changeUserStatus(lotId, status);
         return ResponseEntity.ok(lotMapper.toDTO(moderated));
     }

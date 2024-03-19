@@ -75,16 +75,12 @@ public class LotServiceImpl implements LotService {
         }
 
         if (lotEntity.getExpirationDate() != null) {
-            lotEntity.setExpirationDate(
-                    lotEntity.getExpirationDate()
-                            .withZoneSameLocal(lotEntity.getUser().getZoneinfo() != null ? lotEntity.getUser().getZoneinfo() : ZoneId.systemDefault())
-            );
+            lotEntity.setExpirationDate(lotEntity.getExpirationDate());
         }
 
 
         var saved = lotRepository.save(lotEntity);
         saved.setImages(imageService.uploadImages(saved, files));
-
         return saved;
     }
 
@@ -114,7 +110,7 @@ public class LotServiceImpl implements LotService {
     @Override
     public void deleteById(Long id) {
         var lotToDelete = getById(id);
-        if (lotToDelete.getBets() != null) {
+        if (!lotToDelete.getBets().isEmpty()) {
             throw new LotEditException("You can`t delete this lot, it already has customers");
         }
         if (lotToDelete.getStatus().equals(StatusConstants.ACTIVE)) {
@@ -140,48 +136,61 @@ public class LotServiceImpl implements LotService {
 
     @Override
     @Transactional(rollbackOn = ImageLotException.class)
-    public LotEntity update(Long id, LotEntity entity, MultipartFile[] files, String currency) {
+    public LotEntity update(Long id, LotEntity lotEntityUpdatedFields, MultipartFile[] files, String currency) {
         var lotToUpdate = getById(id);
 
         if (lotToUpdate.getInnerStatus().equals(StatusConstants.ON_MODERATION)) {
             throw new LotEditException("You can`t edit this lot while moderation");
         }
-        if (lotToUpdate.getInnerStatus().equals(StatusConstants.FINISHED)) {
+        if (lotToUpdate.getStatus().equals(StatusConstants.FINISHED)) {
             throw new LotEditException("This auction has already ended");
         }
-        var updatedLot = lotMapper.update(lotToUpdate, entity);
+        if (!lotToUpdate.getBets().isEmpty()) {
+            throw new LotEditException("This lot already has customers");
+        }
+        var updatedLot = lotMapper.update(lotToUpdate, lotEntityUpdatedFields);
         imageService.updateImagesForLot(lotToUpdate, updatedLot, files);
 
-        if (!entity.getLotType().equals(lotToUpdate.getLotType())) {
-            if (entity.getLotType().equals(LotTypeConstants.AUCTION_SELL)) {
-                updatedLot.setLotType(LotTypeConstants.AUCTION_SELL);
-                updatedLot.setInnerStatus(StatusConstants.NEW);
-                updatedLot.setStatus(StatusConstants.INACTIVE);
-                updatedLot.setExpirationDate(null);
+        var isLotTypeChanged = lotEntityUpdatedFields.getLotType().equals(lotToUpdate.getLotType());
+        var newLotType = lotEntityUpdatedFields.getLotType();
+        var newInnerStatus = lotEntityUpdatedFields.getInnerStatus();
+        var newLotStatus = lotEntityUpdatedFields.getStatus();
+
+        if (!isLotTypeChanged) {
+            if (lotEntityUpdatedFields.getLotType().equals(LotTypeConstants.AUCTION_SELL)) {
+                newLotType = LotTypeConstants.AUCTION_SELL;
+                newInnerStatus = StatusConstants.NEW;
             } else {
-                if (lotToUpdate.getLotType().equals(LotTypeConstants.AUCTION_SELL)
-                        && !lotToUpdate.getInnerStatus().equals(StatusConstants.NEW)
-                        && !lotToUpdate.getStatus().equals(StatusConstants.INACTIVE))
+                if (updatedLot.getLotType().equals(LotTypeConstants.AUCTION_SELL) && !updatedLot.getInnerStatus().equals(StatusConstants.NEW)) {
                     throw new InvalidArgumentException(Map.of("lotType", "Lot type cant be changed to auction sell on this active lot"), "Invalid operation");
-                updatedLot.setLotType(entity.getLotType());
-                updatedLot.setInnerStatus(StatusConstants.ACTIVE);
-                updatedLot.setStatus(StatusConstants.ACTIVE);
+                }
+                newLotType = lotEntityUpdatedFields.getLotType();
+                newInnerStatus = StatusConstants.ACTIVE;
+                newLotStatus = StatusConstants.ACTIVE;
             }
         }
 
+        updatedLot.setLotType(newLotType);
+        updatedLot.setInnerStatus(newInnerStatus);
+        updatedLot.setStatus(newLotStatus);
+
         var countryEntity = countryService.getById(updatedLot.getLocation().getCountry().getId());
 
-        var productCategoryEntity = switch (entity.getProductCategory()) {
+        var productCategoryEntity = switch (lotEntityUpdatedFields.getProductCategory()) {
             case ProductCategoryEntity e when e.getId() != null ->
-                    productCategoryService.getById(entity.getProductCategory().getId());
+                    productCategoryService.getById(lotEntityUpdatedFields.getProductCategory().getId());
             case ProductCategoryEntity e when e.getTitle() != null ->
-                    productCategoryService.save(entity.getProductCategory());
+                    productCategoryService.save(lotEntityUpdatedFields.getProductCategory());
             case null, default ->
                     throw new InvalidArgumentException("Provide productCategory.id or productCategory.title");
         };
 
         if (!lotToUpdate.getInnerStatus().equals(StatusConstants.APPROVED)) {
-            lotToUpdate.setInnerStatus(StatusConstants.NEW);
+            updatedLot.setInnerStatus(StatusConstants.NEW);
+        }
+        if (lotToUpdate.getLotType().equals(LotTypeConstants.AUCTION_SELL)) {
+            updatedLot.setInnerStatus(StatusConstants.NEW);
+            updatedLot.setStatus(StatusConstants.INACTIVE);
         }
         updatedLot.setUser(userService.getAuthenticatedUser());
         updatedLot.getLocation().setCountry(countryEntity);
@@ -236,6 +245,7 @@ public class LotServiceImpl implements LotService {
             lot.setAdminComment(adminComment);
         }
         lot.setInnerStatus(StatusConstants.ON_MODERATION);
+        lot.setStatus(StatusConstants.INACTIVE);
         return update(id, lot);
     }
 
@@ -250,16 +260,16 @@ public class LotServiceImpl implements LotService {
         var lot = getById(id);
         if (!lot.getUser().getEnabled())
             throw new InvalidArgumentException("Lot owner is disabled!");
-        if (!lot.getLotType().equals(LotTypeConstants.AUCTION_SELL)) {
-            throw new InvalidArgumentException("This lot is not an auction lot");
-        }
+
         lot.setExpirationDate(Instant.now().plusMillis(lot.getDuration()).atZone(lot.getUser().getZoneinfo() != null ? lot.getUser().getZoneinfo() : ZoneId.systemDefault()));
         lot.setActualStartDate(ZonedDateTime.now(lot.getUser().getZoneinfo() != null ? lot.getUser().getZoneinfo() : ZoneId.systemDefault()));
         lot.setInnerStatus(StatusConstants.APPROVED);
+        if (lot.getUserStatus().equals(StatusConstants.ACTIVE)) {
+            lot.setStatus(StatusConstants.ACTIVE);
+        }
         if (adminComment != null) {
             lot.setAdminComment(adminComment);
         }
-        lot.setStatus(StatusConstants.ACTIVE);
         return update(id, lot);
     }
 
@@ -289,6 +299,7 @@ public class LotServiceImpl implements LotService {
 
         bets.add(newBetEntity);
         lot.setBets(bets);
+        lot.setStatus(StatusConstants.FINISHED);
         var updated = update(lot.getId(), lot);
         return updateCurrency(updated, currency);
     }
@@ -322,7 +333,10 @@ public class LotServiceImpl implements LotService {
         var lot = getById(id);
         validateUserStatusChangeRequest(lot);
         var userStatus = status ? StatusConstants.ACTIVE : StatusConstants.INACTIVE;
-        var lotStatus = status ? StatusConstants.ACTIVE : StatusConstants.INACTIVE;
+        var lotStatus = lot.getStatus();
+        if (status && lot.getInnerStatus().equals(StatusConstants.APPROVED)) {
+            lotStatus = StatusConstants.ACTIVE;
+        }
         if (lot.getLotType().equals(StatusConstants.AUCTION_SELL)) {
             lot.setInnerStatus(StatusConstants.NEW);
             lotStatus = StatusConstants.INACTIVE;
@@ -333,10 +347,6 @@ public class LotServiceImpl implements LotService {
     }
 
     private void validateUserStatusChangeRequest(LotEntity lot) {
-        if (lot.getLotType().equals(StatusConstants.AUCTION_SELL) &&
-                !lot.getInnerStatus().equals(StatusConstants.NEW)) {
-            throw new LotEditException("It`s not possible to change lot userStatus already");
-        }
         if (!lot.getBets().isEmpty()) {
             throw new LotEditException("It`s not possible to change lot userStatus. It already has customers");
         }

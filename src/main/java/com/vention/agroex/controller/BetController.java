@@ -28,15 +28,16 @@ public class BetController {
 
     @PostMapping("/{id}")
     public ResponseEntity<Bet> makeBet(@PathVariable("id") Long lotId,
-                                       @RequestBody BetRequest betRequest) {
+                                       @RequestBody BetRequest betRequest,
+                                       @RequestHeader("currency") String currency) {
         var bet = betMapper.requestToEntity(betRequest);
         var user = userService.getById(betRequest.userId());
-        var lot = lotService.getById(lotId);
+        var lot = lotService.getById(lotId, currency);
 
         bet.setUser(user);
         bet.setLot(lot);
 
-        return ResponseEntity.ok(betMapper.toDTO(betService.makeBet(lotId, bet)));
+        return ResponseEntity.ok(betMapper.toDTO(betService.makeBet(lotId, bet, currency)));
     }
 
     @GetMapping("/{id}")
