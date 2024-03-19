@@ -25,7 +25,7 @@ public class ProductCategoryEntityValidator implements Validator {
     @Override
     public void validate(Object target, Errors errors) {
         ProductCategoryEntity productCategoryEntity = (ProductCategoryEntity) target;
-        Map<String, String> errorsMap = new HashMap<>();
+        Map<String, Object> errorsMap = new HashMap<>();
         if (productCategoryRepository.findByTitleAndIdNot(productCategoryEntity.getId(), productCategoryEntity.getTitle()).isPresent())
             errorsMap.put("title", "Product category with this title already exists");
         if (productCategoryRepository.findById(productCategoryEntity.getParent().getId()).isEmpty())

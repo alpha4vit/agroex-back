@@ -25,7 +25,7 @@ public class UserCreateValidator implements Validator {
     @Override
     public void validate(Object target, Errors errors) {
         User user = (User) target;
-        Map<String, String> errorsMap = new HashMap<>();
+        Map<String, Object> errorsMap = new HashMap<>();
         if (userRepository.findByUsername(user.getUsername()).isPresent())
             errorsMap.put("username", "User with this username already exists!");
         if (userRepository.findByEmail(user.getEmail()).isPresent())
@@ -33,7 +33,7 @@ public class UserCreateValidator implements Validator {
         errors.getFieldErrors()
                 .forEach(fieldError ->
                         errorsMap.put(fieldError.getField(), fieldError.getDefaultMessage()));
-        if (errorsMap.size() > 0){
+        if (!errorsMap.isEmpty()){
             throw new InvalidArgumentException(errorsMap, "Invalid arguments!");
         }
 

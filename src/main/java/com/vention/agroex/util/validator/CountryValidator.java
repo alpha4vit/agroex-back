@@ -25,7 +25,7 @@ public class CountryValidator implements Validator {
     @Override
     public void validate(Object target, Errors errors) {
         Country country = (Country) target;
-        Map<String, String> errorsMap = new HashMap<>();
+        Map<String, Object> errorsMap = new HashMap<>();
         if (countryRepository.findByName(country.getName()).isPresent())
             errorsMap.put("title", "Country with this title already exists!");
         errors.getFieldErrors()

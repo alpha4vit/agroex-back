@@ -56,7 +56,7 @@ public class LotServiceImpl implements LotService {
             case ProductCategoryEntity e when e.getTitle() != null ->
                     productCategoryService.save(lotEntity.getProductCategory(), null);
             case null, default ->
-                    throw new InvalidArgumentException("Provide productCategory.id or productCategory.title");
+                    throw new InvalidArgumentException(Map.of("productCategory", "Provide product category id or title"), "Invalid arguments");
         };
 
         lotEntity.setUser(userService.getAuthenticatedUser());
