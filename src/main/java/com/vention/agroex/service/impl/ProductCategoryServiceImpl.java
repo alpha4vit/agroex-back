@@ -1,7 +1,9 @@
 package com.vention.agroex.service.impl;
 
+import com.vention.agroex.dto.Image;
 import com.vention.agroex.entity.ProductCategoryEntity;
 import com.vention.agroex.repository.ProductCategoryRepository;
+import com.vention.agroex.service.ImageServiceStorage;
 import com.vention.agroex.service.ProductCategoryService;
 import jakarta.persistence.EntityNotFoundException;
 import jakarta.transaction.Transactional;
@@ -9,6 +11,7 @@ import lombok.RequiredArgsConstructor;
 import lombok.extern.slf4j.Slf4j;
 import org.apache.commons.lang3.StringUtils;
 import org.springframework.stereotype.Service;
+import org.springframework.web.multipart.MultipartFile;
 
 import java.util.List;
 
@@ -18,9 +21,17 @@ import java.util.List;
 public class ProductCategoryServiceImpl implements ProductCategoryService {
 
     private final ProductCategoryRepository productCategoryRepository;
+    private final ImageServiceStorage imageServiceStorage;
 
     @Override
-    public ProductCategoryEntity save(ProductCategoryEntity productCategoryEntity) {
+    public ProductCategoryEntity save(ProductCategoryEntity productCategoryEntity, MultipartFile file) {
+        if (file != null) {
+            productCategoryEntity.setImage(
+                    imageServiceStorage.uploadToStorage(
+                            new Image(file)
+                    )
+            );
+        }
         if (productCategoryEntity.getParent() == null) {
             productCategoryEntity.setParent(
                     productCategoryRepository.getRootCategory()
@@ -58,12 +69,20 @@ public class ProductCategoryServiceImpl implements ProductCategoryService {
     }
 
     @Override
-    public ProductCategoryEntity update(Long id, ProductCategoryEntity productCategory) {
+    public ProductCategoryEntity update(Long id, ProductCategoryEntity productCategoryEntity, MultipartFile file) {
         var fetchedCategory = productCategoryRepository.findById(id)
                 .orElseThrow(() -> new EntityNotFoundException(String.format("There is no category with id %d", id)));
-        productCategory.setId(id);
-        productCategory.setParent(fetchedCategory.getParent());
-        return productCategoryRepository.save(productCategory);
+        productCategoryEntity.setId(id);
+        productCategoryEntity.setParent(fetchedCategory.getParent());
+        productCategoryEntity.setImage(fetchedCategory.getImage());
+        if (file != null){
+            productCategoryEntity.setImage(
+                    imageServiceStorage.uploadToStorage(
+                            new Image(file)
+                    )
+            );
+        }
+        return productCategoryRepository.save(productCategoryEntity);
     }
 
 }

@@ -56,7 +56,7 @@ public class LotServiceImpl implements LotService {
             case ProductCategoryEntity e when e.getId() != null ->
                     productCategoryService.getById(lotEntity.getProductCategory().getId());
             case ProductCategoryEntity e when e.getTitle() != null ->
-                    productCategoryService.save(lotEntity.getProductCategory());
+                    productCategoryService.save(lotEntity.getProductCategory(), null);
             case null, default ->
                     throw new InvalidArgumentException("Provide productCategory.id or productCategory.title");
         };
@@ -179,7 +179,7 @@ public class LotServiceImpl implements LotService {
             case ProductCategoryEntity e when e.getId() != null ->
                     productCategoryService.getById(lotEntityUpdatedFields.getProductCategory().getId());
             case ProductCategoryEntity e when e.getTitle() != null ->
-                    productCategoryService.save(lotEntityUpdatedFields.getProductCategory());
+                    productCategoryService.save(lotEntityUpdatedFields.getProductCategory(), null);
             case null, default ->
                     throw new InvalidArgumentException("Provide productCategory.id or productCategory.title");
         };

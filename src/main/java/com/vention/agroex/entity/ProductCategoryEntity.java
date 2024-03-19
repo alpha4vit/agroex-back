@@ -1,6 +1,5 @@
 package com.vention.agroex.entity;
 
-import com.fasterxml.jackson.annotation.JsonIgnore;
 import jakarta.persistence.*;
 import lombok.*;
 
@@ -20,6 +19,9 @@ public class ProductCategoryEntity {
 
     @Column(name = "title")
     private String title;
+
+    @Column(name = "image")
+    private String image;
 
     @ManyToOne
     @JoinColumn(name = "parent_id", referencedColumnName = "id")

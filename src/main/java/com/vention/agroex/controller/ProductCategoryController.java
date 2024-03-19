@@ -1,16 +1,17 @@
 package com.vention.agroex.controller;
 
 import com.vention.agroex.dto.ProductCategory;
-import com.vention.agroex.entity.ProductCategoryEntity;
 import com.vention.agroex.service.ProductCategoryService;
 import com.vention.agroex.util.mapper.ProductCategoryMapper;
-import com.vention.agroex.util.validator.ProductCategoryValidator;
+import com.vention.agroex.util.validator.ProductCategoryEntityValidator;
 import io.swagger.v3.oas.annotations.tags.Tag;
+import jakarta.validation.Valid;
 import lombok.RequiredArgsConstructor;
 import org.springframework.http.ResponseEntity;
 import org.springframework.security.access.prepost.PreAuthorize;
 import org.springframework.validation.BindingResult;
 import org.springframework.web.bind.annotation.*;
+import org.springframework.web.multipart.MultipartFile;
 
 import java.util.List;
 
@@ -21,25 +22,30 @@ import java.util.List;
 public class ProductCategoryController {
 
     private final ProductCategoryService productCategoryService;
-    private final ProductCategoryValidator productCategoryValidator;
+    private final ProductCategoryEntityValidator productCategoryEntityValidator;
     private final ProductCategoryMapper productCategoryMapper;
 
     @PreAuthorize("@customSecurityExpression.isAdmin()")
     @PostMapping()
-    public ResponseEntity<ProductCategory> save(@RequestBody ProductCategoryEntity productCategoryEntity,
+    public ResponseEntity<ProductCategory> save(@RequestPart(value = "file", required = false) MultipartFile image,
+                                                @RequestPart("data") @Valid ProductCategory productCategory,
                                                 BindingResult bindingResult) {
-        productCategoryValidator.validate(productCategoryEntity, bindingResult);
-        var savedProductCategory = productCategoryService.save(productCategoryEntity);
+        var productCategoryEntity = productCategoryMapper.toEntity(productCategory);
+        productCategoryEntityValidator.validate(productCategoryEntity, bindingResult);
+        var savedProductCategory = productCategoryService.save(productCategoryEntity, image);
         return ResponseEntity.ok(productCategoryMapper.toDTO(savedProductCategory));
     }
 
     @PreAuthorize("@customSecurityExpression.isAdmin()")
     @PutMapping("/{id}")
     public ResponseEntity<ProductCategory> update(@PathVariable Long id,
-                                                        @RequestBody ProductCategoryEntity productCategoryEntity,
+                                                        @RequestPart(value = "file", required = false) MultipartFile image,
+                                                        @RequestPart("data") ProductCategory productCategory,
                                                         BindingResult bindingResult) {
-        productCategoryValidator.validate(productCategoryEntity, bindingResult);
-        var updatedProductCategory = productCategoryService.update(id, productCategoryEntity);
+        var productCategoryEntity = productCategoryMapper.toEntity(productCategory);
+        productCategoryEntity.setId(id);
+        productCategoryEntityValidator.validate(productCategoryEntity, bindingResult);
+        var updatedProductCategory = productCategoryService.update(id, productCategoryEntity, image);
         return ResponseEntity.ok(productCategoryMapper.toDTO(updatedProductCategory));
     }
 

@@ -7,7 +7,9 @@ public record ProductCategory(
 
         String title,
 
-        Long parentId) {
+        Long parentId,
+
+        String image) {
 
     @AssertTrue(message = "Provide product category id or title")
     private boolean isIdOrTitlePresented(){
