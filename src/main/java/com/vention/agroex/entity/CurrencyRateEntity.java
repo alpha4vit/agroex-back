@@ -35,7 +35,4 @@ public class CurrencyRateEntity {
     @Column(name = "updated_at")
     private Instant updatedAt;
 
-    public CurrencyRateEntity(String targetCurrency) {
-        this.targetCurrency = targetCurrency;
-    }
 }

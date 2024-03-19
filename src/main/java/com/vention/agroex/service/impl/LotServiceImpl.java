@@ -9,6 +9,7 @@ import com.vention.agroex.exception.InvalidBetException;
 import com.vention.agroex.exception.LotEditException;
 import com.vention.agroex.filter.FilterService;
 import com.vention.agroex.model.LotStatusResponse;
+import com.vention.agroex.repository.CurrencyRateRepository;
 import com.vention.agroex.repository.LotRepository;
 import com.vention.agroex.service.*;
 import com.vention.agroex.util.constant.LotTypeConstants;
@@ -26,16 +27,14 @@ import java.math.BigDecimal;
 import java.time.Instant;
 import java.time.ZoneId;
 import java.time.ZonedDateTime;
-import java.util.ArrayList;
-import java.util.List;
-import java.util.Map;
-import java.util.UUID;
+import java.util.*;
 import java.util.stream.Collectors;
 
 @Slf4j
 @Service
 @RequiredArgsConstructor
 public class LotServiceImpl implements LotService {
+    private final CurrencyRateRepository currencyRateRepository;
 
     private final LotMapper lotMapper;
     private final TagService tagService;
@@ -137,7 +136,7 @@ public class LotServiceImpl implements LotService {
     @Override
     @Transactional(rollbackOn = ImageLotException.class)
     public LotEntity update(Long id, LotEntity lotEntityUpdatedFields, MultipartFile[] files, String currency) {
-        var lotToUpdate = getById(id);
+        var lotToUpdate = getById(id, currency);
 
         if (lotToUpdate.getInnerStatus().equals(StatusConstants.ON_MODERATION)) {
             throw new LotEditException("You can`t edit this lot while moderation");
@@ -214,8 +213,7 @@ public class LotServiceImpl implements LotService {
         result.getLocation().setCountry(countryEntity);
         result.setProductCategory(productCategoryEntity);
 
-        var saved = lotRepository.save(result);
-        return saved;
+        return lotRepository.save(result);
     }
 
     @Override
@@ -375,7 +373,12 @@ public class LotServiceImpl implements LotService {
     }
 
     private LotEntity updateCurrency(LotEntity lotEntity, String currency) {
+        lotEntity.getCurrencyRates().clear();
+        var currencyRates = currencyRateRepository.findBySourceCurrency(lotEntity.getOriginalCurrency())
+                .orElseThrow(() -> new NoSuchElementException(String.format(
+                        "There is no currency with name %s", lotEntity.getCurrency())));
         lotEntity.setCurrency(currency);
+        lotEntity.setCurrencyRates(currencyRates);
         return lotEntity;
     }
 

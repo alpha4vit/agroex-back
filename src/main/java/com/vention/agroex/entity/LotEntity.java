@@ -1,6 +1,5 @@
 package com.vention.agroex.entity;
 
-import com.vention.agroex.util.constant.LotTypeConstants;
 import jakarta.persistence.*;
 import lombok.AllArgsConstructor;
 import lombok.Builder;
@@ -104,8 +103,12 @@ public class LotEntity {
     @OneToMany(mappedBy = "lot", cascade = CascadeType.ALL)
     private List<BetEntity> bets;
 
-    @OneToMany(cascade = CascadeType.ALL)
-    @JoinColumn(name = "currency", referencedColumnName = "currency")
+    @ManyToMany
+    @JoinTable(
+            name = "lot_currency_rates",
+            joinColumns = @JoinColumn(name = "lot_currency"),
+            inverseJoinColumns = @JoinColumn(name = "currency_rates_id")
+    )
     private List<CurrencyRateEntity> currencyRates;
 
     @Transient

@@ -28,7 +28,7 @@ public class CurrencyRateServiceImpl implements CurrencyRateService{
 
     @Override
     public Set<CurrencyRateEntity> getTargetsByCurrency(String currency) {
-        return currencyRateRepository.findBySourceCurrency(currency);
+        return currencyRateRepository.findUniqueBySourceCurrency(currency);
     }
 
     @Override
