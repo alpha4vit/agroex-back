@@ -29,4 +29,6 @@ public interface ProductCategoryRepository extends JpaRepository<ProductCategory
 
     Optional<List<ProductCategoryEntity>> findProductCategoryListByParentIdAndLotsIsNotEmpty(Long parentId);
 
+    List<ProductCategoryEntity> findByIdIsIn(List<Long> idList);
+
 }

@@ -2,22 +2,23 @@ package com.vention.agroex.filter;
 
 import com.vention.agroex.entity.LotEntity;
 import com.vention.agroex.exception.InvalidArgumentException;
+import com.vention.agroex.service.ProductCategoryService;
 import com.vention.agroex.util.constant.StatusConstants;
 import lombok.RequiredArgsConstructor;
 import org.jetbrains.annotations.NotNull;
 import org.springframework.data.jpa.domain.Specification;
 import org.springframework.stereotype.Service;
 
-import java.util.Arrays;
-import java.util.Map;
-import java.util.Objects;
-import java.util.UUID;
+import java.util.*;
 import java.util.stream.Collectors;
 import java.util.stream.Stream;
 
 @Service
 @RequiredArgsConstructor
 public class FilterService {
+
+    private final ProductCategoryService productCategoryService;
+
     private final String EQUALS = ":";
     private final String GREATER = ">";
     private final String LOWER = "<";
@@ -44,7 +45,7 @@ public class FilterService {
             mainFieldsBuilder.with("enabledByAdmin", EQUALS, true, currency);
         }
 
-        if (!nonNullFilters.containsKey("status")){
+        if (!nonNullFilters.containsKey("status")) {
             statusBuilder.with("status", EQUALS, StatusConstants.ACTIVE, currency);
         }
         nonNullFilters.forEach((field, value) -> {
@@ -57,10 +58,12 @@ public class FilterService {
                 case "maxPrice" -> mainFieldsBuilder.with("price", LOWER, Float.parseFloat(value), currency);
                 case "enabledByAdmin" -> mainFieldsBuilder.with("enabledByAdmin", EQUALS, Boolean.parseBoolean(value), currency);
                 case "keyword" -> mainFieldsBuilder.with("keyword", EQUALS, value, currency);
-
-                case "categories" -> getStringStream(value)
-                        .map(Long::parseLong)
-                        .forEach(category -> productCategoryBuilder.with("productCategory", EQUALS, category, currency));
+                case "categories", "subcategories" -> {
+                    if (!nonNullFilters.containsKey("subcategories") || field.equals("subcategories"))
+                        getStringStream(value)
+                                .flatMap(string -> productCategoryService.getAllSubCategories(Long.parseLong(string)).stream())
+                                .forEach(category -> productCategoryBuilder.with("productCategory", EQUALS, category.getId(), currency));
+                }
                 case "users" -> getStringStream(value)
                         .map(UUID::fromString)
                         .forEach(user -> userBuilder.with("user", EQUALS, user, currency));
