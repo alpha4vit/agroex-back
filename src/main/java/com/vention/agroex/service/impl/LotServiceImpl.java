@@ -136,31 +136,33 @@ public class LotServiceImpl implements LotService {
     @Override
     @Transactional(rollbackOn = ImageLotException.class)
     public LotEntity update(Long id, LotEntity lotEntityUpdatedFields, MultipartFile[] files, String currency) {
-        var lotToUpdate = getById(id, currency);
+        var existedLotToUpdate = getById(id, currency);
 
-        if (lotToUpdate.getInnerStatus().equals(StatusConstants.ON_MODERATION)) {
+        if (existedLotToUpdate.getInnerStatus().equals(StatusConstants.ON_MODERATION)) {
             throw new LotEditException("You can`t edit this lot while moderation");
         }
-        if (lotToUpdate.getStatus().equals(StatusConstants.FINISHED)) {
+        if (existedLotToUpdate.getStatus().equals(StatusConstants.FINISHED)) {
             throw new LotEditException("This auction has already ended");
         }
-        if (!lotToUpdate.getBets().isEmpty()) {
+        if (!existedLotToUpdate.getBets().isEmpty()) {
             throw new LotEditException("This lot already has customers");
         }
-        var updatedLot = lotMapper.update(lotToUpdate, lotEntityUpdatedFields);
-        imageService.updateImagesForLot(lotToUpdate, updatedLot, files);
+        var mappedAfterUpdateLot = lotMapper.update(existedLotToUpdate, lotEntityUpdatedFields);
+        imageService.updateImagesForLot(existedLotToUpdate, mappedAfterUpdateLot, files);
 
-        var isLotTypeChanged = lotEntityUpdatedFields.getLotType().equals(lotToUpdate.getLotType());
+        var isLotTypeChanged = !lotEntityUpdatedFields.getLotType().equals(existedLotToUpdate.getLotType());
         var newLotType = lotEntityUpdatedFields.getLotType();
         var newInnerStatus = lotEntityUpdatedFields.getInnerStatus();
         var newLotStatus = lotEntityUpdatedFields.getStatus();
 
-        if (!isLotTypeChanged) {
+        if (isLotTypeChanged) {
             if (lotEntityUpdatedFields.getLotType().equals(LotTypeConstants.AUCTION_SELL)) {
                 newLotType = LotTypeConstants.AUCTION_SELL;
                 newInnerStatus = StatusConstants.NEW;
             } else {
-                if (updatedLot.getLotType().equals(LotTypeConstants.AUCTION_SELL) && !updatedLot.getInnerStatus().equals(StatusConstants.NEW)) {
+                if (existedLotToUpdate.getLotType().equals(LotTypeConstants.AUCTION_SELL)
+                        && !(existedLotToUpdate.getInnerStatus().equals(StatusConstants.NEW) ||
+                        existedLotToUpdate.getInnerStatus().equals(StatusConstants.REJECTED_BY_ADMIN))) {
                     throw new InvalidArgumentException(Map.of("lotType", "Lot type cant be changed to auction sell on this active lot"), "Invalid operation");
                 }
                 newLotType = lotEntityUpdatedFields.getLotType();
@@ -169,11 +171,11 @@ public class LotServiceImpl implements LotService {
             }
         }
 
-        updatedLot.setLotType(newLotType);
-        updatedLot.setInnerStatus(newInnerStatus);
-        updatedLot.setStatus(newLotStatus);
+        mappedAfterUpdateLot.setLotType(newLotType);
+        mappedAfterUpdateLot.setInnerStatus(newInnerStatus);
+        mappedAfterUpdateLot.setStatus(newLotStatus);
 
-        var countryEntity = countryService.getById(updatedLot.getLocation().getCountry().getId());
+        var countryEntity = countryService.getById(mappedAfterUpdateLot.getLocation().getCountry().getId());
 
         var productCategoryEntity = switch (lotEntityUpdatedFields.getProductCategory()) {
             case ProductCategoryEntity e when e.getId() != null ->
@@ -184,21 +186,21 @@ public class LotServiceImpl implements LotService {
                     throw new InvalidArgumentException("Provide productCategory.id or productCategory.title");
         };
 
-        if (!lotToUpdate.getInnerStatus().equals(StatusConstants.APPROVED)) {
-            updatedLot.setInnerStatus(StatusConstants.NEW);
+        if (!existedLotToUpdate.getInnerStatus().equals(StatusConstants.APPROVED)) {
+            mappedAfterUpdateLot.setInnerStatus(StatusConstants.NEW);
         }
-        if (lotToUpdate.getLotType().equals(LotTypeConstants.AUCTION_SELL)) {
-            updatedLot.setInnerStatus(StatusConstants.NEW);
-            updatedLot.setStatus(StatusConstants.INACTIVE);
+        if (existedLotToUpdate.getLotType().equals(LotTypeConstants.AUCTION_SELL)) {
+            mappedAfterUpdateLot.setInnerStatus(StatusConstants.NEW);
+            mappedAfterUpdateLot.setStatus(StatusConstants.INACTIVE);
         }
-        updatedLot.setUser(userService.getAuthenticatedUser());
-        updatedLot.getLocation().setCountry(countryEntity);
-        updatedLot.setProductCategory(productCategoryEntity);
-        updatedLot.setTags(updatedLot.getTags()
+        mappedAfterUpdateLot.setUser(userService.getAuthenticatedUser());
+        mappedAfterUpdateLot.getLocation().setCountry(countryEntity);
+        mappedAfterUpdateLot.setProductCategory(productCategoryEntity);
+        mappedAfterUpdateLot.setTags(mappedAfterUpdateLot.getTags()
                 .stream().map(tagService::save)
                 .toList());
 
-        return updateCurrency(lotRepository.save(updatedLot), currency);
+        return updateCurrency(lotRepository.save(mappedAfterUpdateLot), currency);
     }
 
     @Override
