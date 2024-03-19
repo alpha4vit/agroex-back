@@ -373,7 +373,6 @@ public class LotServiceImpl implements LotService {
     }
 
     private LotEntity updateCurrency(LotEntity lotEntity, String currency) {
-        lotEntity.getCurrencyRates().clear();
         var currencyRates = currencyRateRepository.findBySourceCurrency(lotEntity.getOriginalCurrency())
                 .orElseThrow(() -> new NoSuchElementException(String.format(
                         "There is no currency with name %s", lotEntity.getCurrency())));
