@@ -30,9 +30,9 @@ public class UserController {
 
 
     @GetMapping
-    public ResponseEntity<Object> getAll() {
+    public ResponseEntity<List<User>> getAll() {
         var users = userService.getAll();
-        return ResponseEntity.ok(users);
+        return ResponseEntity.ok(userMapper.toDtos(users));
     }
 
     @GetMapping("/{id}")
