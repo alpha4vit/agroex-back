@@ -85,4 +85,22 @@ public class ProductCategoryServiceImpl implements ProductCategoryService {
         return productCategoryRepository.save(productCategoryEntity);
     }
 
+    @Override
+    public List<ProductCategoryEntity> getAllSubCategories(Long productCategoryId) {
+        var categories = getAll();
+        return categories.stream()
+                .filter(category -> searchParent(category, productCategoryId))
+                .toList();
+    }
+
+    private boolean searchParent(ProductCategoryEntity entity, Long searchId){
+        if (entity.getId().equals(searchId))
+            return true;
+        if (entity.getParent() == null)
+            return false;
+        if (entity.getParent().getId().equals(searchId))
+            return true;
+        return searchParent(entity.getParent(), searchId);
+    }
+
 }

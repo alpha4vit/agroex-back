@@ -20,4 +20,6 @@ public interface ProductCategoryService {
 
     ProductCategoryEntity update(Long id, ProductCategoryEntity productCategoryEntity, MultipartFile file);
 
+    List<ProductCategoryEntity> getAllSubCategories(Long productCategoryId);
+
 }

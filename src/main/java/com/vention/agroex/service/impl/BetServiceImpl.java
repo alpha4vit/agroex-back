@@ -55,7 +55,7 @@ public class BetServiceImpl implements BetService {
         if (lot.getUser().getId() == betEntity.getUser().getId()) {
             throw new InvalidBetException("You can't make bets in your own auction");
         }
-        if (lot.getMinPrice().compareTo(betEntity.getAmount()) >= 0) {
+        if (lot.getMinPrice() != null && lot.getMinPrice().compareTo(betEntity.getAmount()) >= 0) {
             throw new InvalidBetException(
                     String.format("Your bet must be higher than the minimal price: %f", lot.getMinPrice()));
         }

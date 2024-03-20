@@ -124,6 +124,9 @@ public class LotEntity {
     private String adminComment;
 
     public BigDecimal getMinPrice() {
+        if (originalMinPrice == null) {
+            return null;
+        }
         if (currency.equals(originalCurrency)) {
             minPrice = originalMinPrice;
         } else {

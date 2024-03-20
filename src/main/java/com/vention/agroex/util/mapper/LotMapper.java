@@ -2,14 +2,19 @@ package com.vention.agroex.util.mapper;
 
 import com.vention.agroex.dto.Lot;
 import com.vention.agroex.entity.*;
+import com.vention.agroex.model.LotReportModel;
 import com.vention.agroex.util.constant.StatusConstants;
 import org.mapstruct.Mapper;
 import org.mapstruct.Mapping;
 
 import java.math.BigDecimal;
+import java.time.ZoneId;
+import java.time.ZonedDateTime;
 import java.util.List;
 
-@Mapper(componentModel = "spring", uses = {LocationMapper.class, ProductCategoryMapper.class,  BetMapper.class})
+@Mapper(componentModel = "spring",
+        uses = {LocationMapper.class, ProductCategoryMapper.class, BetMapper.class},
+        imports = {ZonedDateTime.class, ZoneId.class})
 public interface LotMapper {
 
     @Mapping(target = "creationDate", ignore = true)
@@ -30,6 +35,7 @@ public interface LotMapper {
 
     List<Lot> toDTOs(List<LotEntity> lotEntities);
 
+    List<Lot> toDTOsFromLotModels(List<LotReportModel> lotReportModels);
 
     default LotEntity update(LotEntity before, LotEntity received) {
         LotEntity result = LotEntity.builder()
