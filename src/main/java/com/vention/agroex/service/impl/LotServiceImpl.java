@@ -23,12 +23,10 @@ import org.springframework.data.domain.PageRequest;
 import org.springframework.stereotype.Service;
 import org.springframework.web.multipart.MultipartFile;
 
-import java.math.BigDecimal;
 import java.time.Instant;
 import java.time.ZoneId;
 import java.time.ZonedDateTime;
 import java.util.*;
-import java.util.stream.Collectors;
 
 @Slf4j
 @Service
@@ -355,24 +353,10 @@ public class LotServiceImpl implements LotService {
     @Override
     public List<LotEntity> getWithCriteria(Map<String, String> filters, int pageNumber, int pageSize, String currency) {
         var searchCriteria = filterService.getCriteria(filters, currency);
-
         var lots = lotRepository.findAll(searchCriteria, PageRequest.of(pageNumber, pageSize)).toList();
-        var lotsWithUpdatedPrice = new ArrayList<>(lots.stream().map(lot -> updateCurrency(lot, currency)).toList());
-        var nonNullFilters = filters.entrySet().stream()
-                .filter(entry -> entry.getValue() != null && !entry.getValue().isEmpty())
-                .collect(Collectors.toMap(Map.Entry::getKey, Map.Entry::getValue));
-
-        nonNullFilters.forEach((field, value) -> {
-            switch (field) {
-                case "minPrice" ->
-                        lotsWithUpdatedPrice.removeIf(lotEntity -> lotEntity.getPrice().compareTo(new BigDecimal(value)) < 0);
-                case "maxPrice" ->
-                        lotsWithUpdatedPrice.removeIf(lotEntity -> lotEntity.getPrice().compareTo(new BigDecimal(value)) > 0);
-            }
-        });
-
-        return lotsWithUpdatedPrice;
+        return new ArrayList<>(lots.stream().map(lot -> updateCurrency(lot, currency)).toList());
     }
+
 
     private LotEntity updateCurrency(LotEntity lotEntity, String currency) {
         var currencyRates = currencyRateRepository.findBySourceCurrency(lotEntity.getOriginalCurrency())
