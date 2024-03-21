@@ -29,7 +29,8 @@ public class SearchMethodInterceptor implements StatementInspector {
             } else {
                 log.error("There is no search condition in search string");
             }
-            var searchInsert = "to_tsvector(search_pc.title || ' ' || le1_0.title || description) @@ to_tsquery('" + keyword + "')";
+            var searchInsert = "to_tsvector(search_pc.title || ' ' || le1_0.title || ' ' ||" +
+                    " description || ' ' || le1_0.variety) @@ to_tsquery('" + keyword + "')";
             sql = sql.replaceFirst("'SEARCH_STRING'='(.*?)'", searchInsert);
         }
         return sql;
