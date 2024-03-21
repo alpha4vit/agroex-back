@@ -151,7 +151,7 @@ public class LotServiceImpl implements LotService {
         var isLotTypeChanged = !lotEntityUpdatedFields.getLotType().equals(existedLotToUpdate.getLotType());
         var newLotType = lotEntityUpdatedFields.getLotType();
         var newInnerStatus = lotEntityUpdatedFields.getInnerStatus();
-        var newLotStatus = lotEntityUpdatedFields.getStatus();
+        var newLotStatus = StatusConstants.INACTIVE;
 
         if (isLotTypeChanged) {
             if (lotEntityUpdatedFields.getLotType().equals(LotTypeConstants.AUCTION_SELL)) {
@@ -166,7 +166,6 @@ public class LotServiceImpl implements LotService {
                 }
                 newLotType = lotEntityUpdatedFields.getLotType();
                 newInnerStatus = StatusConstants.ACTIVE;
-                newLotStatus = StatusConstants.ACTIVE;
             }
         }
 
