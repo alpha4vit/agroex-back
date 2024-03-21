@@ -157,6 +157,7 @@ public class LotServiceImpl implements LotService {
             if (lotEntityUpdatedFields.getLotType().equals(LotTypeConstants.AUCTION_SELL)) {
                 newLotType = LotTypeConstants.AUCTION_SELL;
                 newInnerStatus = StatusConstants.NEW;
+                mappedAfterUpdateLot.setExpirationDate(null);
             } else {
                 if (existedLotToUpdate.getLotType().equals(LotTypeConstants.AUCTION_SELL)
                         && !(existedLotToUpdate.getInnerStatus().equals(StatusConstants.NEW) ||
