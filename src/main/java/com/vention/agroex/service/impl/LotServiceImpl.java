@@ -209,7 +209,7 @@ public class LotServiceImpl implements LotService {
                 .stream().map(tagService::save)
                 .toList());
 
-        if (locationRepository.findByCountryIdAndRegion(mappedAfterUpdateLot.getLocation().getCountry().getId(), updatedLot.getLocation().getRegion()).isPresent()) {
+        if (locationRepository.findByCountryIdAndRegion(mappedAfterUpdateLot.getLocation().getCountry().getId(), mappedAfterUpdateLot.getLocation().getRegion()).isPresent()) {
             mappedAfterUpdateLot.setLocation(
                     locationRepository.findByCountryIdAndRegion(
                             mappedAfterUpdateLot.getLocation().getCountry().getId(),
@@ -381,7 +381,7 @@ public class LotServiceImpl implements LotService {
 
     private LotEntity updateCurrency(LotEntity lotEntity, String currency) {
         var currencyRates = currencyRateRepository.findBySourceCurrency(lotEntity.getOriginalCurrency())
-                .orElseThrow(() -> new NoSuchElementException(String.format(
+                .orElseThrow(() -> new EntityNotFoundException(String.format(
                         "There is no currency with name %s", lotEntity.getCurrency())));
         lotEntity.setCurrency(currency);
         lotEntity.setCurrencyRates(currencyRates);
