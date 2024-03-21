@@ -10,7 +10,7 @@ import java.util.Map;
 @AllArgsConstructor
 public class ExceptionResponse {
 
-    Map<String, String> errors;
+    Map<String, Object> errors;
 
     private String message;
 

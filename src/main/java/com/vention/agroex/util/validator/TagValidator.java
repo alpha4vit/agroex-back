@@ -22,7 +22,7 @@ public class TagValidator implements Validator {
     public void validate(Object target, Errors errors) {
         record ErrorField(String field, String message){}
 
-        Map<String, String> map = errors.getFieldErrors().stream()
+        Map<String, Object> map = errors.getFieldErrors().stream()
                 .map(fieldError -> new ErrorField(
                         fieldError.getField(), fieldError.getDefaultMessage())
                 )

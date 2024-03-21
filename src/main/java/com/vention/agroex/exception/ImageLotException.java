@@ -8,13 +8,13 @@ import java.util.Map;
 public class ImageLotException extends RuntimeException{
 
     private Long createdLotId;
-    private Map<String, String> errors;
+    private Map<String, Object> errors;
 
     public ImageLotException(String message) {
         super(message);
     }
 
-    public ImageLotException(String message, Map<String, String> errors) {
+    public ImageLotException(String message, Map<String, Object> errors) {
         super(message);
         this.errors = errors;
     }

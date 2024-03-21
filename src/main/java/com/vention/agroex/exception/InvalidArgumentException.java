@@ -7,13 +7,13 @@ import java.util.Map;
 @Data
 public class InvalidArgumentException extends RuntimeException{
 
-    private Map<String, String> errors;
+    private Map<String, Object> errors;
 
     public InvalidArgumentException() {
 
     }
 
-    public InvalidArgumentException(Map<String, String> errors, String message) {
+    public InvalidArgumentException(Map<String, Object> errors, String message) {
         super(message);
         this.errors = errors;
     }

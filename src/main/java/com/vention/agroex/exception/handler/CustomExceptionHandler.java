@@ -35,7 +35,7 @@ public class CustomExceptionHandler extends ResponseEntityExceptionHandler {
         record ErrorField(String field, String message) {}
         return switch (ex.getCause()) {
             case InvalidFormatException e -> {
-                Map<String, String> map = e.getPath().stream()
+                Map<String, Object> map = e.getPath().stream()
                         .map(field -> new ErrorField(
                                 field.getFieldName(), String.format("Ivalid input type: %s", e.getValue()))
                         )
@@ -48,7 +48,7 @@ public class CustomExceptionHandler extends ResponseEntityExceptionHandler {
 
     @Override
     protected ResponseEntity<Object> handleMethodArgumentNotValid(MethodArgumentNotValidException ex, HttpHeaders headers, HttpStatusCode status, WebRequest request) {
-        record ErrorField(String field, String message) {}
+        record ErrorField(String field, Object message) {}
         var errors = ex.getBindingResult().getFieldErrors().stream()
                 .map(fieldError -> new ErrorField(
                         fieldError.getField(), fieldError.getDefaultMessage()))
@@ -72,12 +72,12 @@ public class CustomExceptionHandler extends ResponseEntityExceptionHandler {
         };
     }
 
-    private ResponseEntity<Object> createResponse(Exception e, HttpStatus status, Map<String, String> errors) {
+    private ResponseEntity<Object> createResponse(Exception e, HttpStatus status, Map<String, Object> errors) {
         return ResponseEntity.status(status).body(new ExceptionResponse(errors, e.getMessage(), status));
     }
 
     private ResponseEntity<Object> handleConstraintViolationException(ConstraintViolationException e){
-        record ErrorField(String field, String message) {}
+        record ErrorField(String field, Object message) {}
         var errors = e.getConstraintViolations().stream()
                 .map(violation ->
                         new ErrorField(
