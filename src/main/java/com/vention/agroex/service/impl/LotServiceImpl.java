@@ -10,6 +10,7 @@ import com.vention.agroex.exception.LotEditException;
 import com.vention.agroex.filter.FilterService;
 import com.vention.agroex.model.LotStatusResponse;
 import com.vention.agroex.repository.CurrencyRateRepository;
+import com.vention.agroex.repository.LocationRepository;
 import com.vention.agroex.repository.LotRepository;
 import com.vention.agroex.service.*;
 import com.vention.agroex.util.constant.LotTypeConstants;
@@ -26,13 +27,16 @@ import org.springframework.web.multipart.MultipartFile;
 import java.time.Instant;
 import java.time.ZoneId;
 import java.time.ZonedDateTime;
-import java.util.*;
+import java.util.ArrayList;
+import java.util.List;
+import java.util.Map;
+import java.util.UUID;
+import java.util.stream.Collectors;
 
 @Slf4j
 @Service
 @RequiredArgsConstructor
 public class LotServiceImpl implements LotService {
-    private final CurrencyRateRepository currencyRateRepository;
 
     private final LotMapper lotMapper;
     private final TagService tagService;
@@ -42,13 +46,14 @@ public class LotServiceImpl implements LotService {
     private final LotRepository lotRepository;
     private final CountryService countryService;
     private final ProductCategoryService productCategoryService;
+    private final LocationRepository locationRepository;
+    private final CurrencyRateRepository currencyRateRepository;
 
     @Override
     @Transactional(rollbackOn = Exception.class)
     public LotEntity save(LotEntity lotEntity, MultipartFile[] files) {
         validateFiles(files);
 
-        var countryEntity = countryService.getById(lotEntity.getLocation().getCountry().getId());
 
         var productCategoryEntity = switch (lotEntity.getProductCategory()) {
             case ProductCategoryEntity e when e.getId() != null ->
@@ -59,8 +64,17 @@ public class LotServiceImpl implements LotService {
                     throw new InvalidArgumentException(Map.of("productCategory", "Provide product category id or title"), "Invalid arguments");
         };
 
+        if (locationRepository.findByCountryIdAndRegion(lotEntity.getLocation().getCountry().getId(), lotEntity.getLocation().getRegion()).isPresent()) {
+            lotEntity.setLocation(
+                    locationRepository.findByCountryIdAndRegion(
+                            lotEntity.getLocation().getCountry().getId(),
+                            lotEntity.getLocation().getRegion()).get());
+        } else {
+            lotEntity.getLocation()
+                    .setCountry(countryService.getById(lotEntity.getLocation().getCountry().getId()));
+        }
+
         lotEntity.setUser(userService.getAuthenticatedUser());
-        lotEntity.getLocation().setCountry(countryEntity);
         lotEntity.setProductCategory(productCategoryEntity);
         lotEntity.setTags(lotEntity.getTags()
                 .stream().map(tagService::save)
@@ -172,9 +186,7 @@ public class LotServiceImpl implements LotService {
         mappedAfterUpdateLot.setLotType(newLotType);
         mappedAfterUpdateLot.setInnerStatus(newInnerStatus);
         mappedAfterUpdateLot.setStatus(newLotStatus);
-
-        var countryEntity = countryService.getById(mappedAfterUpdateLot.getLocation().getCountry().getId());
-
+        
         var productCategoryEntity = switch (lotEntityUpdatedFields.getProductCategory()) {
             case ProductCategoryEntity e when e.getId() != null ->
                     productCategoryService.getById(lotEntityUpdatedFields.getProductCategory().getId());
@@ -192,11 +204,20 @@ public class LotServiceImpl implements LotService {
             mappedAfterUpdateLot.setStatus(StatusConstants.INACTIVE);
         }
         mappedAfterUpdateLot.setUser(userService.getAuthenticatedUser());
-        mappedAfterUpdateLot.getLocation().setCountry(countryEntity);
         mappedAfterUpdateLot.setProductCategory(productCategoryEntity);
         mappedAfterUpdateLot.setTags(mappedAfterUpdateLot.getTags()
                 .stream().map(tagService::save)
                 .toList());
+
+        if (locationRepository.findByCountryIdAndRegion(mappedAfterUpdateLot.getLocation().getCountry().getId(), updatedLot.getLocation().getRegion()).isPresent()) {
+            mappedAfterUpdateLot.setLocation(
+                    locationRepository.findByCountryIdAndRegion(
+                            mappedAfterUpdateLot.getLocation().getCountry().getId(),
+                            mappedAfterUpdateLot.getLocation().getRegion()).get());
+        } else {
+            mappedAfterUpdateLot.getLocation()
+                    .setCountry(countryService.getById(mappedAfterUpdateLot.getLocation().getCountry().getId()));
+        }
 
         return updateCurrency(lotRepository.save(mappedAfterUpdateLot), currency);
     }
