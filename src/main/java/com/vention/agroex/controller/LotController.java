@@ -80,15 +80,15 @@ public class LotController {
         return ResponseEntity.ok(lotService.getLotStatus(id));
     }
 
-    @PreAuthorize("@customSecurityExpression.isUserEnabled() && @customSecurityExpression.isLotOwner(#lotId)")
     @PostMapping("/{id}/userStatus")
+    @PreAuthorize("@customSecurityExpression.isUserEnabled() && @customSecurityExpression.isLotOwner(#lotId)")
     public ResponseEntity<Lot> changeUserStatus(@PathVariable("id") Long lotId, @RequestParam boolean status) {
         var moderated = lotService.changeUserStatus(lotId, status);
         return ResponseEntity.ok(lotMapper.toDTO(moderated));
     }
 
-    @PreAuthorize("@customSecurityExpression.isAdmin()")
     @PostMapping("/{id}/moderate")
+    @PreAuthorize("@customSecurityExpression.isAdmin()")
     public ResponseEntity<Lot> putOnModeration(@PathVariable("id") Long lotId,
                                                @RequestHeader("currency") String currency,
                                                @RequestParam(value = "adminComment", required = false) String adminComment) {
@@ -96,8 +96,8 @@ public class LotController {
         return ResponseEntity.ok(lotMapper.toDTO(moderated));
     }
 
-    @PreAuthorize("@customSecurityExpression.isAdmin()")
     @PostMapping("/{id}/approve")
+    @PreAuthorize("@customSecurityExpression.isAdmin()")
     public ResponseEntity<Lot> approve(@PathVariable("id") Long lotId,
                                        @RequestHeader("currency") String currency,
                                        @RequestParam(value = "adminComment", required = false) String adminComment) {
@@ -105,8 +105,8 @@ public class LotController {
         return ResponseEntity.ok(lotMapper.toDTO(approved));
     }
 
-    @PreAuthorize("@customSecurityExpression.isAdmin()")
     @PostMapping("/{id}/reject")
+    @PreAuthorize("@customSecurityExpression.isAdmin()")
     public ResponseEntity<Lot> reject(@PathVariable("id") Long lotId,
                                       @RequestParam(value = "adminComment") String adminComment) {
         var rejected = lotService.reject(lotId, adminComment);

@@ -25,8 +25,8 @@ public class ProductCategoryController {
     private final ProductCategoryEntityValidator productCategoryEntityValidator;
     private final ProductCategoryMapper productCategoryMapper;
 
-    @PreAuthorize("@customSecurityExpression.isAdmin()")
     @PostMapping()
+    @PreAuthorize("@customSecurityExpression.isAdmin()")
     public ResponseEntity<ProductCategory> save(@RequestPart(value = "file", required = false) MultipartFile image,
                                                 @RequestPart("data") @Valid ProductCategory productCategory,
                                                 BindingResult bindingResult) {
@@ -36,8 +36,8 @@ public class ProductCategoryController {
         return ResponseEntity.ok(productCategoryMapper.toDTO(savedProductCategory));
     }
 
-    @PreAuthorize("@customSecurityExpression.isAdmin()")
     @PutMapping("/{id}")
+    @PreAuthorize("@customSecurityExpression.isAdmin()")
     public ResponseEntity<ProductCategory> update(@PathVariable Long id,
                                                         @RequestPart(value = "file", required = false) MultipartFile image,
                                                         @RequestPart("data") ProductCategory productCategory,
@@ -68,8 +68,8 @@ public class ProductCategoryController {
         return ResponseEntity.ok(productCategoryMapper.toDTOs(fetchedProductCategories));
     }
 
-    @PreAuthorize("@customSecurityExpression.isAdmin()")
     @DeleteMapping("/{id}")
+    @PreAuthorize("@customSecurityExpression.isAdmin()")
     public ResponseEntity<Long> deleteById(@PathVariable Long id) {
         productCategoryService.deleteById(id);
         return ResponseEntity.ok(id);

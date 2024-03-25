@@ -49,6 +49,17 @@ public class ProductCategoryServiceImpl implements ProductCategoryService {
     }
 
     @Override
+    public ProductCategoryEntity getByTitle(String title) {
+        return productCategoryRepository.getByTitle(title)
+                .orElseThrow(() -> new EntityNotFoundException(String.format("There is no product category with title %s", title)));
+    }
+
+    @Override
+    public boolean existsByTitle(String title) {
+        return productCategoryRepository.existsByTitle(title);
+    }
+
+    @Override
     public List<ProductCategoryEntity> getSubcategoriesById(Long parentId, Boolean lotExisted) {
         var categories = lotExisted ? productCategoryRepository.findProductCategoryListByParentIdAndLotsIsNotEmpty(parentId) :
                 productCategoryRepository.findProductCategoryListByParentId(parentId);

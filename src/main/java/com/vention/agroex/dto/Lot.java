@@ -89,6 +89,7 @@ public class Lot {
     @Valid
     private Location location;
 
+    @Valid
     private List<TagEntity> tags;
 
     private List<ImageResponse> images;

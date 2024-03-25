@@ -61,7 +61,8 @@ public class LotValidator implements Validator {
         var currencies = currencyRateService.getDistinctCurrencies();
         if (!currencies.contains(lot.getOriginalCurrency()))
             map.put("originalCurrency", "Unsupported currency presented!");
-
+        if (lot.getTags().size() > 6)
+            map.put("tag", "Maximum 6 tags allowed to be added");
         if (!map.isEmpty())
             throw new InvalidArgumentException(map, "Invalid arguments!");
     }
