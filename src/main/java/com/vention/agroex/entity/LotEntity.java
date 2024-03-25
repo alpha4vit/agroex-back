@@ -86,7 +86,7 @@ public class LotEntity {
     @JoinColumn(name = "user_id")
     private UserEntity user;
 
-    @ManyToOne(cascade = {CascadeType.MERGE, CascadeType.REMOVE, CascadeType.PERSIST})
+    @ManyToOne(cascade = {CascadeType.MERGE, CascadeType.PERSIST})
     private LocationEntity location;
 
     @ManyToMany

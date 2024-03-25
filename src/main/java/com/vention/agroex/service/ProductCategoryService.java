@@ -12,6 +12,10 @@ public interface ProductCategoryService {
 
     ProductCategoryEntity getById(Long id);
 
+    ProductCategoryEntity getByTitle(String title);
+
+    boolean existsByTitle(String title);
+
     List<ProductCategoryEntity> getSubcategoriesById(Long id, Boolean lotExisted);
 
     void deleteById(Long id);

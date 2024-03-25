@@ -35,7 +35,7 @@ public class LotStatusUpdater {
                     lotService.finishAuction(lot);
                 } else {
                     log.info(String.format("Lot with id %d expired", lot.getId()));
-                    lot.setStatus(StatusConstants.EXPIRED);
+                    lot.setStatus(StatusConstants.FINISHED);
                     lotService.update(lot.getId(), lot);
                 }
             }

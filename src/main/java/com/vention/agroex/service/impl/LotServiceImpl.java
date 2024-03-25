@@ -31,7 +31,6 @@ import java.util.ArrayList;
 import java.util.List;
 import java.util.Map;
 import java.util.UUID;
-import java.util.stream.Collectors;
 
 @Slf4j
 @Service
@@ -58,8 +57,11 @@ public class LotServiceImpl implements LotService {
         var productCategoryEntity = switch (lotEntity.getProductCategory()) {
             case ProductCategoryEntity e when e.getId() != null ->
                     productCategoryService.getById(lotEntity.getProductCategory().getId());
-            case ProductCategoryEntity e when e.getTitle() != null ->
-                    productCategoryService.save(lotEntity.getProductCategory(), null);
+            case ProductCategoryEntity e when e.getTitle() != null -> {
+                if (productCategoryService.existsByTitle(e.getTitle()))
+                    yield productCategoryService.getByTitle(e.getTitle());
+                yield productCategoryService.save(lotEntity.getProductCategory(), null);
+            }
             case null, default ->
                     throw new InvalidArgumentException(Map.of("productCategory", "Provide product category id or title"), "Invalid arguments");
         };
@@ -358,6 +360,9 @@ public class LotServiceImpl implements LotService {
         }
         if (lot.getLotType().equals(StatusConstants.AUCTION_SELL)) {
             lot.setInnerStatus(StatusConstants.NEW);
+            lotStatus = StatusConstants.INACTIVE;
+        }
+        if (!status && !lot.getLotType().equals(StatusConstants.AUCTION_SELL)){
             lotStatus = StatusConstants.INACTIVE;
         }
         lot.setUserStatus(userStatus);

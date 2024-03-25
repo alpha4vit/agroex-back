@@ -33,4 +33,8 @@ public interface ProductCategoryRepository extends JpaRepository<ProductCategory
     @Query(value = "SELECT * FROM product_category WHERE title = :title AND (:id IS NULL OR id <> :id)", nativeQuery = true)
     Optional<ProductCategoryEntity> findByTitleAndIdNot(@Param("id") Long id, @Param("title") String title);
 
+    Boolean existsByTitle(String title);
+
+    Optional<ProductCategoryEntity> getByTitle(String title);
+
 }
