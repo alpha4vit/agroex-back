@@ -9,6 +9,10 @@ public interface CurrencyRateService {
 
     List<CurrencyRateEntity> getAll();
 
+    CurrencyRateEntity create(CurrencyRateEntity rate);
+
+    void deleteById(Long id);
+
     Set<String> getDistinctCurrencies();
 
     Set<CurrencyRateEntity> getTargetsByCurrency(String currency);

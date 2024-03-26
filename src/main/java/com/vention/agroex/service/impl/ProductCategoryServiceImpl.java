@@ -2,6 +2,7 @@ package com.vention.agroex.service.impl;
 
 import com.vention.agroex.dto.Image;
 import com.vention.agroex.entity.ProductCategoryEntity;
+import com.vention.agroex.exception.InvalidArgumentException;
 import com.vention.agroex.repository.ProductCategoryRepository;
 import com.vention.agroex.service.ImageServiceStorage;
 import com.vention.agroex.service.ProductCategoryService;
@@ -70,8 +71,9 @@ public class ProductCategoryServiceImpl implements ProductCategoryService {
     @Override
     @Transactional
     public void deleteById(Long id) {
+        if (!getAllSubCategories(id).isEmpty())
+            throw new InvalidArgumentException("You cant delete category with existing subcategories!");
         productCategoryRepository.deleteById(id);
-        productCategoryRepository.deleteByParentId(id);
     }
 
     @Override

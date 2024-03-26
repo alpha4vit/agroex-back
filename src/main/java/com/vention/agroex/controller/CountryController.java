@@ -37,8 +37,8 @@ public class CountryController {
         return ResponseEntity.ok(countryMapper.toDTO(countryEntity));
     }
 
-    @PreAuthorize("@customSecurityExpression.isAdmin()")
     @PostMapping
+    @PreAuthorize("@customSecurityExpression.isAdmin()")
     public ResponseEntity<Country> createCountry(@RequestBody @Valid Country country,
                                               BindingResult bindingResult){
         countryValidator.validate(country, bindingResult);
@@ -46,8 +46,8 @@ public class CountryController {
         return ResponseEntity.ok(countryMapper.toDTO(saved));
     }
 
-    @PreAuthorize("@customSecurityExpression.isAdmin()")
     @DeleteMapping("/{id}")
+    @PreAuthorize("@customSecurityExpression.isAdmin()")
     @ResponseStatus(HttpStatus.OK)
     public void deleteCountryById(@PathVariable("id") Long id){
         countryService.deleteById(id);
