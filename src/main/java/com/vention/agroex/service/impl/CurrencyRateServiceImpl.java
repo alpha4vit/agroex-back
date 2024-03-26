@@ -22,6 +22,16 @@ public class CurrencyRateServiceImpl implements CurrencyRateService{
     }
 
     @Override
+    public CurrencyRateEntity create(CurrencyRateEntity rate) {
+        return currencyRateRepository.save(rate);
+    }
+
+    @Override
+    public void deleteById(Long id) {
+        currencyRateRepository.deleteById(id);
+    }
+
+    @Override
     public Set<String> getDistinctCurrencies() {
         return currencyRateRepository.findDistinctCurrencies();
     }

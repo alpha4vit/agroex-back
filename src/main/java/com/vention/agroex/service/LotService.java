@@ -45,4 +45,5 @@ public interface LotService {
     List<LotEntity> getUserActivityById(UUID id, String currency);
 
     LotEntity makeDeal(Long lotId, UUID userId, String currency);
+
 }
