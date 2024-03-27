@@ -9,6 +9,7 @@ import org.hibernate.annotations.CreationTimestamp;
 
 import java.math.BigDecimal;
 import java.time.ZonedDateTime;
+import java.util.Comparator;
 import java.util.List;
 import java.util.NoSuchElementException;
 
@@ -123,6 +124,9 @@ public class LotEntity {
     @Column(name = "admin_comment")
     private String adminComment;
 
+    @Transient
+    private BetEntity lastBet;
+
     public BigDecimal getMinPrice() {
         if (originalMinPrice == null) {
             return null;
@@ -157,5 +161,9 @@ public class LotEntity {
     @PostLoad
     private void init() {
         this.currency = this.getOriginalCurrency();
+        this.lastBet = this.bets.stream()
+                .max(Comparator.comparing(BetEntity::getAmount)
+                        .thenComparing(BetEntity::getBetTime))
+                .orElse(null);
     }
 }

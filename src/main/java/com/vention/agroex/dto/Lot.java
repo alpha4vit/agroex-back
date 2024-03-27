@@ -105,4 +105,7 @@ public class Lot {
     private BigDecimal minPrice;
 
     private List<Bet> bets;
+
+    private Bet lastBet;
+
 }
