@@ -3,6 +3,7 @@ package com.vention.agroex.service.impl;
 import com.vention.agroex.dto.Image;
 import com.vention.agroex.entity.ProductCategoryEntity;
 import com.vention.agroex.exception.InvalidArgumentException;
+import com.vention.agroex.repository.LotRepository;
 import com.vention.agroex.repository.ProductCategoryRepository;
 import com.vention.agroex.service.ImageServiceStorage;
 import com.vention.agroex.service.ProductCategoryService;
@@ -23,6 +24,7 @@ public class ProductCategoryServiceImpl implements ProductCategoryService {
 
     private final ProductCategoryRepository productCategoryRepository;
     private final ImageServiceStorage imageServiceStorage;
+    private final LotRepository lotRepository;
 
     @Override
     public ProductCategoryEntity save(ProductCategoryEntity productCategoryEntity, MultipartFile file) {
@@ -71,8 +73,11 @@ public class ProductCategoryServiceImpl implements ProductCategoryService {
     @Override
     @Transactional
     public void deleteById(Long id) {
-        if (!getAllSubCategories(id).isEmpty())
+        var subCategories = getAllSubCategories(id);
+        if (subCategories.size() > 1)
             throw new InvalidArgumentException("You cant delete category with existing subcategories!");
+        if (lotRepository.existsByProductCategoryId(id))
+            throw new InvalidArgumentException("You cant delete category with existing lots!");
         productCategoryRepository.deleteById(id);
     }
 
