@@ -322,6 +322,7 @@ public class LotServiceImpl implements LotService {
         lot.setBets(bets);
         lot.setStatus(StatusConstants.FINISHED);
         var updated = update(lot.getId(), lot);
+        lot.setLastBet(newBetEntity);
         return updateCurrency(updated, currency);
     }
 
