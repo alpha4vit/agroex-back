@@ -36,4 +36,6 @@ public interface LotRepository extends JpaRepository<LotEntity, Long>, JpaSpecif
                                        @Param("lotType") @Nullable String lotType,
                                        @Param("countryId") @Nullable Long countryId);
 
+    Boolean existsByProductCategoryId(Long prodcuctCategoryId);
+
 }
