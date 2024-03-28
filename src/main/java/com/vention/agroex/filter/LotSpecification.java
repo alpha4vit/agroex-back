@@ -8,6 +8,7 @@ import jakarta.persistence.criteria.Predicate;
 import jakarta.persistence.criteria.Root;
 import lombok.AllArgsConstructor;
 import lombok.extern.slf4j.Slf4j;
+import org.apache.commons.lang3.StringUtils;
 import org.jetbrains.annotations.NotNull;
 import org.springframework.data.jpa.domain.Specification;
 
@@ -53,7 +54,10 @@ public class LotSpecification implements Specification<LotEntity> {
     }
 
     private String modifySearchString(String keyword) {
-        return keyword.replace(" ", " & ");
+        keyword = StringUtils.normalizeSpace(keyword);
+        keyword = keyword.replaceAll("\\b(\\w+)\\b", "$1:*");
+        keyword = keyword.replace(" ", " & ");
+        return keyword;
     }
 
     private Predicate getPredicateFromOperation(String operation, Root<LotEntity> root, String key, Object value,
