@@ -47,3 +47,32 @@ aws:
 currency-api:
   key: ${CURRENCY_API_KEY}
   url: ${CURRENCY_URL}
+management:
+  endpoints:
+    enabled-by-default: false
+    web:
+      base-path: /sys
+      exposure:
+        include:
+          - health
+          - prometheus
+      path-mapping:
+        prometheus: metrics
+  endpoint:
+    health:
+      enabled: true
+    prometheus:
+      enabled: true
+  health:
+    db:
+      enabled: true
+  metrics:
+    distribution:
+      percentiles-histogram:
+        http:
+          server:
+            requests: true
+        spring:
+          data:
+            repository:
+              invocations: true
