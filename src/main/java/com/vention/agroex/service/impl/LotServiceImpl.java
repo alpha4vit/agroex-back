@@ -167,12 +167,13 @@ public class LotServiceImpl implements LotService {
         var isLotTypeChanged = !lotEntityUpdatedFields.getLotType().equals(existedLotToUpdate.getLotType());
         var newLotType = lotEntityUpdatedFields.getLotType();
         var newInnerStatus = lotEntityUpdatedFields.getInnerStatus();
-        var newLotStatus = StatusConstants.INACTIVE;
+        var newLotStatus = lotEntityUpdatedFields.getStatus();
 
         if (isLotTypeChanged) {
             if (lotEntityUpdatedFields.getLotType().equals(LotTypeConstants.AUCTION_SELL)) {
                 newLotType = LotTypeConstants.AUCTION_SELL;
                 newInnerStatus = StatusConstants.NEW;
+                newLotStatus = StatusConstants.INACTIVE;
                 mappedAfterUpdateLot.setExpirationDate(null);
             } else {
                 if (existedLotToUpdate.getLotType().equals(LotTypeConstants.AUCTION_SELL)
@@ -182,6 +183,13 @@ public class LotServiceImpl implements LotService {
                 }
                 newLotType = lotEntityUpdatedFields.getLotType();
                 newInnerStatus = StatusConstants.ACTIVE;
+            }
+            if (lotEntityUpdatedFields.getLotType().equals(LotTypeConstants.BUY) || lotEntityUpdatedFields.getLotType().equals(LotTypeConstants.SELL)){
+                if (!lotEntityUpdatedFields.getInnerStatus().equals(StatusConstants.REJECTED_BY_ADMIN)) {
+                    newInnerStatus = StatusConstants.NEW;
+                    newLotStatus = StatusConstants.INACTIVE;
+                }
+
             }
         }
 
