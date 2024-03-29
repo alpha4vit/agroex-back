@@ -1,29 +1,30 @@
 package com.vention.agroex.service;
 
 import com.vention.agroex.model.ReportRequest;
+import org.springframework.core.io.Resource;
 
 public interface ReportService {
 
-    byte[] baseLotReport(ReportRequest reportRequest);
+    Resource baseLotReport(ReportRequest reportRequest);
 
-    byte[] lotReportByMaxPrice(ReportRequest reportRequest);
+    Resource lotReportByMaxPrice(ReportRequest reportRequest);
 
-    byte[] userReportByLotCount(ReportRequest reportRequest);
+    Resource userReportByLotCount(ReportRequest reportRequest);
 
-    byte[] userReportOwnersByBets(ReportRequest reportRequest);
+    Resource userReportOwnersByBets(ReportRequest reportRequest);
 
-    byte[] userReportParticipantByBets(ReportRequest reportRequest);
+    Resource userReportParticipantByBets(ReportRequest reportRequest);
 
-    byte[] countryReportByLotPrice(ReportRequest reportRequest);
+    Resource countryReportByLotPrice(ReportRequest reportRequest);
 
-    byte[] countryReportByLotCount(ReportRequest reportRequest);
+    Resource countryReportByLotCount(ReportRequest reportRequest);
 
-    byte[] countryReportByOwnerCount(ReportRequest reportRequest);
+    Resource countryReportByOwnerCount(ReportRequest reportRequest);
 
-    byte[] countryReportByOwnersLotsBets(ReportRequest reportRequest);
+    Resource countryReportByOwnersLotsBets(ReportRequest reportRequest);
 
-    byte[] countryReportByParticipantCount(ReportRequest reportRequest);
+    Resource countryReportByParticipantCount(ReportRequest reportRequest);
 
-    byte[] countryReportByParticipantBets(ReportRequest reportRequest);
+    Resource countryReportByParticipantBets(ReportRequest reportRequest);
 
 }

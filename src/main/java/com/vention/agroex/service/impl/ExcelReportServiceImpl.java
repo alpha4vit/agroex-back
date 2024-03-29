@@ -12,7 +12,7 @@ import com.vention.agroex.service.ReportService;
 import com.vention.agroex.util.constant.ReportType;
 import lombok.RequiredArgsConstructor;
 import lombok.extern.slf4j.Slf4j;
-import org.apache.poi.util.IOUtils;
+import org.springframework.core.io.Resource;
 import org.springframework.stereotype.Service;
 
 import java.util.List;
@@ -28,172 +28,117 @@ public class ExcelReportServiceImpl implements ReportService {
     private final ExcelWriter excelWriter;
 
     @Override
-    public byte[] baseLotReport(ReportRequest reportRequest) {
+    public Resource baseLotReport(ReportRequest reportRequest) {
         List<LotReportModel> lotReportModels = lotRepository.baseLotFilter(
                 reportRequest.actualStartDate(),
                 reportRequest.expirationDate(),
                 reportRequest.lotType(),
                 reportRequest.countryId()
         );
-        excelWriter.writeLotsReport(lotReportModels);
-        try (var is = getClass().getClassLoader().getResourceAsStream("reports/lotReport.xlsx")){
-            return IOUtils.toByteArray(is);
-        } catch (Exception e) {
-            throw new RuntimeException(e);
-        }
+        return excelWriter.writeLotsReport(lotReportModels);
     }
 
     @Override
-    public byte[] lotReportByMaxPrice(ReportRequest reportRequest) {
+    public Resource lotReportByMaxPrice(ReportRequest reportRequest) {
         List<LotReportModel> lotReportModels = lotRepository.filterByPrice(
                 reportRequest.actualStartDate(),
                 reportRequest.expirationDate(),
                 reportRequest.lotType(),
                 reportRequest.countryId()
         );
-        excelWriter.writeLotsReport(lotReportModels);
-        try (var is = getClass().getClassLoader().getResourceAsStream("reports/lotReport.xlsx")){
-            return IOUtils.toByteArray(is);
-        } catch (Exception e) {
-            throw new RuntimeException(e);
-        }
+        return excelWriter.writeLotsReport(lotReportModels);
     }
 
     @Override
-    public byte[] userReportByLotCount(ReportRequest reportRequest) {
+    public Resource userReportByLotCount(ReportRequest reportRequest) {
         List<UserReportModel> userReportModels = userRepository.filterByLotCount(
                 reportRequest.actualStartDate(),
                 reportRequest.expirationDate(),
                 reportRequest.lotType(),
                 reportRequest.countryId()
         );
-        excelWriter.writeUsersReport(userReportModels, ReportType.USER_MAX_LOT_QUANTITY);
-        try (var is = getClass().getClassLoader().getResourceAsStream("reports/userReport.xlsx")){
-            return IOUtils.toByteArray(is);
-        } catch (Exception e) {
-            throw new RuntimeException(e);
-        }
+        return excelWriter.writeUsersReport(userReportModels, ReportType.USER_MAX_LOT_QUANTITY);
     }
 
     @Override
-    public byte[] userReportOwnersByBets(ReportRequest reportRequest) {
+    public Resource userReportOwnersByBets(ReportRequest reportRequest) {
         List<UserReportModel> userReportModels = userRepository.filterOwnerByBetMoney(
                 reportRequest.actualStartDate(),
                 reportRequest.expirationDate(),
                 reportRequest.lotType(),
                 reportRequest.countryId()
         );
-        excelWriter.writeUsersReport(userReportModels, ReportType.USER_MAX_BET_AMOUNT);
-        try (var is = getClass().getClassLoader().getResourceAsStream("reports/userReport.xlsx")){
-            return IOUtils.toByteArray(is);
-        } catch (Exception e) {
-            throw new RuntimeException(e);
-        }
+        return excelWriter.writeUsersReport(userReportModels, ReportType.USER_MAX_BET_AMOUNT);
     }
 
     @Override
-    public byte[] userReportParticipantByBets(ReportRequest reportRequest) {
+    public Resource userReportParticipantByBets(ReportRequest reportRequest) {
         List<UserReportModel> userReportModels = userRepository.filterParticipantByBets(
                 reportRequest.actualStartDate(),
                 reportRequest.expirationDate(),
                 reportRequest.lotType(),
                 reportRequest.countryId()
         );
-        excelWriter.writeUsersReport(userReportModels, ReportType.USER_MAX_MONEY_IN_LOTS);
-        try (var is = getClass().getClassLoader().getResourceAsStream("reports/userReport.xlsx")){
-            return IOUtils.toByteArray(is);
-        } catch (Exception e) {
-            throw new RuntimeException(e);
-        }
+        return excelWriter.writeUsersReport(userReportModels, ReportType.USER_MAX_MONEY_IN_LOTS);
     }
 
     @Override
-    public byte[] countryReportByLotPrice(ReportRequest reportRequest) {
+    public Resource countryReportByLotPrice(ReportRequest reportRequest) {
         List<CountryReportModel> countryReportModels = countryRepository.filterByLotPrice(
                 reportRequest.actualStartDate(),
                 reportRequest.expirationDate(),
                 reportRequest.lotType()
         );
-        excelWriter.writeCountriesReport(countryReportModels, ReportType.COUNTRY_LOTS_TOTAL_BET_SUM);
-        try (var is = getClass().getClassLoader().getResourceAsStream("reports/countryReport.xlsx")){
-            return IOUtils.toByteArray(is);
-        } catch (Exception e) {
-            throw new RuntimeException(e);
-        }
+        return excelWriter.writeCountriesReport(countryReportModels, ReportType.COUNTRY_LOTS_TOTAL_BET_SUM);
     }
 
     @Override
-    public byte[] countryReportByLotCount(ReportRequest reportRequest) {
+    public Resource countryReportByLotCount(ReportRequest reportRequest) {
         List<CountryReportModel> countryReportModels = countryRepository.filterByLotCount(
                 reportRequest.actualStartDate(),
                 reportRequest.expirationDate(),
                 reportRequest.lotType()
         );
-        excelWriter.writeCountriesReport(countryReportModels, ReportType.COUNTRY_LOTS_TOTAL_QUANTITY);
-        try (var is = getClass().getClassLoader().getResourceAsStream("reports/countryReport.xlsx")){
-            return IOUtils.toByteArray(is);
-        } catch (Exception e) {
-            throw new RuntimeException(e);
-        }
+        return excelWriter.writeCountriesReport(countryReportModels, ReportType.COUNTRY_LOTS_TOTAL_QUANTITY);
     }
 
     @Override
-    public byte[] countryReportByOwnerCount(ReportRequest reportRequest) {
+    public Resource countryReportByOwnerCount(ReportRequest reportRequest) {
         List<CountryReportModel> countryReportModels = countryRepository.filterByOwnerCount(
                 reportRequest.actualStartDate(),
                 reportRequest.expirationDate(),
                 reportRequest.lotType()
         );
-        excelWriter.writeCountriesReport(countryReportModels, ReportType.COUNTRY_LOTS_TOTAL_OWNERS_QUANTITY);
-        try (var is = getClass().getClassLoader().getResourceAsStream("reports/countryReport.xlsx")){
-            return IOUtils.toByteArray(is);
-        } catch (Exception e) {
-            throw new RuntimeException(e);
-        }
+        return excelWriter.writeCountriesReport(countryReportModels, ReportType.COUNTRY_LOTS_TOTAL_OWNERS_QUANTITY);
     }
 
     @Override
-    public byte[] countryReportByOwnersLotsBets(ReportRequest reportRequest) {
+    public Resource countryReportByOwnersLotsBets(ReportRequest reportRequest) {
         List<CountryReportModel> countryReportModels = countryRepository.filterByOwnersLotsBets(
                 reportRequest.actualStartDate(),
                 reportRequest.expirationDate(),
                 reportRequest.lotType()
         );
-        excelWriter.writeCountriesReport(countryReportModels, ReportType.COUNTRY_LOTS_TOTAL_MONEY_NESTED);
-        try (var is = getClass().getClassLoader().getResourceAsStream("reports/countryReport.xlsx")){
-            return IOUtils.toByteArray(is);
-        } catch (Exception e) {
-            throw new RuntimeException(e);
-        }
+        return excelWriter.writeCountriesReport(countryReportModels, ReportType.COUNTRY_LOTS_TOTAL_MONEY_NESTED);
     }
 
     @Override
-    public byte[] countryReportByParticipantCount(ReportRequest reportRequest) {
+    public Resource countryReportByParticipantCount(ReportRequest reportRequest) {
         List<CountryReportModel> countryReportModels = countryRepository.filterByParticipantCount(
                 reportRequest.actualStartDate(),
                 reportRequest.expirationDate(),
                 reportRequest.lotType()
         );
-        excelWriter.writeCountriesReport(countryReportModels, ReportType.COUNTRY_LOTS_TOTAL_MONEY_NESTED);
-        try (var is = getClass().getClassLoader().getResourceAsStream("reports/countryReport.xlsx")){
-            return IOUtils.toByteArray(is);
-        } catch (Exception e) {
-            throw new RuntimeException(e);
-        }
+        return excelWriter.writeCountriesReport(countryReportModels, ReportType.COUNTRY_LOTS_TOTAL_MONEY_NESTED);
     }
 
     @Override
-    public byte[] countryReportByParticipantBets(ReportRequest reportRequest) {
+    public Resource countryReportByParticipantBets(ReportRequest reportRequest) {
         List<CountryReportModel> countryReportModels = countryRepository.filterByParticipantBets(
                 reportRequest.actualStartDate(),
                 reportRequest.expirationDate(),
                 reportRequest.lotType()
         );
-        excelWriter.writeCountriesReport(countryReportModels, ReportType.COUNTRY_LOTS_TOTAL_MONEY_NESTED);
-        try (var is = getClass().getClassLoader().getResourceAsStream("reports/countryReport.xlsx")){
-            return IOUtils.toByteArray(is);
-        } catch (Exception e) {
-            throw new RuntimeException(e);
-        }
+        return excelWriter.writeCountriesReport(countryReportModels, ReportType.COUNTRY_LOTS_TOTAL_MONEY_NESTED);
     }
 }
