@@ -10,9 +10,11 @@ import lombok.extern.slf4j.Slf4j;
 import org.apache.poi.ss.usermodel.*;
 import org.apache.poi.ss.util.CellRangeAddress;
 import org.apache.poi.xssf.usermodel.XSSFWorkbook;
+import org.springframework.core.io.ByteArrayResource;
+import org.springframework.core.io.Resource;
 import org.springframework.stereotype.Component;
 
-import java.io.FileOutputStream;
+import java.io.ByteArrayOutputStream;
 import java.time.LocalDateTime;
 import java.time.ZoneId;
 import java.util.List;
@@ -22,9 +24,8 @@ import java.util.List;
 public class ExcelWriterImpl implements ExcelWriter {
 
     @Override
-    public void writeLotsReport(List<LotReportModel> lotReportModels){
-        try (var file = new FileOutputStream("src/main/resources/reports/lotReport.xlsx");
-            var workbook = new XSSFWorkbook()){
+    public Resource writeLotsReport(List<LotReportModel> lotReportModels){
+        try (var workbook = new XSSFWorkbook(); var out = new ByteArrayOutputStream()) {
             var sheet = workbook.createSheet("Report");
             writeTableHeaderForLots(workbook, sheet);
             var rowCounter = 1;
@@ -86,7 +87,8 @@ public class ExcelWriterImpl implements ExcelWriter {
                 adminCommentCell.setCellValue(lot.getAdmin_comment());
 
             }
-            workbook.write(file);
+            workbook.write(out);
+            return new ByteArrayResource(out.toByteArray());
         }
         catch (Exception e){
             log.error(e.getMessage());
@@ -95,8 +97,8 @@ public class ExcelWriterImpl implements ExcelWriter {
     }
 
     @Override
-    public void writeUsersReport(List<UserReportModel> userReportModels, ReportType reportType) {
-        try (var file = new FileOutputStream("src/main/resources/reports/userReport.xlsx");
+    public Resource writeUsersReport(List<UserReportModel> userReportModels, ReportType reportType) {
+        try (var out = new ByteArrayOutputStream();
              var workbook = new XSSFWorkbook()){
             var sheet = workbook.createSheet("Report");
             writeTableHeaderForUsers(workbook, sheet, reportType);
@@ -127,7 +129,8 @@ public class ExcelWriterImpl implements ExcelWriter {
                 }
 
             }
-            workbook.write(file);
+            workbook.write(out);
+            return new ByteArrayResource(out.toByteArray());
         }
         catch (Exception e){
             log.error(e.getMessage());
@@ -136,8 +139,8 @@ public class ExcelWriterImpl implements ExcelWriter {
     }
 
     @Override
-    public void writeCountriesReport(List<CountryReportModel> countryReportModels, ReportType reportType) {
-        try (var file = new FileOutputStream("src/main/resources/reports/countryReport.xlsx");
+    public Resource writeCountriesReport(List<CountryReportModel> countryReportModels, ReportType reportType) {
+        try (var out = new ByteArrayOutputStream();
              var workbook = new XSSFWorkbook()){
             var sheet = workbook.createSheet("Report");
             writeTableHeaderForCountries(workbook, sheet, reportType);
@@ -160,7 +163,8 @@ public class ExcelWriterImpl implements ExcelWriter {
                 }
 
             }
-            workbook.write(file);
+            workbook.write(out);
+            return new ByteArrayResource(out.toByteArray());
         }
         catch (Exception e){
             log.error(e.getMessage());
