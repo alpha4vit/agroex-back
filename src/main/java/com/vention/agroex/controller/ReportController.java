@@ -43,7 +43,7 @@ public class ReportController {
 
     @SneakyThrows
     @PostMapping("/lotByMaxPrice")
-    public ResponseEntity<InputStreamResource> filterLotsByBaseAndMaxPrice(@RequestBody ReportRequest reportRequest){
+    public ResponseEntity<InputStreamResource> filterLotsByPrice(@RequestBody ReportRequest reportRequest){
         var resource = reportService.lotReportByMaxPrice(reportRequest);
         return ResponseEntity
                 .ok()
@@ -55,7 +55,7 @@ public class ReportController {
 
     @SneakyThrows
     @PostMapping("/userByLotCount")
-    public ResponseEntity<InputStreamResource> filterUsersByLotsBaseAndMaxQuantity(@RequestBody ReportRequest reportRequest){
+    public ResponseEntity<InputStreamResource> filterUsersByLotsAmount(@RequestBody ReportRequest reportRequest){
         var resource = reportService.userReportByLotCount(reportRequest);
         return ResponseEntity
                 .ok()
@@ -67,7 +67,7 @@ public class ReportController {
 
     @SneakyThrows
     @PostMapping("/ownersByBets")
-    public ResponseEntity<InputStreamResource> filterUserByLotsBaseAndMaxAmountInBets(@RequestBody ReportRequest reportRequest){
+    public ResponseEntity<InputStreamResource> filterOwnersByBetsOnTheirLots(@RequestBody ReportRequest reportRequest){
         var resource = reportService.userReportOwnersByBets(reportRequest);
         return ResponseEntity
                 .ok()
@@ -79,7 +79,7 @@ public class ReportController {
 
     @SneakyThrows
     @PostMapping("/participantsByBets")
-    public ResponseEntity<InputStreamResource> filterUserByLotsBaseAndMaxAmountMoneyInLots(@RequestBody ReportRequest reportRequest){
+    public ResponseEntity<InputStreamResource> filterParticipantByBets(@RequestBody ReportRequest reportRequest){
         var resource = reportService.userReportParticipantByBets(reportRequest);
         return ResponseEntity
                 .ok()
@@ -91,7 +91,7 @@ public class ReportController {
 
     @SneakyThrows
     @PostMapping("/countryByLotPrice")
-    public ResponseEntity<InputStreamResource> filterCountryByLotsBaseAndTotalBetAmount(@RequestBody ReportRequest reportRequest){
+    public ResponseEntity<InputStreamResource> filterCountryByLotPrice(@RequestBody ReportRequest reportRequest){
         var resource = reportService.countryReportByLotPrice(reportRequest);
         return ResponseEntity
                 .ok()
@@ -103,7 +103,7 @@ public class ReportController {
 
     @SneakyThrows
     @PostMapping("/countryByLotCount")
-    public ResponseEntity<InputStreamResource> filterCountryByLotsBaseAndTotalLotQuantity(@RequestBody ReportRequest reportRequest){
+    public ResponseEntity<InputStreamResource> filterCountryByLotAmount(@RequestBody ReportRequest reportRequest){
         var resource = reportService.countryReportByLotCount(reportRequest);
         return ResponseEntity
                 .ok()
@@ -115,7 +115,7 @@ public class ReportController {
 
     @SneakyThrows
     @PostMapping("/countryByOwnerCount")
-    public ResponseEntity<InputStreamResource> filterCountryByLotsBaseAndLotOwnersQuantity(@RequestBody ReportRequest reportRequest){
+    public ResponseEntity<InputStreamResource> filterCountryByLotOwnerAmount(@RequestBody ReportRequest reportRequest){
         var resource = reportService.countryReportByOwnerCount(reportRequest);
         return ResponseEntity
                 .ok()
@@ -127,7 +127,7 @@ public class ReportController {
 
     @SneakyThrows
     @PostMapping("/countryByOwnersLotsBets")
-    public ResponseEntity<InputStreamResource> filterCountryByOwnersLotsBets(@RequestBody ReportRequest reportRequest) {
+    public ResponseEntity<InputStreamResource> filterCountryByOwnersBetsOnTheirLots(@RequestBody ReportRequest reportRequest) {
         var resource = reportService.countryReportByOwnersLotsBets(reportRequest);
         return ResponseEntity
                 .ok()
@@ -139,7 +139,7 @@ public class ReportController {
 
     @SneakyThrows
     @PostMapping("/countryByParticipantCount")
-    public ResponseEntity<InputStreamResource> filterCountryByLotsBaseAndLotParticipantsQuantity(@RequestBody ReportRequest reportRequest){
+    public ResponseEntity<InputStreamResource> filterCountryByParticipantAmount(@RequestBody ReportRequest reportRequest){
         var resource = reportService.countryReportByParticipantCount(reportRequest);
         return ResponseEntity
                 .ok()
@@ -151,7 +151,7 @@ public class ReportController {
 
     @SneakyThrows
     @PostMapping("/countryByParticipantBets")
-    public ResponseEntity<InputStreamResource> filterCountryByLotsBaseAndLotParticipantBets(@RequestBody ReportRequest reportRequest){
+    public ResponseEntity<InputStreamResource> filterCountryByParticipantBets(@RequestBody ReportRequest reportRequest){
         var resource = reportService.countryReportByParticipantBets(reportRequest);
         return ResponseEntity
                 .ok()

@@ -49,6 +49,7 @@ public interface LotMapper {
                 .enabledByAdmin(before.getEnabledByAdmin())
                 .creationDate(before.getCreationDate())
                 .expirationDate(received.getExpirationDate() != null ? received.getExpirationDate() : before.getExpirationDate())
+                .actualStartDate(received.getActualStartDate() != null ? received.getActualStartDate() : before.getActualStartDate())
                 .originalPrice(received.getOriginalPrice().compareTo(BigDecimal.valueOf(0.0)) != 0 ? received.getOriginalPrice() : before.getOriginalPrice())
                 .originalMinPrice(received.getOriginalMinPrice() != null ? received.getOriginalMinPrice() : before.getOriginalMinPrice())
                 .size(received.getSize() != null ? received.getSize() : before.getSize())

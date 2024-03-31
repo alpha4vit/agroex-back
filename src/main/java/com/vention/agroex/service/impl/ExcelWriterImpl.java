@@ -156,10 +156,11 @@ public class ExcelWriterImpl implements ExcelWriter {
 
                 var optionalCell = row.createCell(2);
                 switch (reportType){
-                    case COUNTRY_LOTS_TOTAL_BET_SUM -> optionalCell.setCellValue(country.getTotal_bet_sum());
-                    case COUNTRY_LOTS_TOTAL_MONEY_NESTED -> optionalCell.setCellValue(country.getTotal_bets_amount());
-                    case COUNTRY_LOTS_TOTAL_QUANTITY -> optionalCell.setCellValue(country.getTotal_lot_quantity());
-                    case COUNTRY_LOTS_TOTAL_OWNERS_QUANTITY -> optionalCell.setCellValue(country.getTotal_users_quantity());
+                    case COUNTRY_LOT_PRICE -> optionalCell.setCellValue(country.getPrice_sum());
+                    case COUNTRY_PARTICIPANT_COUNT -> optionalCell.setCellValue(country.getTotal_participant_count());
+                    case COUNTRY_LOT_COUNT -> optionalCell.setCellValue(country.getTotal_lot_quantity());
+                    case COUNTRY_OWNER_BETS, COUNTRY_PARTICIPANT_BETS -> optionalCell.setCellValue(country.getTotal_bet_sum());
+                    case COUNTRY_OWNER_COUNT -> optionalCell.setCellValue(country.getTotal_owners_quantity());
                 }
 
             }
@@ -290,10 +291,12 @@ public class ExcelWriterImpl implements ExcelWriter {
         var optionalCell = header.createCell(2);
 
         switch (reportType){
-            case COUNTRY_LOTS_TOTAL_BET_SUM -> optionalCell.setCellValue("Total bet amount");
-            case COUNTRY_LOTS_TOTAL_MONEY_NESTED -> optionalCell.setCellValue("Total money nested");
-            case COUNTRY_LOTS_TOTAL_QUANTITY -> optionalCell.setCellValue("Total lots quantity");
-            case COUNTRY_LOTS_TOTAL_OWNERS_QUANTITY -> optionalCell.setCellValue("Total lots owners quantity");
+            case COUNTRY_LOT_PRICE -> optionalCell.setCellValue("Total lot price");
+            case COUNTRY_LOT_COUNT -> optionalCell.setCellValue("Total lot amount");
+            case COUNTRY_OWNER_BETS -> optionalCell.setCellValue("Total bets sum on owners lots");
+            case COUNTRY_PARTICIPANT_BETS -> optionalCell.setCellValue("Total participant bets sum");
+            case COUNTRY_OWNER_COUNT -> optionalCell.setCellValue("Total lot owner amount");
+            case COUNTRY_PARTICIPANT_COUNT -> optionalCell.setCellValue("Total participant amount");
         }
 
         sheet.setAutoFilter(CellRangeAddress.valueOf("A1:C1"));

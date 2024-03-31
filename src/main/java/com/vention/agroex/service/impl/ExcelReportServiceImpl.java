@@ -89,7 +89,7 @@ public class ExcelReportServiceImpl implements ReportService {
                 reportRequest.expirationDate(),
                 reportRequest.lotType()
         );
-        return excelWriter.writeCountriesReport(countryReportModels, ReportType.COUNTRY_LOTS_TOTAL_BET_SUM);
+        return excelWriter.writeCountriesReport(countryReportModels, ReportType.COUNTRY_LOT_PRICE);
     }
 
     @Override
@@ -99,7 +99,7 @@ public class ExcelReportServiceImpl implements ReportService {
                 reportRequest.expirationDate(),
                 reportRequest.lotType()
         );
-        return excelWriter.writeCountriesReport(countryReportModels, ReportType.COUNTRY_LOTS_TOTAL_QUANTITY);
+        return excelWriter.writeCountriesReport(countryReportModels, ReportType.COUNTRY_LOT_COUNT);
     }
 
     @Override
@@ -109,7 +109,7 @@ public class ExcelReportServiceImpl implements ReportService {
                 reportRequest.expirationDate(),
                 reportRequest.lotType()
         );
-        return excelWriter.writeCountriesReport(countryReportModels, ReportType.COUNTRY_LOTS_TOTAL_OWNERS_QUANTITY);
+        return excelWriter.writeCountriesReport(countryReportModels, ReportType.COUNTRY_OWNER_COUNT);
     }
 
     @Override
@@ -119,7 +119,7 @@ public class ExcelReportServiceImpl implements ReportService {
                 reportRequest.expirationDate(),
                 reportRequest.lotType()
         );
-        return excelWriter.writeCountriesReport(countryReportModels, ReportType.COUNTRY_LOTS_TOTAL_MONEY_NESTED);
+        return excelWriter.writeCountriesReport(countryReportModels, ReportType.COUNTRY_OWNER_BETS);
     }
 
     @Override
@@ -129,7 +129,7 @@ public class ExcelReportServiceImpl implements ReportService {
                 reportRequest.expirationDate(),
                 reportRequest.lotType()
         );
-        return excelWriter.writeCountriesReport(countryReportModels, ReportType.COUNTRY_LOTS_TOTAL_MONEY_NESTED);
+        return excelWriter.writeCountriesReport(countryReportModels, ReportType.COUNTRY_PARTICIPANT_COUNT);
     }
 
     @Override
@@ -139,6 +139,6 @@ public class ExcelReportServiceImpl implements ReportService {
                 reportRequest.expirationDate(),
                 reportRequest.lotType()
         );
-        return excelWriter.writeCountriesReport(countryReportModels, ReportType.COUNTRY_LOTS_TOTAL_MONEY_NESTED);
+        return excelWriter.writeCountriesReport(countryReportModels, ReportType.COUNTRY_PARTICIPANT_BETS);
     }
 }
