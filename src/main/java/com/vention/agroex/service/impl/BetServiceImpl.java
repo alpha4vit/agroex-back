@@ -30,7 +30,7 @@ public class BetServiceImpl implements BetService {
         var lot = lotService.getById(lotId, currency);
 
         validateBet(betEntity, lot);
-        if (betEntity.getAmount().compareTo(lot.getPrice()) == 0) {
+        if (betEntity.getAmount().compareTo(lot.getOriginalPrice()) == 0) {
             log.info(String.format("User with id %s made a maxPrice bet. Auction ended",
                     betEntity.getUser().getId()));
             lotService.finishAuction(lot);
