@@ -342,7 +342,7 @@ public class LotServiceImpl implements LotService {
             throw new InvalidBetException("You can't buy/sell your own lot");
         }
         if (!lot.getStatus().equals(StatusConstants.ACTIVE)) {
-            throw new InvalidBetException("This lot is not active");
+            throw new InvalidBetException("Sorry, this lot is no longer available.\\nPlease consider exploring other available lots");
         }
     }
 
