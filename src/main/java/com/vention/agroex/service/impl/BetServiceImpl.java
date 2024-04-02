@@ -43,7 +43,7 @@ public class BetServiceImpl implements BetService {
         if (betEntity.getAmount().subtract(lot.getMinPrice()).compareTo(new BigDecimal(1)) < 0) {
             throw new InvalidBetException("The minimum price step is one conventional unit");
         }
-        if (betEntity.getAmount().compareTo(lot.getPrice()) > 0) {
+        if (betEntity.getAmount().compareTo(lot.getOriginalPrice()) > 0) {
             throw new InvalidBetException("You can't make bet with amount, which is bigger than lot price");
         }
         if (!lot.getLotType().equals(StatusConstants.AUCTION_SELL)) {
