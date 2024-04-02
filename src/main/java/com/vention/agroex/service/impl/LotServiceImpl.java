@@ -186,8 +186,8 @@ public class LotServiceImpl implements LotService {
             }
             if (lotEntityUpdatedFields.getLotType().equals(LotTypeConstants.BUY) || lotEntityUpdatedFields.getLotType().equals(LotTypeConstants.SELL)){
                 if (!lotEntityUpdatedFields.getInnerStatus().equals(StatusConstants.REJECTED_BY_ADMIN)) {
-                    newInnerStatus = StatusConstants.NEW;
-                    newLotStatus = StatusConstants.INACTIVE;
+                    newInnerStatus = StatusConstants.ACTIVE;
+                    newLotStatus = StatusConstants.ACTIVE;
                 }
 
             }
