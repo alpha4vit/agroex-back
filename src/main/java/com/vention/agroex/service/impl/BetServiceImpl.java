@@ -1,11 +1,15 @@
 package com.vention.agroex.service.impl;
 
+import com.vention.agroex.dto.Notification;
 import com.vention.agroex.entity.BetEntity;
 import com.vention.agroex.entity.LotEntity;
 import com.vention.agroex.exception.InvalidBetException;
 import com.vention.agroex.repository.BetRepository;
 import com.vention.agroex.service.BetService;
 import com.vention.agroex.service.LotService;
+import com.vention.agroex.service.NotificationService;
+import com.vention.agroex.util.constant.NotificationReadStatusConstants;
+import com.vention.agroex.util.constant.Role;
 import com.vention.agroex.util.constant.StatusConstants;
 import jakarta.transaction.Transactional;
 import lombok.RequiredArgsConstructor;
@@ -13,8 +17,10 @@ import lombok.extern.slf4j.Slf4j;
 import org.springframework.stereotype.Service;
 
 import java.math.BigDecimal;
+import java.time.Instant;
 import java.util.Comparator;
 import java.util.List;
+import java.util.UUID;
 
 @Slf4j
 @Service
@@ -22,6 +28,7 @@ import java.util.List;
 public class BetServiceImpl implements BetService {
 
     private final LotService lotService;
+    private final NotificationService notificationService;
     private final BetRepository betRepository;
 
     @Override
@@ -30,12 +37,12 @@ public class BetServiceImpl implements BetService {
         var lot = lotService.getById(lotId, currency);
 
         validateBet(betEntity, lot);
+        saveBet(lot, betEntity);
         if (betEntity.getAmount().compareTo(lot.getOriginalPrice()) == 0) {
             log.info(String.format("User with id %s made a maxPrice bet. Auction ended",
                     betEntity.getUser().getId()));
             lotService.finishAuction(lot);
         }
-        saveBet(lot, betEntity);
         return betEntity;
     }
 
@@ -68,10 +75,26 @@ public class BetServiceImpl implements BetService {
                 .ifPresent(lastBet -> {
                     if (betEntity.getAmount().subtract(lastBet.getAmount()).compareTo(new BigDecimal(1)) < 0) {
                         throw new InvalidBetException(
-                                String.format("Your bet amount must be 1 conventional point higher than the last one: %f", lastBet.getAmount()));
+                                String.format("Your bet amount must be 1 conventional point higher than the last one: %.2f %s", lastBet.getAmount(), lot.getOriginalCurrency()));
                     }
                 });
 
+        bets.forEach(bet -> {
+                    if (!bet.getUser().getId().equals(betEntity.getUser().getId())) {
+                        notificationService.save(new Notification(
+                                UUID.randomUUID(),
+                                bet.getUser().getId(),
+                                lot.getId(),
+                                "BET_OUTBID",
+                                "Your bet was outbid",
+                                String.format("Your bet was outbid. Auction id: %d New bet amount: %.2f %s", lot.getId(), betEntity.getAmount(), lot.getOriginalCurrency()),
+                                NotificationReadStatusConstants.UNREAD,
+                                Instant.now(),
+                                Role.USER
+                        ));
+                    }
+                }
+        );
         bets.addFirst(betEntity);
         lot.setBets(bets);
         lotService.update(lot.getId(), lot);

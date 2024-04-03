@@ -14,10 +14,13 @@ spring:
     driverClassName: org.postgresql.Driver
     url: jdbc:postgresql://${AWS_RDS_HOST}:${AWS_RDS_PORT}/${AWS_RDS_DATABASE}
   jpa:
-    show-sql: true
-    hibernate:
-      dialect: org.hibernate.dialect.PostgreSQLDialect
-      ddl-auto: none
+    properties:
+      hibernate:
+        enable_lazy_load_no_trans: true
+        use_sql_comments: true
+        session_factory:
+          statement_inspector: com.vention.agroex.util.interceptor.SearchMethodInterceptor
+    open-in-view: false
   flyway:
     enabled: true
     locations: classpath:db/migration

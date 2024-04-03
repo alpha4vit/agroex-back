@@ -1,5 +1,6 @@
 package com.vention.agroex.service.impl;
 
+import com.vention.agroex.dto.Notification;
 import com.vention.agroex.entity.BetEntity;
 import com.vention.agroex.entity.LotEntity;
 import com.vention.agroex.entity.ProductCategoryEntity;
@@ -14,6 +15,8 @@ import com.vention.agroex.repository.LocationRepository;
 import com.vention.agroex.repository.LotRepository;
 import com.vention.agroex.service.*;
 import com.vention.agroex.util.constant.LotTypeConstants;
+import com.vention.agroex.util.constant.NotificationReadStatusConstants;
+import com.vention.agroex.util.constant.Role;
 import com.vention.agroex.util.constant.StatusConstants;
 import com.vention.agroex.util.mapper.LotMapper;
 import jakarta.persistence.EntityNotFoundException;
@@ -44,6 +47,7 @@ public class LotServiceImpl implements LotService {
     private final FilterService filterService;
     private final LotRepository lotRepository;
     private final CountryService countryService;
+    private final NotificationService notificationService;
     private final ProductCategoryService productCategoryService;
     private final LocationRepository locationRepository;
     private final CurrencyRateRepository currencyRateRepository;
@@ -91,9 +95,19 @@ public class LotServiceImpl implements LotService {
             lotEntity.setExpirationDate(lotEntity.getExpirationDate());
         }
 
-
         var saved = lotRepository.save(lotEntity);
         saved.setImages(imageService.uploadImages(saved, files));
+        notificationService.save(new Notification(
+                UUID.randomUUID(),
+                saved.getUser().getId(),
+                saved.getId(),
+                "ADMIN_MODERATION",
+                "You have new lot to moderate",
+                String.format("You have new lot to moderate. Lot name: %s", saved.getTitle()),
+                NotificationReadStatusConstants.UNREAD,
+                Instant.now(),
+                Role.ADMIN
+        ));
         return saved;
     }
 
@@ -184,7 +198,7 @@ public class LotServiceImpl implements LotService {
                 newLotType = lotEntityUpdatedFields.getLotType();
                 newInnerStatus = StatusConstants.ACTIVE;
             }
-            if (lotEntityUpdatedFields.getLotType().equals(LotTypeConstants.BUY) || lotEntityUpdatedFields.getLotType().equals(LotTypeConstants.SELL)){
+            if (lotEntityUpdatedFields.getLotType().equals(LotTypeConstants.BUY) || lotEntityUpdatedFields.getLotType().equals(LotTypeConstants.SELL)) {
                 if (!lotEntityUpdatedFields.getInnerStatus().equals(StatusConstants.REJECTED_BY_ADMIN)) {
                     newInnerStatus = StatusConstants.ACTIVE;
                     newLotStatus = StatusConstants.ACTIVE;
@@ -196,7 +210,7 @@ public class LotServiceImpl implements LotService {
         mappedAfterUpdateLot.setLotType(newLotType);
         mappedAfterUpdateLot.setInnerStatus(newInnerStatus);
         mappedAfterUpdateLot.setStatus(newLotStatus);
-        
+
         var productCategoryEntity = switch (lotEntityUpdatedFields.getProductCategory()) {
             case ProductCategoryEntity e when e.getId() != null ->
                     productCategoryService.getById(lotEntityUpdatedFields.getProductCategory().getId());
@@ -228,6 +242,17 @@ public class LotServiceImpl implements LotService {
             mappedAfterUpdateLot.getLocation()
                     .setCountry(countryService.getById(mappedAfterUpdateLot.getLocation().getCountry().getId()));
         }
+        notificationService.save(new Notification(
+                UUID.randomUUID(),
+                mappedAfterUpdateLot.getUser().getId(),
+                mappedAfterUpdateLot.getId(),
+                "ADMIN_MODERATION",
+                "You have new lot to moderate",
+                String.format("You have new lot to moderate. Lot name: %s", mappedAfterUpdateLot.getTitle()),
+                NotificationReadStatusConstants.UNREAD,
+                Instant.now(),
+                Role.ADMIN
+        ));
 
         return updateCurrency(lotRepository.save(mappedAfterUpdateLot), currency);
     }
@@ -268,6 +293,9 @@ public class LotServiceImpl implements LotService {
 
     private LotEntity moderateLot(Long id, String adminComment) {
         var lot = getById(id);
+        if (!lot.getStatus().equals(StatusConstants.NEW)) {
+            throw new InvalidArgumentException("You can`t moderate this lot now!");
+        }
         if (!lot.getUser().getEnabled())
             throw new InvalidArgumentException("Lot owner is disabled!");
         if (adminComment != null) {
@@ -299,12 +327,25 @@ public class LotServiceImpl implements LotService {
         if (adminComment != null) {
             lot.setAdminComment(adminComment);
         }
+        lot.setStatus(StatusConstants.ACTIVE);
         return update(id, lot);
     }
 
     @Override
     public LotEntity approve(Long lotId, String currency, String adminComment) {
         var lot = approveLot(lotId, adminComment);
+        lot.setAdminComment(adminComment);
+        notificationService.save(new Notification(
+                UUID.randomUUID(),
+                lot.getUser().getId(),
+                lot.getId(),
+                "LOT_APPROVED",
+                "Your lot was approved",
+                String.format("Your lot was approved by admin. Lot name: %s", lot.getTitle()),
+                NotificationReadStatusConstants.UNREAD,
+                Instant.now(),
+                Role.USER
+        ));
         return updateCurrency(lot, currency);
     }
 
@@ -312,6 +353,61 @@ public class LotServiceImpl implements LotService {
     public void finishAuction(LotEntity lot) {
         lot.setStatus(StatusConstants.FINISHED);
         update(lot.getId(), lot);
+
+        var bets = lot.getBets();
+        if (bets != null && !bets.isEmpty()) {
+            var winnerBet = bets.getFirst();
+            if (winnerBet != null) {
+                notificationService.save(new Notification(
+                        UUID.randomUUID(),
+                        lot.getUser().getId(),
+                        lot.getId(),
+                        "LOT_FINISHED",
+                        "Your auction finished",
+                        String.format("Your auction finished. Auction name: %s \nLast bet amount: %.2f %s", lot.getTitle(), winnerBet.getAmount(), lot.getOriginalCurrency()),
+                        NotificationReadStatusConstants.UNREAD,
+                        Instant.now(),
+                        Role.USER
+                ));
+                notificationService.save(new Notification(
+                        UUID.randomUUID(),
+                        winnerBet.getUser().getId(),
+                        lot.getId(),
+                        "BET_WIN",
+                        "You won in auction",
+                        String.format("You won in auction. Auction name: %s", winnerBet.getLot().getTitle()),
+                        NotificationReadStatusConstants.UNREAD,
+                        Instant.now(),
+                        Role.USER
+                ));
+                bets.stream().filter(betEntity -> !betEntity.getUser().getId()
+                                .equals(winnerBet.getUser().getId()))
+                        .forEach(betEntity ->
+                                notificationService.save(new Notification(
+                                        UUID.randomUUID(),
+                                        betEntity.getUser().getId(),
+                                        lot.getId(),
+                                        "AUCTION_LOST",
+                                        "You lost in auction",
+                                        String.format("Auction with your bet finished. You lost. Auction name: %s", betEntity.getLot().getTitle()),
+                                        NotificationReadStatusConstants.UNREAD,
+                                        Instant.now(),
+                                        Role.USER
+                                )));
+            }
+        } else {
+            notificationService.save(new Notification(
+                    UUID.randomUUID(),
+                    lot.getUser().getId(),
+                    lot.getId(),
+                    "LOT_FINISHED",
+                    "Your auction finished",
+                    String.format("Your auction finished. Auction name: %s\nResult: no bets", lot.getTitle()),
+                    NotificationReadStatusConstants.UNREAD,
+                    Instant.now(),
+                    Role.USER
+            ));
+        }
     }
 
     @Override
@@ -328,6 +424,17 @@ public class LotServiceImpl implements LotService {
 
         bets.add(newBetEntity);
         lot.setBets(bets);
+        notificationService.save(new Notification(
+                UUID.randomUUID(),
+                lot.getUser().getId(),
+                lot.getId(),
+                "LOT_DEAL",
+                "Your lot got an order",
+                String.format("Your lot got an order. Lot name: %s", lot.getTitle()),
+                NotificationReadStatusConstants.UNREAD,
+                Instant.now(),
+                Role.USER
+        ));
         lot.setStatus(StatusConstants.FINISHED);
         var updated = update(lot.getId(), lot);
         lot.setLastBet(newBetEntity);
@@ -355,6 +462,18 @@ public class LotServiceImpl implements LotService {
         lot.setInnerStatus(StatusConstants.REJECTED_BY_ADMIN);
         lot.setStatus(StatusConstants.INACTIVE);
         lot.setAdminComment(adminComment);
+
+        notificationService.save(new Notification(
+                UUID.randomUUID(),
+                lot.getUser().getId(),
+                lot.getId(),
+                "LOT_REJECT",
+                "Your lot was rejected",
+                String.format("Your lot was rejected by admin. Lot name: %s\n Reject message: %s", lot.getTitle(), lot.getAdminComment()),
+                NotificationReadStatusConstants.UNREAD,
+                Instant.now(),
+                Role.USER
+        ));
         return update(lotId, lot);
     }
 
@@ -371,7 +490,7 @@ public class LotServiceImpl implements LotService {
             lot.setInnerStatus(StatusConstants.NEW);
             lotStatus = StatusConstants.INACTIVE;
         }
-        if (!status && !lot.getLotType().equals(StatusConstants.AUCTION_SELL)){
+        if (!status && !lot.getLotType().equals(StatusConstants.AUCTION_SELL)) {
             lotStatus = StatusConstants.INACTIVE;
         }
         lot.setUserStatus(userStatus);

@@ -13,6 +13,8 @@ import java.util.Comparator;
 import java.util.List;
 import java.util.NoSuchElementException;
 
+import static jakarta.persistence.FetchType.EAGER;
+
 @Data
 @Builder
 @NoArgsConstructor
@@ -101,7 +103,7 @@ public class LotEntity {
     @OneToMany(mappedBy = "lot", cascade = CascadeType.REMOVE)
     private List<ImageEntity> images;
 
-    @OneToMany(mappedBy = "lot", cascade = CascadeType.ALL)
+    @OneToMany(mappedBy = "lot", cascade = CascadeType.ALL, fetch = EAGER)
     private List<BetEntity> bets;
 
     @ManyToMany
