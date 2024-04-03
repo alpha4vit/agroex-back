@@ -1,5 +1,6 @@
 package com.vention.agroex.service.impl;
 
+import com.vention.agroex.controller.SSEBetsController;
 import com.vention.agroex.dto.Notification;
 import com.vention.agroex.entity.BetEntity;
 import com.vention.agroex.entity.LotEntity;
@@ -29,6 +30,7 @@ public class BetServiceImpl implements BetService {
 
     private final LotService lotService;
     private final NotificationService notificationService;
+    private final SSEBetsController sseBetsController;
     private final BetRepository betRepository;
 
     @Override
@@ -71,6 +73,7 @@ public class BetServiceImpl implements BetService {
     private void saveBet(LotEntity lot, BetEntity betEntity) {
         var bets = lot.getBets();
 
+
         bets.stream().max(Comparator.comparing(BetEntity::getBetTime))
                 .ifPresent(lastBet -> {
                     if (betEntity.getAmount().subtract(lastBet.getAmount()).compareTo(new BigDecimal(1)) < 0) {
@@ -98,6 +101,7 @@ public class BetServiceImpl implements BetService {
         bets.addFirst(betEntity);
         lot.setBets(bets);
         lotService.update(lot.getId(), lot);
+        sseBetsController.sendBet(lot.getId(), betEntity);
     }
 
     @Override
