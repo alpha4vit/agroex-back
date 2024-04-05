@@ -86,21 +86,23 @@ public class BetServiceImpl implements BetService {
                                 String.format("Your bet amount must be 1 conventional point higher than the last one: %.2f %s", lastBet.getAmount(), lot.getOriginalCurrency()));
                     }
                 });
-        if (!bets.isEmpty()) {
-            var lastBet = bets.getFirst();
-            if (!lastBet.getUser().getId().equals(betEntity.getUser().getId())) {
-                notificationService.save(new Notification(
-                        UUID.randomUUID(),
-                        lastBet.getUser().getId(),
-                        lot.getId(),
-                        "BET_OUTBID",
-                        "Your bet was outbid",
-                        String.format("Your bet was outbid. Auction id: %d New bet amount: %.2f %s", lot.getId(), betEntity.getAmount(), lot.getOriginalCurrency()),
-                        NotificationReadStatusConstants.UNREAD,
-                        Instant.now(),
-                        Role.USER
-                ));
-            }
+
+        var lastBet = bets.stream()
+                .max(Comparator.comparing(BetEntity::getAmount))
+                .orElse(null);
+
+        if (lastBet != null && !lastBet.getUser().getId().equals(betEntity.getUser().getId())) {
+            notificationService.save(new Notification(
+                    UUID.randomUUID(),
+                    lastBet.getUser().getId(),
+                    lot.getId(),
+                    "BET_OUTBID",
+                    "Your bet was outbid",
+                    String.format("Your bet was outbid. Auction id: %d New bet amount: %.2f %s", lot.getId(), betEntity.getAmount(), lot.getOriginalCurrency()),
+                    NotificationReadStatusConstants.UNREAD,
+                    Instant.now(),
+                    Role.USER
+            ));
         }
 
         bets.addFirst(betEntity);

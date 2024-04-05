@@ -97,18 +97,20 @@ public class LotServiceImpl implements LotService {
         }
 
         var saved = lotRepository.save(lotEntity);
+        if (saved.getLotType().equals(LotTypeConstants.AUCTION_SELL)) {
+            notificationService.save(new Notification(
+                    UUID.randomUUID(),
+                    saved.getUser().getId(),
+                    saved.getId(),
+                    "ADMIN_MODERATION",
+                    "You have new lot to moderate",
+                    String.format("You have new lot to moderate. Lot name: %s", saved.getTitle()),
+                    NotificationReadStatusConstants.UNREAD,
+                    Instant.now(),
+                    Role.ADMIN
+            ));
+        }
         saved.setImages(imageService.uploadImages(saved, files));
-        notificationService.save(new Notification(
-                UUID.randomUUID(),
-                saved.getUser().getId(),
-                saved.getId(),
-                "ADMIN_MODERATION",
-                "You have new lot to moderate",
-                String.format("You have new lot to moderate. Lot name: %s", saved.getTitle()),
-                NotificationReadStatusConstants.UNREAD,
-                Instant.now(),
-                Role.ADMIN
-        ));
         return saved;
     }
 
