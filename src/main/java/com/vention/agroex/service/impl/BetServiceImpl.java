@@ -63,6 +63,9 @@ public class BetServiceImpl implements BetService {
         if (lot.getStatus().equals(StatusConstants.FINISHED)) {
             throw new InvalidBetException("This auction is already finished");
         }
+        if (!lot.getStatus().equals(StatusConstants.ACTIVE)) {
+            throw new InvalidBetException("This auction is not active. You can`t make bets now");
+        }
         if (lot.getUser().getId() == betEntity.getUser().getId()) {
             throw new InvalidBetException("You can't make bets in your own auction");
         }
