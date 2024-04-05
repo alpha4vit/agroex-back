@@ -22,7 +22,6 @@ import java.time.Instant;
 import java.util.Comparator;
 import java.util.List;
 import java.util.UUID;
-import java.util.stream.Collectors;
 
 @Slf4j
 @Service
@@ -87,29 +86,21 @@ public class BetServiceImpl implements BetService {
                                 String.format("Your bet amount must be 1 conventional point higher than the last one: %.2f %s", lastBet.getAmount(), lot.getOriginalCurrency()));
                     }
                 });
+        var lastBet = bets.getFirst();
+        if (!lastBet.getUser().getId().equals(betEntity.getUser().getId())) {
+            notificationService.save(new Notification(
+                    UUID.randomUUID(),
+                    lastBet.getUser().getId(),
+                    lot.getId(),
+                    "BET_OUTBID",
+                    "Your bet was outbid",
+                    String.format("Your bet was outbid. Auction id: %d New bet amount: %.2f %s", lot.getId(), betEntity.getAmount(), lot.getOriginalCurrency()),
+                    NotificationReadStatusConstants.UNREAD,
+                    Instant.now(),
+                    Role.USER
+            ));
+        }
 
-        bets.stream()
-                .collect(Collectors.groupingBy(BetEntity::getUser))
-                .values()
-                .stream()
-                .map(List::getFirst)
-                .toList()
-                .forEach(bet -> {
-                            if (!bet.getUser().getId().equals(betEntity.getUser().getId())) {
-                                notificationService.save(new Notification(
-                                        UUID.randomUUID(),
-                                        bet.getUser().getId(),
-                                        lot.getId(),
-                                        "BET_OUTBID",
-                                        "Your bet was outbid",
-                                        String.format("Your bet was outbid. Auction id: %d New bet amount: %.2f %s", lot.getId(), betEntity.getAmount(), lot.getOriginalCurrency()),
-                                        NotificationReadStatusConstants.UNREAD,
-                                        Instant.now(),
-                                        Role.USER
-                                ));
-                            }
-                        }
-                );
         bets.addFirst(betEntity);
         lot.setBets(bets);
         lotService.update(lot.getId(), lot);
