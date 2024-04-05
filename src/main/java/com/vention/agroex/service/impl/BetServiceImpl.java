@@ -87,18 +87,20 @@ public class BetServiceImpl implements BetService {
                     }
                 });
         var lastBet = bets.getFirst();
-        if (!lastBet.getUser().getId().equals(betEntity.getUser().getId())) {
-            notificationService.save(new Notification(
-                    UUID.randomUUID(),
-                    lastBet.getUser().getId(),
-                    lot.getId(),
-                    "BET_OUTBID",
-                    "Your bet was outbid",
-                    String.format("Your bet was outbid. Auction id: %d New bet amount: %.2f %s", lot.getId(), betEntity.getAmount(), lot.getOriginalCurrency()),
-                    NotificationReadStatusConstants.UNREAD,
-                    Instant.now(),
-                    Role.USER
-            ));
+        if (lastBet != null) {
+            if (!lastBet.getUser().getId().equals(betEntity.getUser().getId())) {
+                notificationService.save(new Notification(
+                        UUID.randomUUID(),
+                        lastBet.getUser().getId(),
+                        lot.getId(),
+                        "BET_OUTBID",
+                        "Your bet was outbid",
+                        String.format("Your bet was outbid. Auction id: %d New bet amount: %.2f %s", lot.getId(), betEntity.getAmount(), lot.getOriginalCurrency()),
+                        NotificationReadStatusConstants.UNREAD,
+                        Instant.now(),
+                        Role.USER
+                ));
+            }
         }
 
         bets.addFirst(betEntity);
