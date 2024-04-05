@@ -49,7 +49,7 @@ public class BetServiceImpl implements BetService {
     }
 
     private void validateBet(BetEntity betEntity, LotEntity lot) {
-        if (betEntity.getAmount().subtract(lot.getMinPrice()).compareTo(new BigDecimal(1)) < 0) {
+        if (betEntity.getAmount().subtract(lot.getOriginalMinPrice()).compareTo(new BigDecimal(1)) < 0) {
             throw new InvalidBetException("The minimum price step is one conventional unit");
         }
         if (betEntity.getAmount().compareTo(lot.getOriginalPrice()) > 0) {
@@ -64,7 +64,7 @@ public class BetServiceImpl implements BetService {
         if (lot.getUser().getId() == betEntity.getUser().getId()) {
             throw new InvalidBetException("You can't make bets in your own auction");
         }
-        if (lot.getMinPrice() != null && lot.getMinPrice().compareTo(betEntity.getAmount()) >= 0) {
+        if (lot.getMinPrice() != null && lot.getOriginalMinPrice().compareTo(betEntity.getAmount()) >= 0) {
             throw new InvalidBetException(
                     String.format("Your bet must be higher than the minimal price: %f", lot.getMinPrice()));
         }

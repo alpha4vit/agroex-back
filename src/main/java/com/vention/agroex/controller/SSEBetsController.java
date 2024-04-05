@@ -6,6 +6,7 @@ import com.vention.agroex.entity.BetEntity;
 import com.vention.agroex.exception.JsonIOException;
 import com.vention.agroex.model.SSEBetsResponse;
 import com.vention.agroex.model.SSEBetsSubscription;
+import com.vention.agroex.model.SubscriptionGreeting;
 import com.vention.agroex.service.LotService;
 import com.vention.agroex.util.mapper.BetMapper;
 import lombok.RequiredArgsConstructor;
@@ -48,9 +49,14 @@ public class SSEBetsController {
                 log.info("subscription " + subId + " was closed");
             });
 
-            var bets = lot.getBets();
-            bets.forEach(bet -> sendBet(lotId, bet));
             subscriptions.put(subId, new SSEBetsSubscription(lotId, fluxSink));
+            var bets = lot.getBets();
+            if (!bets.isEmpty()) {
+                bets.forEach(bet -> sendBet(lotId, bet));
+            } else {
+                ServerSentEvent<SubscriptionGreeting> helloEvent = ServerSentEvent.builder(new SubscriptionGreeting("Connected successfully")).build();
+                fluxSink.next(helloEvent);
+            }
         });
     }
 
