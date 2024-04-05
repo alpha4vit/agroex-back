@@ -34,6 +34,7 @@ import java.util.ArrayList;
 import java.util.List;
 import java.util.Map;
 import java.util.UUID;
+import java.util.stream.Collectors;
 
 @Slf4j
 @Service
@@ -293,9 +294,6 @@ public class LotServiceImpl implements LotService {
 
     private LotEntity moderateLot(Long id, String adminComment) {
         var lot = getById(id);
-        if (!lot.getStatus().equals(StatusConstants.NEW)) {
-            throw new InvalidArgumentException("You can`t moderate this lot now!");
-        }
         if (!lot.getUser().getEnabled())
             throw new InvalidArgumentException("Lot owner is disabled!");
         if (adminComment != null) {
@@ -382,6 +380,11 @@ public class LotServiceImpl implements LotService {
                 ));
                 bets.stream().filter(betEntity -> !betEntity.getUser().getId()
                                 .equals(winnerBet.getUser().getId()))
+                        .collect(Collectors.groupingBy(BetEntity::getUser))
+                        .values()
+                        .stream()
+                        .map(List::getFirst)
+                        .toList()
                         .forEach(betEntity ->
                                 notificationService.save(new Notification(
                                         UUID.randomUUID(),
