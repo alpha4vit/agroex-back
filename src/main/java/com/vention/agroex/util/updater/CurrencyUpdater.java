@@ -1,6 +1,6 @@
 package com.vention.agroex.util.updater;
 
-import com.vention.agroex.model.CurrencyExchange;
+import com.vention.agroex.client.CurrencyClient;
 import com.vention.agroex.service.CurrencyRateService;
 import jakarta.transaction.Transactional;
 import lombok.RequiredArgsConstructor;
@@ -8,11 +8,8 @@ import lombok.extern.slf4j.Slf4j;
 import org.springframework.beans.factory.annotation.Value;
 import org.springframework.scheduling.annotation.Scheduled;
 import org.springframework.stereotype.Service;
-import org.springframework.web.client.RestTemplate;
-import org.springframework.web.util.UriComponentsBuilder;
 
 import java.math.BigDecimal;
-import java.util.Map;
 
 @Slf4j
 @Service
@@ -22,40 +19,26 @@ public class CurrencyUpdater {
     @Value(value = "${currency-api.key}")
     private String currencyKey;
 
-    @Value(value = "${currency-api.url}")
-    private String currencyUrl;
+    private final String EVERY_12_HOURS = "0 0 */12 * * *";
 
     private final CurrencyRateService currencyRateService;
-    private final RestTemplate restTemplate;
+    private final CurrencyClient currencyClient;
 
-    @Scheduled(cron = "0 0 */12 * * *")
+
+    @Scheduled(cron = EVERY_12_HOURS)
     @Transactional(rollbackOn = Exception.class)
     public void updateCurrencies() {
         log.info("Currency rates update started");
         var currencyNames = currencyRateService.getDistinctCurrencies();
         currencyNames.forEach(currencyName -> {
             var targets = currencyRateService.getTargetsByCurrency(currencyName);
-            var updatedRates = getAllCurrenciesByBase(currencyName);
+            var updatedRates = currencyClient.getAllCurrenciesByBase(currencyName, currencyKey).quotes();
             targets.forEach(targetEntity -> targetEntity.setRate(
                     new BigDecimal(updatedRates.get(
                             currencyName + targetEntity.getTargetCurrency())
                     )));
         });
         log.info("Currency rates updated");
-    }
-
-    public Map<String, String> getAllCurrenciesByBase(String base) {
-        try {
-            UriComponentsBuilder builder = UriComponentsBuilder.fromUriString(currencyUrl)
-                    .queryParam("apikey", currencyKey)
-                    .queryParam("source", base);
-
-            var response = restTemplate.getForObject(builder.toUriString(), CurrencyExchange.class);
-            return response.quotes();
-        } catch (Exception e) {
-            log.error(e.getMessage());
-        }
-        return null;
     }
 
 }

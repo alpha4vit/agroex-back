@@ -16,10 +16,11 @@ import java.util.NoSuchElementException;
 import static jakarta.persistence.FetchType.EAGER;
 
 @Data
+@Entity
 @Builder
 @NoArgsConstructor
 @AllArgsConstructor
-@Entity(name = "lot")
+@Table(name = "lot")
 public class LotEntity {
 
     @Id
