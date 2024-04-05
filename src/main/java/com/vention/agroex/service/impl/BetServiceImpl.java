@@ -45,6 +45,8 @@ public class BetServiceImpl implements BetService {
                     betEntity.getUser().getId()));
             lotService.finishAuction(lot);
         }
+        betEntity.setBetTime(Instant.now());
+        sseBetsController.sendBet(lot.getId(), betEntity, lot.getStatus());
         return betEntity;
     }
 
@@ -101,7 +103,6 @@ public class BetServiceImpl implements BetService {
         bets.addFirst(betEntity);
         lot.setBets(bets);
         lotService.update(lot.getId(), lot);
-        sseBetsController.sendBet(lot.getId(), betEntity);
     }
 
     @Override

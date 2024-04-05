@@ -52,7 +52,7 @@ public class SSEBetsController {
             subscriptions.put(subId, new SSEBetsSubscription(lotId, fluxSink));
             var bets = lot.getBets();
             if (!bets.isEmpty()) {
-                bets.forEach(bet -> sendBet(lotId, bet));
+                bets.forEach(bet -> sendBet(lotId, bet, lot.getStatus()));
             } else {
                 ServerSentEvent<SubscriptionGreeting> helloEvent = ServerSentEvent.builder(new SubscriptionGreeting("Connected successfully")).build();
                 fluxSink.next(helloEvent);
@@ -60,9 +60,8 @@ public class SSEBetsController {
         });
     }
 
-    public void sendBet(Long lotId, BetEntity betEntity) {
+    public void sendBet(Long lotId, BetEntity betEntity, String lotStatus) {
         var lot = lotService.getById(lotId);
-        var lotStatus = lot.getStatus();
         subscriptions.values().forEach((subscription -> {
             ServerSentEvent<String> event;
             try {
