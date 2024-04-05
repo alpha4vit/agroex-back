@@ -17,7 +17,7 @@ public class CountryServiceImpl implements CountryService {
 
     @Override
     public List<CountryEntity> getAll(Boolean lotExisted) {
-        return lotExisted != null && lotExisted ? countryRepository.findByLocationsIsNotEmpty() : countryRepository.findAll();
+        return lotExisted != null && lotExisted ? countryRepository.findByLotExistence() : countryRepository.findAll();
     }
 
     @Override

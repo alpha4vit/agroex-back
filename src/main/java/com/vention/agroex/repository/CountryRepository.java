@@ -15,7 +15,15 @@ import java.util.Optional;
 @Repository
 public interface CountryRepository extends JpaRepository<CountryEntity, Long> {
     Optional<CountryEntity> findByName(String name);
-    List<CountryEntity> findByLocationsIsNotEmpty();
+
+
+    @Query(value = """
+                    SELECT distinct c FROM CountryEntity c
+                    JOIN LocationEntity lc ON c.id = lc.country.id
+                    JOIN LotEntity l ON l.location.id = lc.id
+                    WHERE l.status = 'active'
+                    """)
+    List<CountryEntity> findByLotExistence();
 
     @Query(value = "select * from country_filter_by_lot_price(:startDate, :expirationDate, :lotType)", nativeQuery = true)
     List<CountryReportModel> filterByLotPrice(@Param("startDate") ZonedDateTime startDate,
