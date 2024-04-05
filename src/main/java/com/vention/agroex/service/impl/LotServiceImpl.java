@@ -81,6 +81,9 @@ public class LotServiceImpl implements LotService {
                     .setCountry(countryService.getById(lotEntity.getLocation().getCountry().getId()));
         }
 
+        if (lotEntity.getLotType().equals(LotTypeConstants.SELL) || lotEntity.getLotType().equals(LotTypeConstants.BUY))
+            lotEntity.setDuration(0L);
+
         lotEntity.setUser(userService.getAuthenticatedUser());
         lotEntity.setProductCategory(productCategoryEntity);
         lotEntity.setTags(lotEntity.getTags()
