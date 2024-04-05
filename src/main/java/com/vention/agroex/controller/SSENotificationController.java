@@ -18,10 +18,9 @@ import org.springframework.scheduling.annotation.Scheduled;
 import org.springframework.web.bind.annotation.*;
 import reactor.core.publisher.Flux;
 
-import java.util.ArrayList;
-import java.util.List;
-import java.util.Optional;
+import java.util.Map;
 import java.util.UUID;
+import java.util.concurrent.ConcurrentHashMap;
 
 @Slf4j
 @RestController
@@ -33,16 +32,14 @@ public class SSENotificationController {
     private final NotificationService notificationService;
     private final ObjectMapper objectMapper;
     private final UserService userService;
-    List<NotificationSubscriptionData> subscriptions = new ArrayList<>();
+
+    Map<UUID, NotificationSubscriptionData> subscriptions = new ConcurrentHashMap<>();
 
     @GetMapping(path = "/open-sse-stream", produces = MediaType.TEXT_EVENT_STREAM_VALUE)
     public Flux<ServerSentEvent> openSseStream() {
         var user = userService.getAuthenticatedUser();
         var userId = user.getId();
         var roles = user.getRoles();
-        Optional<NotificationSubscriptionData> existingSub = subscriptions.stream()
-                .filter(sub -> sub.userId().equals(userId))
-                .findFirst();
 
         return Flux.create(fluxSink -> {
             log.info("create subscription for " + userId);
@@ -52,7 +49,7 @@ public class SSENotificationController {
             });
             ServerSentEvent<SubscriptionGreeting> helloEvent = ServerSentEvent.builder(new SubscriptionGreeting("Connected successfully")).build();
             fluxSink.next(helloEvent);
-            subscriptions.add(new NotificationSubscriptionData(userId, fluxSink, roles));
+            subscriptions.put(userId, new NotificationSubscriptionData(userId, fluxSink, roles));
         });
     }
 
@@ -80,17 +77,17 @@ public class SSENotificationController {
                         throw new JsonIOException("Error while notification sending");
                     }
                     if (notificationEntity.getRole().equals(Role.ADMIN)) {
-                        subscriptions.forEach((subscription -> {
+                        subscriptions.forEach(((uuid, subscription) -> {
                             if (subscription.roles().contains(notificationEntity.getRole())) {
                                 subscription.fluxSink().next(event);
                             }
                         }));
                     } else {
-                        subscriptions.forEach((subscription -> {
+                        subscriptions.forEach((uuid, subscription) -> {
                             if (subscription.userId().equals(notificationEntity.getUserId())) {
                                 subscription.fluxSink().next(event);
                             }
-                        }));
+                        });
                     }
                 });
     }
