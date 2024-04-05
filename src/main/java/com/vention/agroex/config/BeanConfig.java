@@ -10,10 +10,10 @@ import com.vention.agroex.props.MinioProperties;
 import io.minio.MinioClient;
 import lombok.RequiredArgsConstructor;
 import lombok.extern.slf4j.Slf4j;
+import org.springframework.cloud.openfeign.EnableFeignClients;
 import org.springframework.context.annotation.Bean;
 import org.springframework.context.annotation.Configuration;
 import org.springframework.scheduling.annotation.EnableScheduling;
-import org.springframework.web.client.RestTemplate;
 
 import java.io.IOException;
 import java.io.InputStream;
@@ -22,6 +22,7 @@ import java.util.Map;
 @Slf4j
 @Configuration
 @EnableScheduling
+@EnableFeignClients(basePackages = "com.vention.agroex")
 @RequiredArgsConstructor
 public class BeanConfig {
 
@@ -53,8 +54,4 @@ public class BeanConfig {
         return extensions;
     }
 
-    @Bean
-    public RestTemplate restTemplate(){
-        return new RestTemplate();
-    }
 }
