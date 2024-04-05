@@ -19,7 +19,7 @@ public class NotificationEntity {
     @Id
     private UUID id;
 
-    @ManyToOne
+    @ManyToOne(cascade = CascadeType.REMOVE)
     @ToString.Exclude
     private LotEntity lot;
 

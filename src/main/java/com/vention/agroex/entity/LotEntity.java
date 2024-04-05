@@ -130,6 +130,9 @@ public class LotEntity {
     @Transient
     private BetEntity lastBet;
 
+    @OneToMany(mappedBy = "lot", cascade = CascadeType.REMOVE)
+    private List<NotificationEntity> notifications;
+
     public BigDecimal getMinPrice() {
         if (originalMinPrice == null) {
             return null;
