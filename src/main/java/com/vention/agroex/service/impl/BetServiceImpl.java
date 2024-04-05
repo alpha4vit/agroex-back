@@ -86,8 +86,8 @@ public class BetServiceImpl implements BetService {
                                 String.format("Your bet amount must be 1 conventional point higher than the last one: %.2f %s", lastBet.getAmount(), lot.getOriginalCurrency()));
                     }
                 });
-        var lastBet = bets.getFirst();
-        if (lastBet != null) {
+        if (!bets.isEmpty()) {
+            var lastBet = bets.getFirst();
             if (!lastBet.getUser().getId().equals(betEntity.getUser().getId())) {
                 notificationService.save(new Notification(
                         UUID.randomUUID(),
