@@ -22,7 +22,7 @@ Create an API for agricultural exchange, which provides functionality on buy\sel
 11. **MapStruct**
 12. **Prometheus / Grafana**
 13. **Swagger**
-14. **Docker compose**
+14. **Docker**
 
 ## Setup
 1. **Clone this repository**
